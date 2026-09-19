@@ -207,7 +207,7 @@ struct CaptureFlowView: View {
             GlassCard {
                 VStack(spacing: PrismSpacing.sm) {
                     Image(systemName: "link")
-                        .font(.title)
+                        .font(.system(size: 28))
                         .foregroundStyle(PrismColors.lavender)
                     Text(URLHelpers.domain(from: URLHelpers.normalizedURL(from: urlText)) ?? "Link attached")
                         .font(PrismTypography.headline())

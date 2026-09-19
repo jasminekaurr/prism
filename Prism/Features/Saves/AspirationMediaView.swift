@@ -28,7 +28,7 @@ struct AspirationMediaView: View {
             } else {
                 VStack(spacing: PrismSpacing.xs) {
                     Image(systemName: item.sourceURL == nil ? "photo" : "link")
-                        .font(.title)
+                        .font(.system(size: 28))
                         .foregroundStyle(PrismColors.textTertiary)
                     if let domain = item.sourceDomain {
                         Text(domain)

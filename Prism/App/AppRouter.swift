@@ -31,6 +31,7 @@ struct RootView: View {
             sheetContent(sheet)
         }
         .tint(PrismColors.lavender)
+        .font(PrismTypography.body())
     }
 
     @ViewBuilder

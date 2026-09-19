@@ -35,7 +35,7 @@ struct HomeView: View {
                     router.sheet = .capture
                 } label: {
                     Image(systemName: "plus")
-                        .font(.title2.weight(.semibold))
+                        .font(PrismTypography.title(22))
                         .foregroundStyle(.white)
                         .frame(width: 56, height: 56)
                         .background(Circle().fill(Color.black.opacity(0.85)).shadow(color: PrismColors.violet.opacity(0.5), radius: 12))
@@ -265,7 +265,7 @@ struct SavedItemCard: View {
                 AspirationMediaView(item: item, height: 140)
                 if item.sourceDomain != nil {
                     Image(systemName: "link")
-                        .font(.caption2)
+                        .font(PrismTypography.micro())
                         .padding(6)
                         .background(Circle().fill(Color.black.opacity(0.5)))
                         .padding(8)

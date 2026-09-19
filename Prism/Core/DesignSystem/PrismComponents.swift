@@ -2,28 +2,22 @@
 
 import SwiftUI
 
+/// App-wide background: the Prism light-refraction art with a uniform blur.
 struct PrismAtmosphericBackground: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var phase: CGFloat = 0
-
     var body: some View {
-        ZStack {
-            PrismColors.backgroundDeep
-            PrismGradients.atmospheric
-            PrismGradients.prismShimmer
-                .opacity(0.55)
-                .blur(radius: 40)
-                .offset(x: reduceMotion ? 0 : phase, y: reduceMotion ? 0 : phase * 0.4)
-            // Film grain stand-in
-            Color.black.opacity(0.15)
+        GeometryReader { geo in
+            Image("PrismBackground")
+                .resizable()
+                .scaledToFill()
+                .frame(width: geo.size.width, height: geo.size.height)
+                .clipped()
+                .blur(radius: PrismBackdrop.blurRadius, opaque: true)
+                .overlay(Color.black.opacity(PrismBackdrop.scrimOpacity))
+                .clipped()
         }
+        .background(PrismColors.backgroundDeep)
         .ignoresSafeArea()
-        .onAppear {
-            guard !reduceMotion else { return }
-            withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
-                phase = 18
-            }
-        }
+        .accessibilityHidden(true)
     }
 }
 
