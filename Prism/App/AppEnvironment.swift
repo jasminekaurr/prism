@@ -34,6 +34,23 @@ final class AppEnvironment: ObservableObject {
         }
     }
 
+    /// Reschedules (or cancels) the opt-in weekly recap. Call on launch and when the setting changes.
+    /// The count is computed when this runs, so it reflects the state at last app open.
+    func refreshWeeklyRecap() async {
+        guard let profile else { return }
+        guard profile.notificationPreferences.isWeeklyRecapOn else {
+            await container.notificationScheduler.cancelWeeklyRecap()
+            return
+        }
+        let items = (try? await container.savedItemRepository.fetchAll(userID: profile.id)) ?? []
+        let count = RecapPlanner.pausedCount(items: items)
+        guard let date = RecapPlanner.nextRecapDate() else { return }
+        await container.notificationScheduler.scheduleWeeklyRecap(
+            body: RecapPlanner.body(pausedCount: count),
+            at: date
+        )
+    }
+
     func ensureDemoProfileIfNeeded() async throws {
         if let existing = try await container.profileRepository.currentProfile() {
             profile = existing
@@ -73,6 +90,7 @@ final class AppRouter: ObservableObject {
         case goalSetup(UUID?)
         case goalDetail(UUID)
         case addProgress(UUID)
+        case goalFromCollection(UUID)
 
         var id: String {
             switch self {
@@ -87,6 +105,7 @@ final class AppRouter: ObservableObject {
             case .goalSetup(let id): return "goalSetup-\(id?.uuidString ?? "new")"
             case .goalDetail(let id): return "goalDetail-\(id)"
             case .addProgress(let id): return "progress-\(id)"
+            case .goalFromCollection(let id): return "goalFromCollection-\(id)"
             }
         }
     }

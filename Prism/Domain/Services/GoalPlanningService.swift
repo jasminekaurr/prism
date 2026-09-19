@@ -112,6 +112,60 @@ struct GoalPlanningService: Sendable {
         return updated
     }
 
+    // MARK: - Lifecycle
+
+    /// The goal Prism should reference in nudges: primary first, then the first active one.
+    func focusGoal(in goals: [PrismGoal]) -> PrismGoal? {
+        let open = goals.filter {
+            $0.trackStatus != .completed && $0.trackStatus != .abandoned && $0.trackStatus != .paused
+        }
+        return open.first { $0.priority == .primary } ?? open.first { $0.priority == .active }
+    }
+
+    /// Works for every goal type, including low/no-cost goals that have no target amount.
+    func markComplete(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
+        var updated = goal
+        updated.trackStatus = .completed
+        updated.completedAt = now
+        updated.pausedAt = nil
+        updated.updatedAt = now
+        return updated
+    }
+
+    func pause(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
+        var updated = goal
+        updated.trackStatus = .paused
+        updated.pausedAt = now
+        updated.updatedAt = now
+        return updated
+    }
+
+    func resume(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
+        var updated = goal
+        updated.pausedAt = nil
+        updated.trackStatus = .onTrack
+        updated.updatedAt = now
+        updated.trackStatus = pace(for: updated, now: now).trackStatus
+        return updated
+    }
+
+    func abandon(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
+        var updated = goal
+        updated.trackStatus = .abandoned
+        updated.pausedAt = nil
+        updated.updatedAt = now
+        return updated
+    }
+
+    func recordOutcome(_ goal: PrismGoal, rating: GoalOutcomeRating, note: String?, now: Date = .now) -> PrismGoal {
+        var updated = goal
+        updated.outcomeRating = rating
+        let trimmed = note?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        updated.outcomeNote = trimmed.isEmpty ? nil : trimmed
+        updated.updatedAt = now
+        return updated
+    }
+
     // MARK: - Private
 
     private func monthsUntil(_ date: Date?, from now: Date, calendar: Calendar) -> Int? {

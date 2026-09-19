@@ -126,6 +126,9 @@ final class SDSavedItem {
     var decidedAt: Date?
     var archivedAt: Date?
     var deletedAt: Date?
+    var regretCheckInAt: Date?
+    var regretAnswerRaw: String?
+    var regretAnsweredAt: Date?
 
     init(from item: SavedItem) {
         self.id = item.id
@@ -153,6 +156,9 @@ final class SDSavedItem {
         self.decidedAt = item.decidedAt
         self.archivedAt = item.archivedAt
         self.deletedAt = item.deletedAt
+        self.regretCheckInAt = item.regretCheckInAt
+        self.regretAnswerRaw = item.regretAnswer?.rawValue
+        self.regretAnsweredAt = item.regretAnsweredAt
     }
 
     func toDomain() -> SavedItem {
@@ -181,7 +187,10 @@ final class SDSavedItem {
             reviewAt: reviewAt,
             decidedAt: decidedAt,
             archivedAt: archivedAt,
-            deletedAt: deletedAt
+            deletedAt: deletedAt,
+            regretCheckInAt: regretCheckInAt,
+            regretAnswer: regretAnswerRaw.flatMap(RegretAnswer.init(rawValue:)),
+            regretAnsweredAt: regretAnsweredAt
         )
     }
 
@@ -208,6 +217,9 @@ final class SDSavedItem {
         decidedAt = item.decidedAt
         archivedAt = item.archivedAt
         deletedAt = item.deletedAt
+        regretCheckInAt = item.regretCheckInAt
+        regretAnswerRaw = item.regretAnswer?.rawValue
+        regretAnsweredAt = item.regretAnsweredAt
     }
 }
 
@@ -418,6 +430,8 @@ final class SDGoal {
     var updatedAt: Date
     var completedAt: Date?
     var pausedAt: Date?
+    var outcomeRatingRaw: String?
+    var outcomeNote: String?
 
     init(from goal: PrismGoal) {
         self.id = goal.id
@@ -440,6 +454,8 @@ final class SDGoal {
         self.updatedAt = goal.updatedAt
         self.completedAt = goal.completedAt
         self.pausedAt = goal.pausedAt
+        self.outcomeRatingRaw = goal.outcomeRating?.rawValue
+        self.outcomeNote = goal.outcomeNote
     }
 
     func toDomain() -> PrismGoal {
@@ -463,7 +479,9 @@ final class SDGoal {
             createdAt: createdAt,
             updatedAt: updatedAt,
             completedAt: completedAt,
-            pausedAt: pausedAt
+            pausedAt: pausedAt,
+            outcomeRating: outcomeRatingRaw.flatMap(GoalOutcomeRating.init(rawValue:)),
+            outcomeNote: outcomeNote
         )
     }
 
@@ -485,6 +503,8 @@ final class SDGoal {
         updatedAt = goal.updatedAt
         completedAt = goal.completedAt
         pausedAt = goal.pausedAt
+        outcomeRatingRaw = goal.outcomeRating?.rawValue
+        outcomeNote = goal.outcomeNote
     }
 }
 

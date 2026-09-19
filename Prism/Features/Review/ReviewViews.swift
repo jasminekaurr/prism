@@ -11,6 +11,7 @@ struct ReviewHubView: View {
     @State private var considering: [SavedItem] = []
     @State private var letGo: [SavedItem] = []
     @State private var purchased: [SavedItem] = []
+    @State private var regretDue: [SavedItem] = []
     @State private var showDeck = false
     @State private var undoBanner: String?
 
@@ -43,12 +44,16 @@ struct ReviewHubView: View {
                             }
                         }
 
-                        if ready.isEmpty && considering.isEmpty {
+                        if ready.isEmpty && considering.isEmpty && regretDue.isEmpty {
                             EmptyStateView(
                                 title: "Nothing to revisit yet",
                                 message: "When a cooling-off period ends, items will appear here. You can also open anything you’re still considering."
                             )
                             .accessibilityIdentifier("review.empty")
+                        }
+
+                        if !regretDue.isEmpty {
+                            regretSection
                         }
 
                         if !ready.isEmpty {
@@ -107,9 +112,46 @@ struct ReviewHubView: View {
         }
     }
 
+    private var regretSection: some View {
+        VStack(alignment: .leading, spacing: PrismSpacing.sm) {
+            Text("Check-in").font(PrismTypography.headline())
+            ForEach(regretDue) { item in
+                GlassCard {
+                    VStack(alignment: .leading, spacing: PrismSpacing.sm) {
+                        Text("Still glad you bought \u{201C}\(item.title)\u{201D}?")
+                            .font(PrismTypography.body())
+                        HStack {
+                            ForEach(RegretAnswer.allCases) { answer in
+                                Button(answer.displayName) {
+                                    Task { await answerRegret(item, answer) }
+                                }
+                                .buttonStyle(.bordered)
+                                .accessibilityIdentifier("regret.\(answer.rawValue)")
+                            }
+                        }
+                    }
+                }
+            }
+            Text("Only you see this. It helps your Money Story show what was worth it.")
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.textTertiary)
+        }
+        .accessibilityIdentifier("review.regretSection")
+    }
+
+    private func answerRegret(_ item: SavedItem, _ answer: RegretAnswer) async {
+        let updated = RegretCheckIn.answer(answer, for: item)
+        try? await container.savedItemRepository.upsert(updated)
+        await container.notificationScheduler.cancelRegretCheckIn(itemID: item.id)
+        container.analytics.track(.regretCheckInAnswered)
+        PrismHaptics.soft()
+        await reload()
+    }
+
     private func reload() async {
         guard let userID = environment.profile?.id else { return }
         let all = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
+        regretDue = RegretCheckIn.due(items: all)
         let due = (try? await container.savedItemRepository.fetchReadyForReview(userID: userID, asOf: .now)) ?? []
         ready = due
         let dueIDs = Set(due.map(\.id))
@@ -131,6 +173,7 @@ struct ReviewHubView: View {
         try? await container.savedItemRepository.upsert(result.item)
         try? await container.decisionRepository.append(result.event)
         await container.notificationScheduler.cancelReviewReminder(itemID: item.id)
+        await container.notificationScheduler.cancelRegretCheckIn(itemID: item.id)
         undoBanner = nil
         environment.lastUndo = nil
         await reload()
@@ -148,6 +191,7 @@ struct ReviewDeckView: View {
 
     @State private var index = 0
     @State private var offset: CGSize = .zero
+    @State private var redirectPrompt: RedirectPrompt?
 
     var body: some View {
         NavigationStack {
@@ -224,6 +268,9 @@ struct ReviewDeckView: View {
                     Button("Close") { dismiss() }
                 }
             }
+            .sheet(item: $redirectPrompt) { prompt in
+                RedirectNudgeView(goal: prompt.goal, itemTitle: prompt.itemTitle)
+            }
             .onChange(of: router.sheet) { _, new in
                 // After buy/keep sheets dismiss, advance
                 if new == nil {
@@ -249,6 +296,10 @@ struct ReviewDeckView: View {
         withAnimation(.easeOut(duration: PrismMotion.archival)) {
             offset = .zero
             index += 1
+        }
+        let goals = (try? await container.goalRepository.fetchAll(userID: userID)) ?? []
+        if let focus = container.goalPlanningService.focusGoal(in: goals) {
+            redirectPrompt = RedirectPrompt(goal: focus, itemTitle: item.title)
         }
     }
 
@@ -364,6 +415,9 @@ struct BuyConfirmationView: View {
         await container.notificationScheduler.cancelReviewReminder(itemID: item.id)
         if didPurchase {
             container.analytics.track(.itemPurchasedConfirmed)
+            if let due = result.item.regretCheckInAt, profile.notificationPreferences.isRegretCheckInOn {
+                await container.notificationScheduler.scheduleRegretCheckIn(itemID: item.id, at: due)
+            }
         }
         container.analytics.track(.reviewCompleted)
         PrismHaptics.decision()
@@ -425,5 +479,104 @@ struct KeepConsideringView: View {
         }
         PrismHaptics.soft()
         dismiss()
+    }
+}
+
+struct RedirectPrompt: Identifiable {
+    let id = UUID()
+    let goal: PrismGoal
+    let itemTitle: String
+}
+
+/// Shown after letting go of a save while a goal is active. Nothing is added automatically:
+/// an estimate is never treated as money saved.
+struct RedirectNudgeView: View {
+    let goal: PrismGoal
+    let itemTitle: String
+    @EnvironmentObject private var environment: AppEnvironment
+    @EnvironmentObject private var container: DependencyContainer
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var amountText = ""
+    @State private var errorText: String?
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                PrismAtmosphericBackground()
+                VStack(alignment: .leading, spacing: PrismSpacing.md) {
+                    Text("Letting go takes intention")
+                        .font(PrismTypography.title(22))
+                        .accessibilityIdentifier("redirect.title")
+                    Text("You let go of \u{201C}\(itemTitle)\u{201D}. Want to note that as progress on \u{201C}\(goal.title)\u{201D}?")
+                        .font(PrismTypography.body())
+                        .foregroundStyle(PrismColors.textSecondary)
+
+                    SectionMicroLabel(text: "Money you actually moved to this goal (optional)")
+                    TextField("Leave blank to just note it", text: $amountText)
+                        .keyboardType(.decimalPad)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: PrismRadius.md).stroke(PrismColors.glassStroke))
+                        .accessibilityIdentifier("redirect.amount")
+                    Text("Prism never counts an estimate as savings. Only enter an amount you really set aside.")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textTertiary)
+
+                    if let errorText {
+                        Text(errorText).foregroundStyle(PrismColors.danger)
+                    }
+
+                    PrismPrimaryButton(title: "Note it as progress") {
+                        Task { await accept() }
+                    }
+                    .accessibilityIdentifier("redirect.accept")
+
+                    Button("Not now") { dismiss() }
+                        .foregroundStyle(PrismColors.textSecondary)
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("redirect.dismiss")
+                    Spacer()
+                }
+                .padding()
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            }
+        }
+    }
+
+    private func accept() async {
+        guard let profile = environment.profile else { return }
+        let amount = DecimalParsing.parse(amountText)
+        if !amountText.trimmingCharacters(in: .whitespaces).isEmpty && amount == nil {
+            errorText = "Enter a number, or leave it blank."
+            return
+        }
+        do {
+            try await container.goalRepository.appendContribution(
+                GoalContribution(
+                    id: UUID(), userID: profile.id, goalID: goal.id, kind: .behavioral,
+                    amount: nil, currencyCode: nil,
+                    note: "Let go of a lower-priority save", createdAt: .now
+                )
+            )
+            if let amount, amount > 0 {
+                try await container.goalRepository.appendContribution(
+                    GoalContribution(
+                        id: UUID(), userID: profile.id, goalID: goal.id, kind: .financial,
+                        amount: amount, currencyCode: goal.currencyCode,
+                        note: "Redirected after letting go", createdAt: .now
+                    )
+                )
+                var updated = container.goalPlanningService.applyFinancialContribution(to: goal, amount: amount)
+                updated.trackStatus = container.goalPlanningService.pace(for: updated).trackStatus
+                try await container.goalRepository.upsert(updated)
+            }
+            container.analytics.track(.redirectNudgeAccepted)
+            PrismHaptics.save()
+            dismiss()
+        } catch {
+            errorText = "Couldn\u{2019}t save that. Try again."
+        }
     }
 }

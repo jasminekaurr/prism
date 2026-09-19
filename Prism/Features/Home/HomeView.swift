@@ -123,6 +123,24 @@ struct HomeView: View {
                     .padding(.horizontal, PrismSpacing.md)
                 }
             }
+
+            if !pausedOrFinishedGoals.isEmpty {
+                Text("Paused & finished")
+                    .font(PrismTypography.headline())
+                    .foregroundStyle(PrismColors.textSecondary)
+                    .padding(.horizontal, PrismSpacing.md)
+                    .padding(.top, PrismSpacing.xs)
+                ForEach(pausedOrFinishedGoals) { goal in
+                    Button {
+                        router.sheet = .goalDetail(goal.id)
+                    } label: {
+                        GoalCardView(goal: goal, pace: container.goalPlanningService.pace(for: goal), isPrimary: false)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, PrismSpacing.md)
+                    .accessibilityIdentifier("home.finishedGoal.\(goal.id.uuidString)")
+                }
+            }
         }
     }
 
@@ -179,6 +197,10 @@ struct HomeView: View {
                 && $0.trackStatus != .abandoned
                 && $0.trackStatus != .paused
         }
+    }
+
+    private var pausedOrFinishedGoals: [PrismGoal] {
+        goals.filter { $0.trackStatus == .paused || $0.trackStatus == .completed }
     }
 
     private var filteredItems: [SavedItem] {

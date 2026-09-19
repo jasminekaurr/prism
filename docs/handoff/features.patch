@@ -1,0 +1,1748 @@
+diff --git a/PRIVACY.md b/PRIVACY.md
+index 3916d56..ab9af96 100644
+--- a/PRIVACY.md
++++ b/PRIVACY.md
+@@ -14,7 +14,9 @@ Prism does **not** collect contacts, location, banking data, or browsing history
+ 
+ ## Analytics (optional)
+ 
+-Events only: `onboarding_completed`, `item_saved`, `review_completed`, `item_purchased_confirmed`, `item_let_go`, `notification_enabled`.
++Events only: `onboarding_completed`, `item_saved`, `review_completed`, `item_purchased_confirmed`, `item_let_go`, `notification_enabled`, `goal_created`, `goal_contribution_added`, `goal_completed`, `goal_outcome_recorded`, `regret_check_in_answered`, `weekly_recap_enabled`, `redirect_nudge_accepted`, `goal_from_collection_created`.
++
++Notifications (weekly recap, purchase check-in, cooling-off) never include item titles, goal titles, or prices. The weekly recap shows only a count. Shared Money Story images contain counts and a goal percentage only.
+ 
+ Never: item title, reflection, URL, price, per-item feelings, media, merchant, PII.
+ 
+diff --git a/Prism/App/AppEnvironment.swift b/Prism/App/AppEnvironment.swift
+index 9f01521..6ef24f6 100644
+--- a/Prism/App/AppEnvironment.swift
++++ b/Prism/App/AppEnvironment.swift
+@@ -34,6 +34,23 @@ final class AppEnvironment: ObservableObject {
+         }
+     }
+ 
++    /// Reschedules (or cancels) the opt-in weekly recap. Call on launch and when the setting changes.
++    /// The count is computed when this runs, so it reflects the state at last app open.
++    func refreshWeeklyRecap() async {
++        guard let profile else { return }
++        guard profile.notificationPreferences.isWeeklyRecapOn else {
++            await container.notificationScheduler.cancelWeeklyRecap()
++            return
++        }
++        let items = (try? await container.savedItemRepository.fetchAll(userID: profile.id)) ?? []
++        let count = RecapPlanner.pausedCount(items: items)
++        guard let date = RecapPlanner.nextRecapDate() else { return }
++        await container.notificationScheduler.scheduleWeeklyRecap(
++            body: RecapPlanner.body(pausedCount: count),
++            at: date
++        )
++    }
++
+     func ensureDemoProfileIfNeeded() async throws {
+         if let existing = try await container.profileRepository.currentProfile() {
+             profile = existing
+@@ -73,6 +90,7 @@ final class AppRouter: ObservableObject {
+         case goalSetup(UUID?)
+         case goalDetail(UUID)
+         case addProgress(UUID)
++        case goalFromCollection(UUID)
+ 
+         var id: String {
+             switch self {
+@@ -87,6 +105,7 @@ final class AppRouter: ObservableObject {
+             case .goalSetup(let id): return "goalSetup-\(id?.uuidString ?? "new")"
+             case .goalDetail(let id): return "goalDetail-\(id)"
+             case .addProgress(let id): return "progress-\(id)"
++            case .goalFromCollection(let id): return "goalFromCollection-\(id)"
+             }
+         }
+     }
+diff --git a/Prism/App/AppRouter.swift b/Prism/App/AppRouter.swift
+index a8a75ae..af75757 100644
+--- a/Prism/App/AppRouter.swift
++++ b/Prism/App/AppRouter.swift
+@@ -26,6 +26,7 @@ struct RootView: View {
+                 router.showOnboarding = true
+             }
+             await container.notificationScheduler.reconcilePending()
++            await environment.refreshWeeklyRecap()
+         }
+         .sheet(item: $router.sheet) { sheet in
+             sheetContent(sheet)
+@@ -64,10 +65,45 @@ struct RootView: View {
+             GoalDetailView(goalID: id)
+         case .addProgress(let id):
+             AddProgressView(goalID: id)
++        case .goalFromCollection(let id):
++            GoalFromCollectionLoader(collectionID: id)
+         }
+     }
+ }
+ 
++/// Loads a collection and its open aspirations before presenting goal setup.
++struct GoalFromCollectionLoader: View {
++    let collectionID: UUID
++    @EnvironmentObject private var environment: AppEnvironment
++    @EnvironmentObject private var container: DependencyContainer
++    @State private var collection: PrismCollection?
++    @State private var items: [SavedItem] = []
++    @State private var loaded = false
++
++    var body: some View {
++        Group {
++            if !loaded {
++                ProgressView()
++                    .task { await load() }
++            } else {
++                GoalSetupFlowView(sourceItem: nil, sourceCollection: collection, collectionItems: items)
++            }
++        }
++    }
++
++    private func load() async {
++        collection = try? await container.collectionRepository.fetch(id: collectionID)
++        if let userID = environment.profile?.id {
++            let all = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
++            items = all.filter {
++                $0.collectionID == collectionID
++                    && ($0.status == .considering || $0.status == .readyForReview)
++            }
++        }
++        loaded = true
++    }
++}
++
+ /// Loads optional source aspiration before presenting goal setup.
+ struct GoalSetupSheetLoader: View {
+     let itemID: UUID?
+diff --git a/Prism/Core/Analytics/Analytics.swift b/Prism/Core/Analytics/Analytics.swift
+index fdfb2be..d60b3f8 100644
+--- a/Prism/Core/Analytics/Analytics.swift
++++ b/Prism/Core/Analytics/Analytics.swift
+@@ -15,6 +15,12 @@ enum AnalyticsEvent: String, Sendable {
+     case notificationEnabled = "notification_enabled"
+     case goalCreated = "goal_created"
+     case goalContributionAdded = "goal_contribution_added"
++    case goalCompleted = "goal_completed"
++    case goalOutcomeRecorded = "goal_outcome_recorded"
++    case regretCheckInAnswered = "regret_check_in_answered"
++    case weeklyRecapEnabled = "weekly_recap_enabled"
++    case redirectNudgeAccepted = "redirect_nudge_accepted"
++    case goalFromCollectionCreated = "goal_from_collection_created"
+ }
+ 
+ /// Never attaches titles, reflections, prices, URLs, or media.
+diff --git a/Prism/Domain/Models/DomainModels.swift b/Prism/Domain/Models/DomainModels.swift
+index 2d78857..a0f1ee0 100644
+--- a/Prism/Domain/Models/DomainModels.swift
++++ b/Prism/Domain/Models/DomainModels.swift
+@@ -16,6 +16,12 @@ struct UserProfile: Identifiable, Codable, Equatable, Sendable {
+ struct NotificationPreferences: Codable, Equatable, Sendable {
+     var coolingOffRemindersEnabled: Bool
+     var permissionAsked: Bool
++    /// Optional so profiles saved before these existed still decode.
++    var weeklyRecapEnabled: Bool? = nil
++    var regretCheckInsEnabled: Bool? = nil
++
++    var isWeeklyRecapOn: Bool { weeklyRecapEnabled ?? false }
++    var isRegretCheckInOn: Bool { regretCheckInsEnabled ?? false }
+ 
+     static let `default` = NotificationPreferences(
+         coolingOffRemindersEnabled: false,
+@@ -103,6 +109,9 @@ struct SavedItem: Identifiable, Codable, Equatable, Sendable {
+     var decidedAt: Date?
+     var archivedAt: Date?
+     var deletedAt: Date?
++    var regretCheckInAt: Date? = nil
++    var regretAnswer: RegretAnswer? = nil
++    var regretAnsweredAt: Date? = nil
+ }
+ 
+ struct MediaAsset: Identifiable, Codable, Equatable, Sendable {
+diff --git a/Prism/Domain/Models/Enums.swift b/Prism/Domain/Models/Enums.swift
+index b02cce2..d9d6d89 100644
+--- a/Prism/Domain/Models/Enums.swift
++++ b/Prism/Domain/Models/Enums.swift
+@@ -245,3 +245,39 @@ enum AspirationLinkRole: String, Codable, CaseIterable, Identifiable, Sendable {
+         }
+     }
+ }
++
++// MARK: - Reflection outcomes
++
++/// How a user felt about a finished goal. Stored on the goal, never shared.
++enum GoalOutcomeRating: String, Codable, CaseIterable, Identifiable, Sendable {
++    case worthIt
++    case mixed
++    case notReally
++
++    var id: String { rawValue }
++
++    var displayName: String {
++        switch self {
++        case .worthIt: return "Worth it"
++        case .mixed: return "Mixed"
++        case .notReally: return "Not really"
++        }
++    }
++}
++
++/// Answer to the post-purchase "still glad you bought it?" check-in.
++enum RegretAnswer: String, Codable, CaseIterable, Identifiable, Sendable {
++    case glad
++    case neutral
++    case regret
++
++    var id: String { rawValue }
++
++    var displayName: String {
++        switch self {
++        case .glad: return "Glad"
++        case .neutral: return "Neutral"
++        case .regret: return "Regret"
++        }
++    }
++}
+diff --git a/Prism/Domain/Models/GoalModels.swift b/Prism/Domain/Models/GoalModels.swift
+index ce0f69d..a1d1839 100644
+--- a/Prism/Domain/Models/GoalModels.swift
++++ b/Prism/Domain/Models/GoalModels.swift
+@@ -23,6 +23,8 @@ struct PrismGoal: Identifiable, Codable, Equatable, Sendable {
+     var updatedAt: Date
+     var completedAt: Date?
+     var pausedAt: Date?
++    var outcomeRating: GoalOutcomeRating? = nil
++    var outcomeNote: String? = nil
+ }
+ 
+ struct GoalMilestone: Identifiable, Codable, Equatable, Sendable {
+diff --git a/Prism/Domain/Services/DecisionService.swift b/Prism/Domain/Services/DecisionService.swift
+index 572e620..e393a1f 100644
+--- a/Prism/Domain/Services/DecisionService.swift
++++ b/Prism/Domain/Services/DecisionService.swift
+@@ -19,7 +19,8 @@ struct DecisionService: Sendable {
+         purchaseConfirmed: Bool,
+         confirmedPrice: Decimal?,
+         currencyCode: String?,
+-        now: Date = .now
++        now: Date = .now,
++        checkInInterval: TimeInterval = RegretCheckIn.interval
+     ) throws -> DecisionTransitionResult {
+         guard item.status == .considering || item.status == .readyForReview || item.status == .letGo else {
+             throw DecisionServiceError.invalidTransition
+@@ -32,6 +33,9 @@ struct DecisionService: Sendable {
+             updated.confirmedPurchaseCurrencyCode = currencyCode
+             updated.decidedAt = now
+             updated.archivedAt = nil
++            updated.regretCheckInAt = now.addingTimeInterval(checkInInterval)
++            updated.regretAnswer = nil
++            updated.regretAnsweredAt = nil
+         } else {
+             // User chose Buy but said purchase did not happen — keep considering with a note via event.
+             updated.status = .considering
+@@ -136,6 +140,9 @@ struct DecisionService: Sendable {
+             if lastEvent.decision == .buy {
+                 updated.confirmedPurchasePrice = nil
+                 updated.confirmedPurchaseCurrencyCode = nil
++                updated.regretCheckInAt = nil
++                updated.regretAnswer = nil
++                updated.regretAnsweredAt = nil
+             }
+         }
+         let undoID = UUID()
+@@ -156,3 +163,35 @@ struct DecisionService: Sendable {
+         return DecisionTransitionResult(item: updated, event: event)
+     }
+ }
++
++/// Post-purchase "still glad you bought it?" check-in rules.
++enum RegretCheckIn {
++    static let defaultInterval: TimeInterval = 30 * 24 * 60 * 60
++    static let demoInterval: TimeInterval = 60
++    static let demoDefaultsKey = "prism.debug.shortRegret"
++
++    /// 30 days, or 1 minute when the DEBUG demo switch in Settings is on.
++    static var interval: TimeInterval {
++        UserDefaults.standard.bool(forKey: demoDefaultsKey) ? demoInterval : defaultInterval
++    }
++
++    /// Purchased items whose check-in date has passed and that have no answer yet.
++    static func due(items: [SavedItem], now: Date = .now) -> [SavedItem] {
++        items.filter { item in
++            guard item.deletedAt == nil,
++                  item.status == .purchased,
++                  item.regretAnswer == nil,
++                  let due = item.regretCheckInAt else { return false }
++            return due <= now
++        }
++        .sorted { ($0.regretCheckInAt ?? .distantPast) < ($1.regretCheckInAt ?? .distantPast) }
++    }
++
++    static func answer(_ answer: RegretAnswer, for item: SavedItem, now: Date = .now) -> SavedItem {
++        var updated = item
++        updated.regretAnswer = answer
++        updated.regretAnsweredAt = now
++        updated.updatedAt = now
++        return updated
++    }
++}
+diff --git a/Prism/Domain/Services/GoalPlanningService.swift b/Prism/Domain/Services/GoalPlanningService.swift
+index 3607399..5acdf29 100644
+--- a/Prism/Domain/Services/GoalPlanningService.swift
++++ b/Prism/Domain/Services/GoalPlanningService.swift
+@@ -112,6 +112,60 @@ struct GoalPlanningService: Sendable {
+         return updated
+     }
+ 
++    // MARK: - Lifecycle
++
++    /// The goal Prism should reference in nudges: primary first, then the first active one.
++    func focusGoal(in goals: [PrismGoal]) -> PrismGoal? {
++        let open = goals.filter {
++            $0.trackStatus != .completed && $0.trackStatus != .abandoned && $0.trackStatus != .paused
++        }
++        return open.first { $0.priority == .primary } ?? open.first { $0.priority == .active }
++    }
++
++    /// Works for every goal type, including low/no-cost goals that have no target amount.
++    func markComplete(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
++        var updated = goal
++        updated.trackStatus = .completed
++        updated.completedAt = now
++        updated.pausedAt = nil
++        updated.updatedAt = now
++        return updated
++    }
++
++    func pause(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
++        var updated = goal
++        updated.trackStatus = .paused
++        updated.pausedAt = now
++        updated.updatedAt = now
++        return updated
++    }
++
++    func resume(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
++        var updated = goal
++        updated.pausedAt = nil
++        updated.trackStatus = .onTrack
++        updated.updatedAt = now
++        updated.trackStatus = pace(for: updated, now: now).trackStatus
++        return updated
++    }
++
++    func abandon(_ goal: PrismGoal, now: Date = .now) -> PrismGoal {
++        var updated = goal
++        updated.trackStatus = .abandoned
++        updated.pausedAt = nil
++        updated.updatedAt = now
++        return updated
++    }
++
++    func recordOutcome(_ goal: PrismGoal, rating: GoalOutcomeRating, note: String?, now: Date = .now) -> PrismGoal {
++        var updated = goal
++        updated.outcomeRating = rating
++        let trimmed = note?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
++        updated.outcomeNote = trimmed.isEmpty ? nil : trimmed
++        updated.updatedAt = now
++        return updated
++    }
++
+     // MARK: - Private
+ 
+     private func monthsUntil(_ date: Date?, from now: Date, calendar: Calendar) -> Int? {
+diff --git a/Prism/Domain/Services/MoneyStoryService.swift b/Prism/Domain/Services/MoneyStoryService.swift
+index 8ec6661..798ee1c 100644
+--- a/Prism/Domain/Services/MoneyStoryService.swift
++++ b/Prism/Domain/Services/MoneyStoryService.swift
+@@ -25,6 +25,11 @@ struct MoneyStorySnapshot: Equatable, Sendable {
+     var estimatedLetGoSampleSize: Int
+     var commonFeelings: [FeelingCount]
+     var commonIntents: [IntentCount]
++    var regretGlad: Int = 0
++    var regretNeutral: Int = 0
++    var regretRegret: Int = 0
++
++    var regretAnswered: Int { regretGlad + regretNeutral + regretRegret }
+ 
+     static let empty = MoneyStorySnapshot(
+         purchasesConfirmed: 0,
+@@ -142,7 +147,10 @@ struct MoneyStoryService: Sendable {
+             estimatedValueOfItemsLetGo: estimatedLetGoPrices.isEmpty ? nil : estimatedLetGoPrices.reduce(0, +),
+             estimatedLetGoSampleSize: estimatedLetGoPrices.count,
+             commonFeelings: Array(topFeelings),
+-            commonIntents: topIntents
++            commonIntents: topIntents,
++            regretGlad: purchased.filter { $0.regretAnswer == .glad }.count,
++            regretNeutral: purchased.filter { $0.regretAnswer == .neutral }.count,
++            regretRegret: purchased.filter { $0.regretAnswer == .regret }.count
+         )
+     }
+ 
+@@ -202,3 +210,29 @@ struct SpendingPocketService: Sendable {
+         }
+     }
+ }
++
++/// Weekly recap planning — counts only, never item names or prices.
++enum RecapPlanner {
++    /// Items saved in the last 7 days (each save is a paused impulse).
++    static func pausedCount(items: [SavedItem], now: Date = .now, calendar: Calendar = .current) -> Int {
++        guard let start = calendar.date(byAdding: .day, value: -7, to: now) else { return 0 }
++        return items.filter { $0.deletedAt == nil && $0.createdAt >= start }.count
++    }
++
++    /// Next Sunday at 18:00 local time, strictly after `now`.
++    static func nextRecapDate(after now: Date = .now, calendar: Calendar = .current) -> Date? {
++        var components = DateComponents()
++        components.weekday = 1
++        components.hour = 18
++        components.minute = 0
++        return calendar.nextDate(after: now, matching: components, matchingPolicy: .nextTime)
++    }
++
++    static func body(pausedCount: Int) -> String {
++        switch pausedCount {
++        case 0: return "A quiet week. Open Prism when you want to reflect."
++        case 1: return "You paused 1 impulse this week. Open Prism to see your story."
++        default: return "You paused \(pausedCount) impulses this week. Open Prism to see your story."
++        }
++    }
++}
+diff --git a/Prism/Features/Collections/CollectionsView.swift b/Prism/Features/Collections/CollectionsView.swift
+index 95e0f59..df74a89 100644
+--- a/Prism/Features/Collections/CollectionsView.swift
++++ b/Prism/Features/Collections/CollectionsView.swift
+@@ -45,6 +45,14 @@ struct CollectionsView: View {
+                                                 }
+                                             }
+                                             Spacer()
++                                            if itemCounts[collection.id, default: 0] > 0 {
++                                                Button("Make a goal") {
++                                                    router.sheet = .goalFromCollection(collection.id)
++                                                }
++                                                .font(PrismTypography.caption())
++                                                .buttonStyle(.bordered)
++                                                .accessibilityIdentifier("collections.makeGoal.\(collection.id.uuidString)")
++                                            }
+                                         }
+                                     }
+                                     .accessibilityIdentifier("collections.item.\(collection.id.uuidString)")
+diff --git a/Prism/Features/Goals/AddProgressView.swift b/Prism/Features/Goals/AddProgressView.swift
+index 4faae01..d8416b9 100644
+--- a/Prism/Features/Goals/AddProgressView.swift
++++ b/Prism/Features/Goals/AddProgressView.swift
+@@ -109,6 +109,9 @@ struct AddProgressView: View {
+                 let pace = container.goalPlanningService.pace(for: goal)
+                 goal.trackStatus = pace.trackStatus
+                 try await container.goalRepository.upsert(goal)
++                if goal.trackStatus == .completed {
++                    container.analytics.track(.goalCompleted)
++                }
+             }
+             container.analytics.track(.goalContributionAdded)
+             PrismHaptics.save()
+diff --git a/Prism/Features/Goals/GoalDetailView.swift b/Prism/Features/Goals/GoalDetailView.swift
+index 59e5baa..9a6a0d1 100644
+--- a/Prism/Features/Goals/GoalDetailView.swift
++++ b/Prism/Features/Goals/GoalDetailView.swift
+@@ -12,6 +12,10 @@ struct GoalDetailView: View {
+     @State private var pace: GoalPaceSnapshot?
+     @State private var milestones: [GoalMilestone] = []
+     @State private var contributions: [GoalContribution] = []
++    @State private var components: [GoalComponent] = []
++    @State private var showCompletion = false
++    @State private var completionPrompted = false
++    @State private var confirmAbandon = false
+ 
+     var body: some View {
+         NavigationStack {
+@@ -28,6 +32,20 @@ struct GoalDetailView: View {
+ 
+                             progressBlock(goal: goal, pace: pace)
+ 
++                            if let rating = goal.outcomeRating {
++                                GlassCard {
++                                    SectionMicroLabel(text: "How it turned out")
++                                    Text(rating.displayName)
++                                        .font(PrismTypography.headline())
++                                    if let note = goal.outcomeNote {
++                                        Text(note)
++                                            .font(PrismTypography.body())
++                                            .foregroundStyle(PrismColors.textSecondary)
++                                    }
++                                }
++                                .accessibilityIdentifier("goalDetail.outcome")
++                            }
++
+                             if let motivation = goal.motivation {
+                                 GlassCard {
+                                     SectionMicroLabel(text: "Why it matters")
+@@ -48,6 +66,24 @@ struct GoalDetailView: View {
+                                 }
+                             }
+ 
++                            if !components.isEmpty {
++                                Text("Plan components").font(PrismTypography.headline())
++                                ForEach(components) { c in
++                                    HStack {
++                                        Text(c.name)
++                                        Spacer()
++                                        if let cost = c.estimatedCost {
++                                            Text("Est. \(CurrencyFormatting.string(from: cost, currencyCode: c.currencyCode ?? goal.currencyCode))")
++                                                .foregroundStyle(PrismColors.textSecondary)
++                                        }
++                                    }
++                                    .font(PrismTypography.caption())
++                                }
++                                Text("Component costs are your own estimates, not confirmed prices.")
++                                    .font(PrismTypography.caption())
++                                    .foregroundStyle(PrismColors.textTertiary)
++                            }
++
+                             if !contributions.isEmpty {
+                                 Text("Recent progress").font(PrismTypography.headline())
+                                 ForEach(contributions.prefix(5)) { c in
+@@ -57,10 +93,14 @@ struct GoalDetailView: View {
+                                 }
+                             }
+ 
+-                            PrismPrimaryButton(title: "Add progress") {
+-                                router.sheet = .addProgress(goal.id)
++                            if goal.trackStatus != .completed && goal.trackStatus != .abandoned {
++                                PrismPrimaryButton(title: "Add progress") {
++                                    router.sheet = .addProgress(goal.id)
++                                }
++                                .accessibilityIdentifier("goalDetail.addProgress")
+                             }
+-                            .accessibilityIdentifier("goalDetail.addProgress")
++
++                            lifecycleActions(goal: goal)
+                         }
+                         .padding()
+                     }
+@@ -78,6 +118,70 @@ struct GoalDetailView: View {
+         .onChange(of: router.sheet) { _, new in
+             if new == nil { Task { await load() } }
+         }
++        .sheet(isPresented: $showCompletion, onDismiss: { Task { await load() } }) {
++            GoalCompletionView(goalID: goalID)
++        }
++        .confirmationDialog("Abandon this goal?", isPresented: $confirmAbandon, titleVisibility: .visible) {
++            Button("Abandon goal", role: .destructive) {
++                Task { await abandon() }
++            }
++            Button("Cancel", role: .cancel) {}
++        } message: {
++            Text("It stays in your history. Nothing is deleted.")
++        }
++    }
++
++    @ViewBuilder
++    private func lifecycleActions(goal: PrismGoal) -> some View {
++        if goal.trackStatus == .completed {
++            if goal.outcomeRating == nil {
++                Button("Reflect on this goal") { showCompletion = true }
++                    .buttonStyle(.bordered)
++                    .accessibilityIdentifier("goalDetail.reflect")
++            }
++        } else if goal.trackStatus != .abandoned {
++            HStack {
++                Button("Mark complete") { Task { await complete() } }
++                    .accessibilityIdentifier("goalDetail.complete")
++                if goal.trackStatus == .paused {
++                    Button("Resume") { Task { await resume() } }
++                        .accessibilityIdentifier("goalDetail.resume")
++                } else {
++                    Button("Pause") { Task { await pause() } }
++                        .accessibilityIdentifier("goalDetail.pause")
++                }
++                Button("Abandon", role: .destructive) { confirmAbandon = true }
++                    .accessibilityIdentifier("goalDetail.abandon")
++            }
++            .buttonStyle(.bordered)
++            .font(PrismTypography.caption())
++        }
++    }
++
++    private func complete() async {
++        guard let goal else { return }
++        try? await container.goalRepository.upsert(container.goalPlanningService.markComplete(goal))
++        container.analytics.track(.goalCompleted)
++        PrismHaptics.save()
++        await load()
++    }
++
++    private func pause() async {
++        guard let goal else { return }
++        try? await container.goalRepository.upsert(container.goalPlanningService.pause(goal))
++        await load()
++    }
++
++    private func resume() async {
++        guard let goal else { return }
++        try? await container.goalRepository.upsert(container.goalPlanningService.resume(goal))
++        await load()
++    }
++
++    private func abandon() async {
++        guard let goal else { return }
++        try? await container.goalRepository.upsert(container.goalPlanningService.abandon(goal))
++        await load()
+     }
+ 
+     private func progressBlock(goal: PrismGoal, pace: GoalPaceSnapshot) -> some View {
+@@ -123,6 +227,102 @@ struct GoalDetailView: View {
+             pace = container.goalPlanningService.pace(for: goal)
+             milestones = (try? await container.goalRepository.fetchMilestones(goalID: goal.id)) ?? []
+             contributions = (try? await container.goalRepository.fetchContributions(goalID: goal.id)) ?? []
++            components = (try? await container.goalRepository.fetchComponents(goalID: goal.id)) ?? []
++            if goal.trackStatus == .completed && goal.outcomeRating == nil && !completionPrompted {
++                completionPrompted = true
++                showCompletion = true
++            }
+         }
+     }
+ }
++
++/// Celebration plus one gentle question. Skippable; the outcome stays on the device.
++struct GoalCompletionView: View {
++    let goalID: UUID
++    @EnvironmentObject private var container: DependencyContainer
++    @Environment(\.dismiss) private var dismiss
++
++    @State private var goal: PrismGoal?
++    @State private var rating: GoalOutcomeRating?
++    @State private var note = ""
++
++    var body: some View {
++        NavigationStack {
++            ZStack {
++                PrismAtmosphericBackground()
++                ScrollView {
++                    VStack(spacing: PrismSpacing.md) {
++                        Image(systemName: "sparkles")
++                            .font(.system(size: 44))
++                            .foregroundStyle(PrismColors.warmLight)
++                        Text("You made it happen")
++                            .font(PrismTypography.title())
++                            .accessibilityIdentifier("goalCompletion.title")
++                        if let goal {
++                            Text(goal.title)
++                                .font(PrismTypography.headline())
++                                .multilineTextAlignment(.center)
++                            if let reason = goal.customMotivation ?? goal.motivation?.displayName {
++                                Text("You started this because: \(reason)")
++                                    .font(PrismTypography.caption())
++                                    .foregroundStyle(PrismColors.textSecondary)
++                                    .multilineTextAlignment(.center)
++                            }
++                        }
++
++                        Text("Was it worth it?")
++                            .font(PrismTypography.title(22))
++                            .padding(.top, PrismSpacing.sm)
++                        ForEach(GoalOutcomeRating.allCases) { option in
++                            Button {
++                                rating = option
++                            } label: {
++                                HStack {
++                                    Text(option.displayName)
++                                    Spacer()
++                                    if rating == option { Image(systemName: "checkmark.circle.fill") }
++                                }
++                                .padding(12)
++                                .background {
++                                    RoundedRectangle(cornerRadius: PrismRadius.md)
++                                        .stroke(rating == option ? PrismColors.lavender : PrismColors.glassStroke)
++                                }
++                            }
++                            .buttonStyle(.plain)
++                            .frame(minHeight: 44)
++                            .accessibilityIdentifier("goalCompletion.\(option.rawValue)")
++                        }
++                        TextField("Anything you learned? (optional)", text: $note, axis: .vertical)
++                            .padding()
++                            .background(RoundedRectangle(cornerRadius: PrismRadius.md).stroke(PrismColors.glassStroke))
++
++                        PrismPrimaryButton(title: "Save reflection") {
++                            Task { await save() }
++                        }
++                        .disabled(rating == nil)
++                        .accessibilityIdentifier("goalCompletion.save")
++
++                        Button("Skip for now") { dismiss() }
++                            .foregroundStyle(PrismColors.textSecondary)
++                            .frame(minHeight: 44)
++                    }
++                    .padding()
++                }
++            }
++        }
++        .task {
++            goal = try? await container.goalRepository.fetch(id: goalID)
++            rating = goal?.outcomeRating
++            note = goal?.outcomeNote ?? ""
++        }
++    }
++
++    private func save() async {
++        guard let goal, let rating else { return }
++        let updated = container.goalPlanningService.recordOutcome(goal, rating: rating, note: note)
++        try? await container.goalRepository.upsert(updated)
++        container.analytics.track(.goalOutcomeRecorded)
++        PrismHaptics.save()
++        dismiss()
++    }
++}
+diff --git a/Prism/Features/Goals/GoalSetupFlowView.swift b/Prism/Features/Goals/GoalSetupFlowView.swift
+index 74a15bc..5d77554 100644
+--- a/Prism/Features/Goals/GoalSetupFlowView.swift
++++ b/Prism/Features/Goals/GoalSetupFlowView.swift
+@@ -4,6 +4,8 @@ import SwiftUI
+ 
+ struct GoalSetupFlowView: View {
+     var sourceItem: SavedItem?
++    var sourceCollection: PrismCollection?
++    var collectionItems: [SavedItem] = []
+     @EnvironmentObject private var environment: AppEnvironment
+     @EnvironmentObject private var container: DependencyContainer
+     @Environment(\.dismiss) private var dismiss
+@@ -22,6 +24,7 @@ struct GoalSetupFlowView: View {
+     @State private var includesBuffer = false
+     @State private var errorText: String?
+     @State private var previewPace: GoalPaceSnapshot?
++    @State private var excludedItemIDs: Set<UUID> = []
+ 
+     var body: some View {
+         NavigationStack {
+@@ -86,6 +89,12 @@ struct GoalSetupFlowView: View {
+                 }
+                 type = inferredType(from: sourceItem)
+             }
++            if let sourceCollection {
++                title = sourceCollection.name
++                goalDescription = sourceCollection.description ?? ""
++                type = collectionItems.contains { $0.intent == .dream } ? .experience : .project
++                syncTargetFromComponents()
++            }
+             refreshPreview()
+         }
+     }
+@@ -117,9 +126,55 @@ struct GoalSetupFlowView: View {
+                 }
+             }
+             .pickerStyle(.menu)
++            if sourceCollection != nil {
++                componentsPicker
++            }
++        }
++    }
++
++    private var componentsPicker: some View {
++        VStack(alignment: .leading, spacing: PrismSpacing.xs) {
++            SectionMicroLabel(text: "Items in this plan")
++            if collectionItems.isEmpty {
++                Text("No open saves in this collection yet. You can still create the goal.")
++                    .font(PrismTypography.caption())
++                    .foregroundStyle(PrismColors.textSecondary)
++            }
++            ForEach(collectionItems) { item in
++                Toggle(isOn: Binding(
++                    get: { !excludedItemIDs.contains(item.id) },
++                    set: { included in
++                        if included { excludedItemIDs.remove(item.id) } else { excludedItemIDs.insert(item.id) }
++                        syncTargetFromComponents()
++                        refreshPreview()
++                    }
++                )) {
++                    VStack(alignment: .leading, spacing: 2) {
++                        Text(item.title)
++                        Text(item.estimatedPrice.map {
++                            "Estimated \(CurrencyFormatting.string(from: $0, currencyCode: item.estimatedCurrencyCode ?? currencyCode))"
++                        } ?? "No estimate yet")
++                            .font(PrismTypography.caption())
++                            .foregroundStyle(PrismColors.textSecondary)
++                    }
++                }
++                .accessibilityIdentifier("goalSetup.component.\(item.id.uuidString)")
++            }
++            Text("The target starts as the sum of your own estimates. You can change it on the Target step.")
++                .font(PrismTypography.caption())
++                .foregroundStyle(PrismColors.textTertiary)
+         }
+     }
+ 
++    private var includedItems: [SavedItem] {
++        collectionItems.filter { !excludedItemIDs.contains($0.id) }
++    }
++
++    private func syncTargetFromComponents() {
++        let total = includedItems.compactMap(\.estimatedPrice).reduce(Decimal(0), +)
++        targetAmountText = total > 0 ? "\(total)" : ""
++    }
++
+     private var motivationStep: some View {
+         VStack(alignment: .leading, spacing: PrismSpacing.sm) {
+             Text("Why does this matter to you?")
+@@ -232,6 +287,16 @@ struct GoalSetupFlowView: View {
+                         .foregroundStyle(PrismColors.textTertiary)
+                 }
+             }
++            if sourceCollection != nil && !includedItems.isEmpty {
++                GlassCard {
++                    VStack(alignment: .leading, spacing: 4) {
++                        SectionMicroLabel(text: "Plan components (estimated)")
++                        ForEach(includedItems) { item in
++                            Text(item.title).font(PrismTypography.body())
++                        }
++                    }
++                }
++            }
+             Text("Starter milestones will be added. You can edit them anytime.")
+                 .font(PrismTypography.caption())
+                 .foregroundStyle(PrismColors.textSecondary)
+@@ -332,6 +397,10 @@ struct GoalSetupFlowView: View {
+                 )
+             }
+             try await seedMilestones(for: goal)
++            if sourceCollection != nil {
++                try await saveComponents(for: goal)
++                container.analytics.track(.goalFromCollectionCreated)
++            }
+             container.analytics.track(.goalCreated)
+             PrismHaptics.save()
+             dismiss()
+@@ -341,6 +410,34 @@ struct GoalSetupFlowView: View {
+         }
+     }
+ 
++    private func saveComponents(for goal: PrismGoal) async throws {
++        for (index, item) in includedItems.enumerated() {
++            try await container.goalRepository.upsertComponent(
++                GoalComponent(
++                    id: UUID(),
++                    userID: goal.userID,
++                    goalID: goal.id,
++                    name: item.title,
++                    estimatedCost: item.estimatedPrice,
++                    currencyCode: item.estimatedPrice == nil ? nil : (item.estimatedCurrencyCode ?? goal.currencyCode),
++                    isOptional: false,
++                    sortOrder: index,
++                    createdAt: .now
++                )
++            )
++            try await container.goalRepository.linkAspiration(
++                GoalAspirationLink(
++                    id: UUID(),
++                    userID: goal.userID,
++                    goalID: goal.id,
++                    savedItemID: item.id,
++                    role: .essential,
++                    createdAt: .now
++                )
++            )
++        }
++    }
++
+     private func seedMilestones(for goal: PrismGoal) async throws {
+         let titles: [String]
+         switch goal.type {
+diff --git a/Prism/Features/Home/HomeView.swift b/Prism/Features/Home/HomeView.swift
+index a6efc69..7656722 100644
+--- a/Prism/Features/Home/HomeView.swift
++++ b/Prism/Features/Home/HomeView.swift
+@@ -123,6 +123,24 @@ struct HomeView: View {
+                     .padding(.horizontal, PrismSpacing.md)
+                 }
+             }
++
++            if !pausedOrFinishedGoals.isEmpty {
++                Text("Paused & finished")
++                    .font(PrismTypography.headline())
++                    .foregroundStyle(PrismColors.textSecondary)
++                    .padding(.horizontal, PrismSpacing.md)
++                    .padding(.top, PrismSpacing.xs)
++                ForEach(pausedOrFinishedGoals) { goal in
++                    Button {
++                        router.sheet = .goalDetail(goal.id)
++                    } label: {
++                        GoalCardView(goal: goal, pace: container.goalPlanningService.pace(for: goal), isPrimary: false)
++                    }
++                    .buttonStyle(.plain)
++                    .padding(.horizontal, PrismSpacing.md)
++                    .accessibilityIdentifier("home.finishedGoal.\(goal.id.uuidString)")
++                }
++            }
+         }
+     }
+ 
+@@ -181,6 +199,10 @@ struct HomeView: View {
+         }
+     }
+ 
++    private var pausedOrFinishedGoals: [PrismGoal] {
++        goals.filter { $0.trackStatus == .paused || $0.trackStatus == .completed }
++    }
++
+     private var filteredItems: [SavedItem] {
+         items.filter { item in
+             if let statusFilter, item.status != statusFilter { return false }
+diff --git a/Prism/Features/MoneyStory/MoneyStoryView.swift b/Prism/Features/MoneyStory/MoneyStoryView.swift
+index 0e60b32..7eab2ab 100644
+--- a/Prism/Features/MoneyStory/MoneyStoryView.swift
++++ b/Prism/Features/MoneyStory/MoneyStoryView.swift
+@@ -20,6 +20,10 @@ struct MoneyStoryView: View {
+     @State private var letGoItems: [SavedItem] = []
+     @State private var insight: String = ""
+     @State private var primaryGoalLine: String?
++    @State private var goalsCompleted = 0
++    @State private var goalsRated = 0
++    @State private var goalsWorthIt = 0
++    @State private var shareImage: Image?
+ 
+     var body: some View {
+         NavigationStack {
+@@ -47,6 +51,19 @@ struct MoneyStoryView: View {
+                             Task { await reload() }
+                         }
+ 
++                        if let shareImage {
++                            ShareLink(
++                                item: shareImage,
++                                preview: SharePreview("My Prism story", image: shareImage)
++                            ) {
++                                Label("Share my story", systemImage: "square.and.arrow.up")
++                                    .font(PrismTypography.caption())
++                                    .frame(maxWidth: .infinity, minHeight: 44)
++                            }
++                            .buttonStyle(.bordered)
++                            .accessibilityIdentifier("moneyStory.share")
++                        }
++
+                         pocketCard
+                         if let primaryGoalLine {
+                             GlassCard {
+@@ -139,6 +156,16 @@ struct MoneyStoryView: View {
+                 metric("Items let go", "\(snapshot.itemsLetGo)")
+                 metric("Still considering", "\(snapshot.itemsStillConsidering)")
+                 metric("Impulses paused", "\(snapshot.impulsesPaused)")
++                if snapshot.regretAnswered > 0 {
++                    metric("Glad you bought", "\(snapshot.regretGlad) of \(snapshot.regretAnswered)")
++                        .accessibilityIdentifier("moneyStory.regret")
++                }
++                if goalsCompleted > 0 {
++                    metric("Goals completed", "\(goalsCompleted)")
++                    if goalsRated > 0 {
++                        metric("Goals that felt worth it", "\(goalsWorthIt) of \(goalsRated)")
++                    }
++                }
+                 if let avg = snapshot.averageHoursToDecision {
+                     metric("Avg. hours to decide", String(format: "%.0f", avg))
+                 }
+@@ -187,6 +214,14 @@ struct MoneyStoryView: View {
+         }
+     }
+ 
++    @MainActor
++    private func renderShareImage(_ data: ShareCardData) -> Image? {
++        let renderer = ImageRenderer(content: MoneyStoryShareCard(data: data))
++        renderer.scale = 3
++        guard let uiImage = renderer.uiImage else { return nil }
++        return Image(uiImage: uiImage)
++    }
++
+     private func metric(_ title: String, _ value: String) -> some View {
+         HStack {
+             Text(title).foregroundStyle(PrismColors.textSecondary)
+@@ -208,6 +243,11 @@ struct MoneyStoryView: View {
+         letGoItems = items.filter { $0.status == .letGo }
+ 
+         let goals = (try? await container.goalRepository.fetchAll(userID: profile.id)) ?? []
++        let completedGoals = goals.filter { $0.trackStatus == .completed }
++        let ratings = completedGoals.compactMap(\.outcomeRating)
++        goalsCompleted = completedGoals.count
++        goalsRated = ratings.count
++        goalsWorthIt = ratings.filter { $0 == .worthIt }.count
+         if let primary = goals.first(where: { $0.priority == .primary }) {
+             let pace = container.goalPlanningService.pace(for: primary)
+             let contribs = (try? await container.goalRepository.fetchContributions(goalID: primary.id)) ?? []
+@@ -233,6 +273,19 @@ struct MoneyStoryView: View {
+             primaryGoalLine = nil
+         }
+ 
++        let primaryForCard = goals.first { $0.priority == .primary && $0.trackStatus != .abandoned }
++        let percent = primaryForCard.flatMap { container.goalPlanningService.percentFunded(for: $0) }
++        shareImage = await renderShareImage(
++            ShareCardData(
++                period: filter.displayName,
++                paused: snapshot.impulsesPaused,
++                letGo: snapshot.itemsLetGo,
++                purchased: snapshot.purchasesConfirmed,
++                goalsCompleted: goalsCompleted,
++                primaryGoalPercent: percent.map { Int($0.rounded()) }
++            )
++        )
++
+         if let topIntent = snapshot.commonIntents.first,
+            let topFeeling = snapshot.commonFeelings.first {
+             insight = "You saved \(items.count) items in this period. Most were tagged “\(topFeeling.name),” and you chose to buy \(snapshot.purchasesConfirmed) after reviewing them. Top intent: \(topIntent.intent.displayName)."
+@@ -243,3 +296,72 @@ struct MoneyStoryView: View {
+         }
+     }
+ }
++
++/// Counts only: no item titles, no goal titles, no prices.
++struct ShareCardData: Equatable {
++    var period: String
++    var paused: Int
++    var letGo: Int
++    var purchased: Int
++    var goalsCompleted: Int
++    var primaryGoalPercent: Int?
++}
++
++/// Rendered to an image for sharing. Uses plain shapes only; materials do not render reliably off-screen.
++struct MoneyStoryShareCard: View {
++    let data: ShareCardData
++
++    var body: some View {
++        VStack(spacing: 20) {
++            Text("Prism")
++                .font(PrismTypography.display(30))
++            Text("My Money Story \u{00B7} \(data.period)")
++                .font(PrismTypography.caption())
++                .foregroundStyle(PrismColors.textSecondary)
++            VStack(spacing: 4) {
++                Text("\(data.paused)")
++                    .font(PrismTypography.display(72))
++                Text(data.paused == 1 ? "impulse paused" : "impulses paused")
++                    .font(PrismTypography.body())
++                    .foregroundStyle(PrismColors.textSecondary)
++            }
++            HStack(spacing: 28) {
++                stat(value: data.letGo, label: "let go")
++                stat(value: data.purchased, label: "chosen on purpose")
++                if data.goalsCompleted > 0 {
++                    stat(value: data.goalsCompleted, label: data.goalsCompleted == 1 ? "goal done" : "goals done")
++                }
++            }
++            if let percent = data.primaryGoalPercent {
++                VStack(spacing: 6) {
++                    Text("Primary goal \(percent)% funded")
++                        .font(PrismTypography.caption())
++                    ZStack(alignment: .leading) {
++                        Capsule().fill(Color.white.opacity(0.18))
++                        Capsule()
++                            .fill(PrismColors.cyan)
++                            .frame(width: 220 * CGFloat(min(max(percent, 0), 100)) / 100)
++                    }
++                    .frame(width: 220, height: 8)
++                }
++            }
++            Spacer(minLength: 0)
++            Text("Turn impulse into inspiration.")
++                .font(PrismTypography.caption())
++                .foregroundStyle(PrismColors.textTertiary)
++        }
++        .foregroundStyle(PrismColors.textPrimary)
++        .padding(28)
++        .frame(width: 360, height: 450)
++        .background(PrismGradients.atmospheric)
++    }
++
++    private func stat(value: Int, label: String) -> some View {
++        VStack(spacing: 2) {
++            Text("\(value)").font(PrismTypography.title(28))
++            Text(label)
++                .font(PrismTypography.caption())
++                .foregroundStyle(PrismColors.textSecondary)
++        }
++    }
++}
+diff --git a/Prism/Features/Review/ReviewViews.swift b/Prism/Features/Review/ReviewViews.swift
+index 171713c..8320ac6 100644
+--- a/Prism/Features/Review/ReviewViews.swift
++++ b/Prism/Features/Review/ReviewViews.swift
+@@ -11,6 +11,7 @@ struct ReviewHubView: View {
+     @State private var considering: [SavedItem] = []
+     @State private var letGo: [SavedItem] = []
+     @State private var purchased: [SavedItem] = []
++    @State private var regretDue: [SavedItem] = []
+     @State private var showDeck = false
+     @State private var undoBanner: String?
+ 
+@@ -43,7 +44,7 @@ struct ReviewHubView: View {
+                             }
+                         }
+ 
+-                        if ready.isEmpty && considering.isEmpty {
++                        if ready.isEmpty && considering.isEmpty && regretDue.isEmpty {
+                             EmptyStateView(
+                                 title: "Nothing to revisit yet",
+                                 message: "When a cooling-off period ends, items will appear here. You can also open anything you’re still considering."
+@@ -51,6 +52,10 @@ struct ReviewHubView: View {
+                             .accessibilityIdentifier("review.empty")
+                         }
+ 
++                        if !regretDue.isEmpty {
++                            regretSection
++                        }
++
+                         if !ready.isEmpty {
+                             section(title: "Ready to revisit", items: ready)
+                             PrismPrimaryButton(title: "Start review") {
+@@ -107,9 +112,46 @@ struct ReviewHubView: View {
+         }
+     }
+ 
++    private var regretSection: some View {
++        VStack(alignment: .leading, spacing: PrismSpacing.sm) {
++            Text("Check-in").font(PrismTypography.headline())
++            ForEach(regretDue) { item in
++                GlassCard {
++                    VStack(alignment: .leading, spacing: PrismSpacing.sm) {
++                        Text("Still glad you bought \u{201C}\(item.title)\u{201D}?")
++                            .font(PrismTypography.body())
++                        HStack {
++                            ForEach(RegretAnswer.allCases) { answer in
++                                Button(answer.displayName) {
++                                    Task { await answerRegret(item, answer) }
++                                }
++                                .buttonStyle(.bordered)
++                                .accessibilityIdentifier("regret.\(answer.rawValue)")
++                            }
++                        }
++                    }
++                }
++            }
++            Text("Only you see this. It helps your Money Story show what was worth it.")
++                .font(PrismTypography.caption())
++                .foregroundStyle(PrismColors.textTertiary)
++        }
++        .accessibilityIdentifier("review.regretSection")
++    }
++
++    private func answerRegret(_ item: SavedItem, _ answer: RegretAnswer) async {
++        let updated = RegretCheckIn.answer(answer, for: item)
++        try? await container.savedItemRepository.upsert(updated)
++        await container.notificationScheduler.cancelRegretCheckIn(itemID: item.id)
++        container.analytics.track(.regretCheckInAnswered)
++        PrismHaptics.soft()
++        await reload()
++    }
++
+     private func reload() async {
+         guard let userID = environment.profile?.id else { return }
+         let all = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
++        regretDue = RegretCheckIn.due(items: all)
+         let due = (try? await container.savedItemRepository.fetchReadyForReview(userID: userID, asOf: .now)) ?? []
+         ready = due
+         let dueIDs = Set(due.map(\.id))
+@@ -131,6 +173,7 @@ struct ReviewHubView: View {
+         try? await container.savedItemRepository.upsert(result.item)
+         try? await container.decisionRepository.append(result.event)
+         await container.notificationScheduler.cancelReviewReminder(itemID: item.id)
++        await container.notificationScheduler.cancelRegretCheckIn(itemID: item.id)
+         undoBanner = nil
+         environment.lastUndo = nil
+         await reload()
+@@ -148,6 +191,7 @@ struct ReviewDeckView: View {
+ 
+     @State private var index = 0
+     @State private var offset: CGSize = .zero
++    @State private var redirectPrompt: RedirectPrompt?
+ 
+     var body: some View {
+         NavigationStack {
+@@ -224,6 +268,9 @@ struct ReviewDeckView: View {
+                     Button("Close") { dismiss() }
+                 }
+             }
++            .sheet(item: $redirectPrompt) { prompt in
++                RedirectNudgeView(goal: prompt.goal, itemTitle: prompt.itemTitle)
++            }
+             .onChange(of: router.sheet) { _, new in
+                 // After buy/keep sheets dismiss, advance
+                 if new == nil {
+@@ -250,6 +297,10 @@ struct ReviewDeckView: View {
+             offset = .zero
+             index += 1
+         }
++        let goals = (try? await container.goalRepository.fetchAll(userID: userID)) ?? []
++        if let focus = container.goalPlanningService.focusGoal(in: goals) {
++            redirectPrompt = RedirectPrompt(goal: focus, itemTitle: item.title)
++        }
+     }
+ 
+     private func reloadAdvance() async {
+@@ -364,6 +415,9 @@ struct BuyConfirmationView: View {
+         await container.notificationScheduler.cancelReviewReminder(itemID: item.id)
+         if didPurchase {
+             container.analytics.track(.itemPurchasedConfirmed)
++            if let due = result.item.regretCheckInAt, profile.notificationPreferences.isRegretCheckInOn {
++                await container.notificationScheduler.scheduleRegretCheckIn(itemID: item.id, at: due)
++            }
+         }
+         container.analytics.track(.reviewCompleted)
+         PrismHaptics.decision()
+@@ -427,3 +481,102 @@ struct KeepConsideringView: View {
+         dismiss()
+     }
+ }
++
++struct RedirectPrompt: Identifiable {
++    let id = UUID()
++    let goal: PrismGoal
++    let itemTitle: String
++}
++
++/// Shown after letting go of a save while a goal is active. Nothing is added automatically:
++/// an estimate is never treated as money saved.
++struct RedirectNudgeView: View {
++    let goal: PrismGoal
++    let itemTitle: String
++    @EnvironmentObject private var environment: AppEnvironment
++    @EnvironmentObject private var container: DependencyContainer
++    @Environment(\.dismiss) private var dismiss
++
++    @State private var amountText = ""
++    @State private var errorText: String?
++
++    var body: some View {
++        NavigationStack {
++            ZStack {
++                PrismAtmosphericBackground()
++                VStack(alignment: .leading, spacing: PrismSpacing.md) {
++                    Text("Letting go takes intention")
++                        .font(PrismTypography.title(22))
++                        .accessibilityIdentifier("redirect.title")
++                    Text("You let go of \u{201C}\(itemTitle)\u{201D}. Want to note that as progress on \u{201C}\(goal.title)\u{201D}?")
++                        .font(PrismTypography.body())
++                        .foregroundStyle(PrismColors.textSecondary)
++
++                    SectionMicroLabel(text: "Money you actually moved to this goal (optional)")
++                    TextField("Leave blank to just note it", text: $amountText)
++                        .keyboardType(.decimalPad)
++                        .padding()
++                        .background(RoundedRectangle(cornerRadius: PrismRadius.md).stroke(PrismColors.glassStroke))
++                        .accessibilityIdentifier("redirect.amount")
++                    Text("Prism never counts an estimate as savings. Only enter an amount you really set aside.")
++                        .font(PrismTypography.caption())
++                        .foregroundStyle(PrismColors.textTertiary)
++
++                    if let errorText {
++                        Text(errorText).foregroundStyle(PrismColors.danger)
++                    }
++
++                    PrismPrimaryButton(title: "Note it as progress") {
++                        Task { await accept() }
++                    }
++                    .accessibilityIdentifier("redirect.accept")
++
++                    Button("Not now") { dismiss() }
++                        .foregroundStyle(PrismColors.textSecondary)
++                        .frame(minHeight: 44)
++                        .accessibilityIdentifier("redirect.dismiss")
++                    Spacer()
++                }
++                .padding()
++            }
++            .toolbar {
++                ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
++            }
++        }
++    }
++
++    private func accept() async {
++        guard let profile = environment.profile else { return }
++        let amount = DecimalParsing.parse(amountText)
++        if !amountText.trimmingCharacters(in: .whitespaces).isEmpty && amount == nil {
++            errorText = "Enter a number, or leave it blank."
++            return
++        }
++        do {
++            try await container.goalRepository.appendContribution(
++                GoalContribution(
++                    id: UUID(), userID: profile.id, goalID: goal.id, kind: .behavioral,
++                    amount: nil, currencyCode: nil,
++                    note: "Let go of a lower-priority save", createdAt: .now
++                )
++            )
++            if let amount, amount > 0 {
++                try await container.goalRepository.appendContribution(
++                    GoalContribution(
++                        id: UUID(), userID: profile.id, goalID: goal.id, kind: .financial,
++                        amount: amount, currencyCode: goal.currencyCode,
++                        note: "Redirected after letting go", createdAt: .now
++                    )
++                )
++                var updated = container.goalPlanningService.applyFinancialContribution(to: goal, amount: amount)
++                updated.trackStatus = container.goalPlanningService.pace(for: updated).trackStatus
++                try await container.goalRepository.upsert(updated)
++            }
++            container.analytics.track(.redirectNudgeAccepted)
++            PrismHaptics.save()
++            dismiss()
++        } catch {
++            errorText = "Couldn\u{2019}t save that. Try again."
++        }
++    }
++}
+diff --git a/Prism/Features/Settings/SettingsView.swift b/Prism/Features/Settings/SettingsView.swift
+index d38d0a4..76c69b5 100644
+--- a/Prism/Features/Settings/SettingsView.swift
++++ b/Prism/Features/Settings/SettingsView.swift
+@@ -12,6 +12,9 @@ struct SettingsView: View {
+     @State private var pocketPaused = false
+     @State private var coolingEnabled = true
+     @State private var notificationsEnabled = false
++    @State private var weeklyRecapEnabled = false
++    @State private var regretCheckInsEnabled = false
++    @AppStorage(RegretCheckIn.demoDefaultsKey) private var shortRegretDemo = false
+     @State private var exportURL: URL?
+     @State private var showWipeConfirm = false
+     @State private var statusMessage: String?
+@@ -67,6 +70,21 @@ struct SettingsView: View {
+                             .font(.caption)
+                     }
+ 
++                    Section("Reflection nudges") {
++                        Toggle("Weekly recap", isOn: $weeklyRecapEnabled)
++                            .accessibilityIdentifier("settings.weeklyRecap")
++                        Toggle("Purchase check-ins", isOn: $regretCheckInsEnabled)
++                            .accessibilityIdentifier("settings.regretCheckIns")
++                        Button("Save nudges") { Task { await saveNudges() } }
++                            .accessibilityIdentifier("settings.nudges.save")
++                        Text("Off by default. Notifications never include item names or prices. The recap shows only a count.")
++                            .font(.caption)
++                        #if DEBUG
++                        Toggle("Demo: check-in 1 minute after a purchase", isOn: $shortRegretDemo)
++                            .accessibilityIdentifier("settings.demo.shortRegret")
++                        #endif
++                    }
++
+                     Section("Privacy & security") {
+                         Toggle("App lock (Face ID / Touch ID)", isOn: $settings.appLockEnabled)
+                             .accessibilityIdentifier("settings.appLock")
+@@ -133,7 +151,26 @@ struct SettingsView: View {
+             }
+             coolingEnabled = profile.defaultCoolingPeriods.enabled
+             notificationsEnabled = profile.notificationPreferences.coolingOffRemindersEnabled
++            weeklyRecapEnabled = profile.notificationPreferences.isWeeklyRecapOn
++            regretCheckInsEnabled = profile.notificationPreferences.isRegretCheckInOn
++        }
++    }
++
++    private func saveNudges() async {
++        guard var profile = environment.profile else { return }
++        if (weeklyRecapEnabled || regretCheckInsEnabled) && !profile.notificationPreferences.permissionAsked {
++            _ = await container.notificationScheduler.requestPermission()
++            profile.notificationPreferences.permissionAsked = true
++        }
++        profile.notificationPreferences.weeklyRecapEnabled = weeklyRecapEnabled
++        profile.notificationPreferences.regretCheckInsEnabled = regretCheckInsEnabled
++        try? await container.profileRepository.save(profile)
++        environment.profile = profile
++        if weeklyRecapEnabled {
++            container.analytics.track(.weeklyRecapEnabled)
+         }
++        await environment.refreshWeeklyRecap()
++        statusMessage = "Nudge preferences saved."
+     }
+ 
+     private func savePocket() async {
+@@ -192,6 +229,7 @@ struct SettingsView: View {
+ 
+     private func wipe() async {
+         try? await container.profileRepository.deleteAllLocalData()
++        await container.notificationScheduler.cancelWeeklyRecap()
+         environment.profile = nil
+         statusMessage = "Local data deleted."
+     }
+diff --git a/Prism/Infrastructure/Notifications/NotificationScheduler.swift b/Prism/Infrastructure/Notifications/NotificationScheduler.swift
+index 820b4aa..8d655c9 100644
+--- a/Prism/Infrastructure/Notifications/NotificationScheduler.swift
++++ b/Prism/Infrastructure/Notifications/NotificationScheduler.swift
+@@ -8,6 +8,10 @@ protocol NotificationScheduling: Sendable {
+     func scheduleReviewReminder(itemID: UUID, at date: Date) async
+     func cancelReviewReminder(itemID: UUID) async
+     func reconcilePending() async
++    func scheduleRegretCheckIn(itemID: UUID, at date: Date) async
++    func cancelRegretCheckIn(itemID: UUID) async
++    func scheduleWeeklyRecap(body: String, at date: Date) async
++    func cancelWeeklyRecap() async
+ }
+ 
+ struct LocalNotificationScheduler: NotificationScheduling {
+@@ -51,6 +55,46 @@ struct LocalNotificationScheduler: NotificationScheduling {
+         // Future: re-fetch ready items and reschedule missing notifications.
+     }
+ 
++    func scheduleRegretCheckIn(itemID: UUID, at date: Date) async {
++        let id = Self.regretIdentifier(for: itemID)
++        center.removePendingNotificationRequests(withIdentifiers: [id])
++        // Intentionally omit item title for lock-screen privacy.
++        await add(id: id, body: "Time for a quick check-in on a past purchase.", at: date, itemID: itemID)
++    }
++
++    func cancelRegretCheckIn(itemID: UUID) async {
++        center.removePendingNotificationRequests(withIdentifiers: [Self.regretIdentifier(for: itemID)])
++    }
++
++    func scheduleWeeklyRecap(body: String, at date: Date) async {
++        center.removePendingNotificationRequests(withIdentifiers: [Self.recapIdentifier])
++        await add(id: Self.recapIdentifier, body: body, at: date, itemID: nil)
++    }
++
++    func cancelWeeklyRecap() async {
++        center.removePendingNotificationRequests(withIdentifiers: [Self.recapIdentifier])
++    }
++
++    private func add(id: String, body: String, at date: Date, itemID: UUID?) async {
++        guard date > .now else { return }
++        let content = UNMutableNotificationContent()
++        content.title = "Prism"
++        content.body = body
++        content.sound = .default
++        if let itemID {
++            content.userInfo = ["itemID": itemID.uuidString]
++        }
++        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
++        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
++        try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
++    }
++
++    private static let recapIdentifier = "recap.weekly"
++
++    private static func regretIdentifier(for itemID: UUID) -> String {
++        "regret.\(itemID.uuidString)"
++    }
++
+     private static func identifier(for itemID: UUID) -> String {
+         "review.\(itemID.uuidString)"
+     }
+@@ -73,6 +117,16 @@ actor MockNotificationScheduler: NotificationScheduling {
+ 
+     func reconcilePending() async {}
+ 
++    private(set) var regretScheduled: [UUID] = []
++    private(set) var regretCancelled: [UUID] = []
++    private(set) var recapBodies: [String] = []
++    private(set) var recapCancelCount = 0
++
++    func scheduleRegretCheckIn(itemID: UUID, at date: Date) async { regretScheduled.append(itemID) }
++    func cancelRegretCheckIn(itemID: UUID) async { regretCancelled.append(itemID) }
++    func scheduleWeeklyRecap(body: String, at date: Date) async { recapBodies.append(body) }
++    func cancelWeeklyRecap() async { recapCancelCount += 1 }
++
+     func scheduledIDs() -> [UUID] { scheduled.map(\.0) }
+     func cancelledIDs() -> [UUID] { cancelled }
+ }
+diff --git a/Prism/Infrastructure/SwiftData/SwiftDataModels.swift b/Prism/Infrastructure/SwiftData/SwiftDataModels.swift
+index 0fde607..1222bcd 100644
+--- a/Prism/Infrastructure/SwiftData/SwiftDataModels.swift
++++ b/Prism/Infrastructure/SwiftData/SwiftDataModels.swift
+@@ -126,6 +126,9 @@ final class SDSavedItem {
+     var decidedAt: Date?
+     var archivedAt: Date?
+     var deletedAt: Date?
++    var regretCheckInAt: Date?
++    var regretAnswerRaw: String?
++    var regretAnsweredAt: Date?
+ 
+     init(from item: SavedItem) {
+         self.id = item.id
+@@ -153,6 +156,9 @@ final class SDSavedItem {
+         self.decidedAt = item.decidedAt
+         self.archivedAt = item.archivedAt
+         self.deletedAt = item.deletedAt
++        self.regretCheckInAt = item.regretCheckInAt
++        self.regretAnswerRaw = item.regretAnswer?.rawValue
++        self.regretAnsweredAt = item.regretAnsweredAt
+     }
+ 
+     func toDomain() -> SavedItem {
+@@ -181,7 +187,10 @@ final class SDSavedItem {
+             reviewAt: reviewAt,
+             decidedAt: decidedAt,
+             archivedAt: archivedAt,
+-            deletedAt: deletedAt
++            deletedAt: deletedAt,
++            regretCheckInAt: regretCheckInAt,
++            regretAnswer: regretAnswerRaw.flatMap(RegretAnswer.init(rawValue:)),
++            regretAnsweredAt: regretAnsweredAt
+         )
+     }
+ 
+@@ -208,6 +217,9 @@ final class SDSavedItem {
+         decidedAt = item.decidedAt
+         archivedAt = item.archivedAt
+         deletedAt = item.deletedAt
++        regretCheckInAt = item.regretCheckInAt
++        regretAnswerRaw = item.regretAnswer?.rawValue
++        regretAnsweredAt = item.regretAnsweredAt
+     }
+ }
+ 
+@@ -418,6 +430,8 @@ final class SDGoal {
+     var updatedAt: Date
+     var completedAt: Date?
+     var pausedAt: Date?
++    var outcomeRatingRaw: String?
++    var outcomeNote: String?
+ 
+     init(from goal: PrismGoal) {
+         self.id = goal.id
+@@ -440,6 +454,8 @@ final class SDGoal {
+         self.updatedAt = goal.updatedAt
+         self.completedAt = goal.completedAt
+         self.pausedAt = goal.pausedAt
++        self.outcomeRatingRaw = goal.outcomeRating?.rawValue
++        self.outcomeNote = goal.outcomeNote
+     }
+ 
+     func toDomain() -> PrismGoal {
+@@ -463,7 +479,9 @@ final class SDGoal {
+             createdAt: createdAt,
+             updatedAt: updatedAt,
+             completedAt: completedAt,
+-            pausedAt: pausedAt
++            pausedAt: pausedAt,
++            outcomeRating: outcomeRatingRaw.flatMap(GoalOutcomeRating.init(rawValue:)),
++            outcomeNote: outcomeNote
+         )
+     }
+ 
+@@ -485,6 +503,8 @@ final class SDGoal {
+         updatedAt = goal.updatedAt
+         completedAt = goal.completedAt
+         pausedAt = goal.pausedAt
++        outcomeRatingRaw = goal.outcomeRating?.rawValue
++        outcomeNote = goal.outcomeNote
+     }
+ }
+ 
+diff --git a/PrismTests/PrismCoreTests.swift b/PrismTests/PrismCoreTests.swift
+index 3d145ab..8317339 100644
+--- a/PrismTests/PrismCoreTests.swift
++++ b/PrismTests/PrismCoreTests.swift
+@@ -265,3 +265,170 @@ final class GoalPlanningTests: XCTestCase {
+         XCTAssertTrue(copy!.contains("Japan"))
+     }
+ }
++
++// MARK: - Reflection features (regret check-in, goal lifecycle, weekly recap)
++
++private func makeTestItem(
++    status: ItemStatus = .considering,
++    createdAt: Date = .now,
++    checkInAt: Date? = nil,
++    answer: RegretAnswer? = nil
++) -> SavedItem {
++    SavedItem(
++        id: UUID(), userID: UUID(), collectionID: nil, title: "Item", notes: nil, reflection: nil,
++        sourceURL: nil, sourceDomain: nil, merchantName: nil, intent: .want, costSignificance: .small,
++        priority: nil, estimatedPrice: nil, estimatedCurrencyCode: nil,
++        confirmedPurchasePrice: nil, confirmedPurchaseCurrencyCode: nil,
++        status: status, primaryMediaID: nil, notificationsEnabled: false,
++        createdAt: createdAt, updatedAt: createdAt, reviewAt: nil, decidedAt: nil,
++        archivedAt: nil, deletedAt: nil,
++        regretCheckInAt: checkInAt, regretAnswer: answer, regretAnsweredAt: nil
++    )
++}
++
++private func makeTestGoal(
++    type: GoalType = .purchase,
++    priority: GoalPriorityLevel = .active,
++    status: GoalTrackStatus = .onTrack,
++    target: Decimal? = 1000
++) -> PrismGoal {
++    PrismGoal(
++        id: UUID(), userID: UUID(), sourceAspirationID: nil, title: "Goal", goalDescription: nil,
++        type: type, motivation: .joy, customMotivation: nil, targetAmount: target,
++        currencyCode: "USD", amountSaved: 0,
++        targetDate: Calendar.current.date(byAdding: .month, value: 6, to: .now),
++        contributionFrequency: .monthly, priority: priority, includesBuffer: false,
++        trackStatus: status, createdAt: .now, updatedAt: .now, completedAt: nil, pausedAt: nil
++    )
++}
++
++final class RegretCheckInTests: XCTestCase {
++    func testBuySchedulesCheckIn() throws {
++        let item = makeTestItem(status: .considering)
++        let now = Date(timeIntervalSince1970: 2_000_000)
++        let result = try DecisionService().applyBuy(
++            item: item, userID: item.userID, purchaseConfirmed: true,
++            confirmedPrice: 20, currencyCode: "USD", now: now,
++            checkInInterval: RegretCheckIn.defaultInterval
++        )
++        XCTAssertEqual(result.item.regretCheckInAt, now.addingTimeInterval(30 * 24 * 3600))
++        XCTAssertNil(result.item.regretAnswer)
++    }
++
++    func testBuyNotConfirmedDoesNotSchedule() throws {
++        let item = makeTestItem(status: .considering)
++        let result = try DecisionService().applyBuy(
++            item: item, userID: item.userID, purchaseConfirmed: false,
++            confirmedPrice: nil, currencyCode: nil
++        )
++        XCTAssertNil(result.item.regretCheckInAt)
++    }
++
++    func testUndoBuyClearsCheckIn() throws {
++        let item = makeTestItem(status: .considering)
++        let service = DecisionService()
++        let bought = try service.applyBuy(
++            item: item, userID: item.userID, purchaseConfirmed: true,
++            confirmedPrice: 20, currencyCode: "USD"
++        )
++        let undone = try service.undo(item: bought.item, lastEvent: bought.event, userID: item.userID)
++        XCTAssertNil(undone.item.regretCheckInAt)
++        XCTAssertNil(undone.item.regretAnswer)
++    }
++
++    func testDueFilter() {
++        let now = Date(timeIntervalSince1970: 3_000_000)
++        let due = makeTestItem(status: .purchased, checkInAt: now.addingTimeInterval(-60))
++        let future = makeTestItem(status: .purchased, checkInAt: now.addingTimeInterval(3600))
++        let answered = makeTestItem(status: .purchased, checkInAt: now.addingTimeInterval(-60), answer: .glad)
++        let notPurchased = makeTestItem(status: .letGo, checkInAt: now.addingTimeInterval(-60))
++        let result = RegretCheckIn.due(items: [due, future, answered, notPurchased], now: now)
++        XCTAssertEqual(result.map(\.id), [due.id])
++    }
++
++    func testMoneyStoryCountsAnswers() {
++        let glad = makeTestItem(status: .purchased, answer: .glad)
++        let regret = makeTestItem(status: .purchased, answer: .regret)
++        let unanswered = makeTestItem(status: .purchased)
++        let snap = MoneyStoryService().snapshot(items: [glad, regret, unanswered])
++        XCTAssertEqual(snap.regretGlad, 1)
++        XCTAssertEqual(snap.regretRegret, 1)
++        XCTAssertEqual(snap.regretAnswered, 2)
++    }
++
++    func testMockSchedulerRecordsRegretCalls() async {
++        let mock = MockNotificationScheduler()
++        let id = UUID()
++        await mock.scheduleRegretCheckIn(itemID: id, at: .now.addingTimeInterval(60))
++        await mock.cancelRegretCheckIn(itemID: id)
++        let scheduled = await mock.regretScheduled
++        let cancelled = await mock.regretCancelled
++        XCTAssertEqual(scheduled, [id])
++        XCTAssertEqual(cancelled, [id])
++    }
++}
++
++final class GoalLifecycleTests: XCTestCase {
++    func testLowCostGoalCanBeMarkedComplete() {
++        let goal = makeTestGoal(type: .lowCost, target: nil)
++        let done = GoalPlanningService().markComplete(goal)
++        XCTAssertEqual(done.trackStatus, .completed)
++        XCTAssertNotNil(done.completedAt)
++    }
++
++    func testFocusGoalPrefersPrimaryAndSkipsPausedOrDone() {
++        let primary = makeTestGoal(priority: .primary)
++        let active = makeTestGoal(priority: .active)
++        let pausedPrimary = makeTestGoal(priority: .primary, status: .paused)
++        let service = GoalPlanningService()
++        XCTAssertEqual(service.focusGoal(in: [active, primary])?.id, primary.id)
++        XCTAssertEqual(service.focusGoal(in: [pausedPrimary, active])?.id, active.id)
++        XCTAssertNil(service.focusGoal(in: [makeTestGoal(priority: .someday)]))
++        XCTAssertNil(service.focusGoal(in: [makeTestGoal(status: .completed)]))
++    }
++
++    func testRecordOutcomeTrimsNote() {
++        let goal = makeTestGoal()
++        let service = GoalPlanningService()
++        let withNote = service.recordOutcome(goal, rating: .worthIt, note: "  Loved it  ")
++        XCTAssertEqual(withNote.outcomeRating, .worthIt)
++        XCTAssertEqual(withNote.outcomeNote, "Loved it")
++        let blank = service.recordOutcome(goal, rating: .mixed, note: "   ")
++        XCTAssertNil(blank.outcomeNote)
++    }
++
++    func testPauseAndResume() {
++        let service = GoalPlanningService()
++        let paused = service.pause(makeTestGoal())
++        XCTAssertEqual(paused.trackStatus, .paused)
++        XCTAssertNotNil(paused.pausedAt)
++        let resumed = service.resume(paused)
++        XCTAssertNil(resumed.pausedAt)
++        XCTAssertNotEqual(resumed.trackStatus, .paused)
++    }
++}
++
++final class RecapPlannerTests: XCTestCase {
++    func testNextRecapIsFutureSundayAtSixPM() {
++        var calendar = Calendar(identifier: .gregorian)
++        calendar.timeZone = TimeZone(identifier: "UTC")!
++        let now = calendar.date(from: DateComponents(year: 2026, month: 9, day: 16, hour: 9))! // a Wednesday
++        let date = RecapPlanner.nextRecapDate(after: now, calendar: calendar)!
++        XCTAssertGreaterThan(date, now)
++        XCTAssertEqual(calendar.component(.weekday, from: date), 1)
++        XCTAssertEqual(calendar.component(.hour, from: date), 18)
++    }
++
++    func testPausedCountOnlyLastSevenDays() {
++        let now = Date(timeIntervalSince1970: 5_000_000)
++        let recent = makeTestItem(createdAt: now.addingTimeInterval(-2 * 24 * 3600))
++        let old = makeTestItem(createdAt: now.addingTimeInterval(-10 * 24 * 3600))
++        XCTAssertEqual(RecapPlanner.pausedCount(items: [recent, old], now: now), 1)
++    }
++
++    func testBodyNeverContainsItemDetails() {
++        XCTAssertTrue(RecapPlanner.body(pausedCount: 3).contains("3 impulses"))
++        XCTAssertTrue(RecapPlanner.body(pausedCount: 1).contains("1 impulse "))
++        XCTAssertFalse(RecapPlanner.body(pausedCount: 0).isEmpty)
++    }
++}
+diff --git a/docs/MVP_SCOPE.md b/docs/MVP_SCOPE.md
+index 41e424a..ff5bc94 100644
+--- a/docs/MVP_SCOPE.md
++++ b/docs/MVP_SCOPE.md
+@@ -18,6 +18,13 @@ Canonical vision: [PRODUCT_VISION.md](PRODUCT_VISION.md)
+ | Add progress (financial / planning / behavioral) | Implemented |
+ | Goal-aware trade-off copy on detail + buy confirmation | Implemented |
+ | Money Story goal priority insight | Implemented |
++| Goal completion moment + outcome reflection (worth it / mixed / not really) | Implemented, not yet compiled ([HANDOFF_FEATURES.md](HANDOFF_FEATURES.md)) |
++| Goal lifecycle: complete (incl. low-cost), pause, resume, abandon; paused/finished list on Home | Implemented, not yet compiled |
++| Redirect nudge after letting go (behavioral note; optional user-entered amount) | Implemented, not yet compiled |
++| Regret check-in after purchase + Money Story "glad you bought" | Implemented, not yet compiled |
++| Weekly recap local notification (opt-in, count only) | Implemented, not yet compiled |
++| Shareable Money Story card (counts only) | Implemented, not yet compiled |
++| Goal from a collection (components from saved estimates) | Experimental, not yet compiled |
+ | Item detail + optional reflection/feelings/tags/estimate | Implemented |
+ | Cooling-off defaults + local notification scheduler | Implemented |
+ | Review Buy / Keep considering / Let go + Undo payload | Implemented |
+@@ -37,7 +44,9 @@ Canonical vision: [PRODUCT_VISION.md](PRODUCT_VISION.md)
+ | Multi-goal monthly allocation editor | Deferred |
+ | Auto plan cost from linked aspiration roles | Deferred |
+ | Full component booking deadlines | Deferred |
+-| Goal outcome reflection after complete/abandon | Partial (status only) |
++| Goal outcome reflection after complete/abandon | Completion reflection implemented; abandon reflection not done |
++| Background refresh of weekly recap count | Not done (count is computed at app open) |
++| Edit plan components after creating a goal from a collection | Not done |
+ | Supabase + RLS + private media | Deferred (stubs + setup doc) |
+ | Sign in with Apple + Keychain session | Stub UI only |
+ | Live offline sync queue | Designed, not live |
+diff --git a/docs/PRODUCT_VISION.md b/docs/PRODUCT_VISION.md
+index bc1c38e..5ceb109 100644
+--- a/docs/PRODUCT_VISION.md
++++ b/docs/PRODUCT_VISION.md
+@@ -113,3 +113,14 @@ Explain whether everyday choices reflect declared priorities (contributions, red
+ - Automatic plan cost recompute from linked saves (“$4,860 plan”)
+ - Full component booking deadlines
+ - Cloud sync of goals
++
++## Update: reflection loop (learn + reflect)
++
++Added after the goals slice, to close the "Decide intentionally, Learn" end of the loop. Details and test steps: [HANDOFF_FEATURES.md](HANDOFF_FEATURES.md).
++
++- **Finish and reflect:** completing a goal (any type, including low/no-cost) asks one question, "Was it worth it?", and feeds Money Story.
++- **Redirect on let-go:** after letting go of a save, Prism offers to note it as progress on the focus goal. It records a behavioral note; money is added only if the user types an amount they actually moved. Estimates are never savings.
++- **Purchase check-in:** 30 days after a confirmed purchase, ask "still glad you bought it?" (opt-in notification; the in-app card always works).
++- **Weekly recap:** opt-in Sunday notification with a count only.
++- **Shareable story card:** counts and goal percentage only, never titles or prices.
++- **Goal from a collection (experimental):** a collection becomes one goal whose components are the user's own estimates. This pulls part of the deferred "automatic plan cost from linked saves" item into scope.
