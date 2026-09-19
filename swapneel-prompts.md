@@ -50,3 +50,19 @@ Update Prism vision to goals (aspiration → goal → plan → contribution → 
 **Key decisions:** Home leads with goals; aspirations remain the save feed; pace from user-entered targets only; soft active-goal limit of 3.
 
 **Errors encountered:** SavedItemCard dropped on Home rewrite (restored); monthly pace test flaky on calendar month count (fixed with pinned dates).
+
+### Prompt 4 — 2026-09-19
+in the mmn_dev com.jasminekaur.prism - make this the bundle
+
+**TL;DR:** Set canonical bundle ID to `com.jasminekaur.prism` on `mmn_dev` (share/tests/app group aligned; team `84UWSJTPV6`).
+
+**Files changed:**
+- `project.yml` — bundle IDs + DEVELOPMENT_TEAM
+- `Prism.xcodeproj/project.pbxproj` — regenerated from project.yml
+- `ShareInbox.swift`, `ShareViewController.swift` — App Group `group.com.jasminekaur.prism`
+- `.env.example`, `README.md`, `TESTFLIGHT_CHECKLIST.md` — docs/IDs
+- `scratchpad/bundle-id-mmn-dev-v1.md` — [NEW] plan
+
+**Key decisions:** Share/tests use `com.jasminekaur.prism.*` suffix; kept existing team ID from Xcode signing.
+
+**Errors encountered:** None

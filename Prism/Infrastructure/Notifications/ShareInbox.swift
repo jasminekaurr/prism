@@ -3,7 +3,7 @@
 import Foundation
 
 enum MainAppShareInbox {
-    static let appGroupID = "group.com.prism.app"
+    static let appGroupID = "group.com.jasminekaur.prism"
 
     struct Payload: Codable {
         var urlString: String?

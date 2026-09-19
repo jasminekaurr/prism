@@ -17,4 +17,4 @@ Ship local-first Prism iOS MVP per approved plan: SwiftUI + SwiftData, spending 
 - Spending pocket soft-preview (A); calendar month; confirmed purchase reduces remaining
 - AI Description deferred
 - New York system serif (Fraunces fallback documented)
-- Bundle ID placeholder: com.prism.app
+- Bundle ID: `com.jasminekaur.prism` (see `scratchpad/bundle-id-mmn-dev-v1.md`)

@@ -518,11 +518,11 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					354E9E00C35439418CFE0A18 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 84UWSJTPV6;
 						ProvisioningStyle = Automatic;
 					};
 					CDFC0F00FA9F3945D4407FE1 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 84UWSJTPV6;
 						ProvisioningStyle = Automatic;
 					};
 					E4FDFF3727A5ABDE970ACA5D = {
@@ -651,7 +651,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Prism.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Prism";
@@ -668,7 +668,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Prism;
@@ -685,7 +685,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Prism.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Prism";
@@ -702,7 +702,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Prism;
@@ -719,7 +719,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Prism;
@@ -732,7 +732,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Prism;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Prism uses the camera so you can save items you want to revisit later.";
@@ -744,7 +744,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism;
 				PRODUCT_NAME = Prism;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -884,10 +884,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.share;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -901,7 +901,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Prism;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Prism uses the camera so you can save items you want to revisit later.";
@@ -913,7 +913,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism;
 				PRODUCT_NAME = Prism;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -924,10 +924,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.share;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -939,10 +939,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.share;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -960,7 +960,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Prism.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Prism";
@@ -1034,7 +1034,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Prism;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Prism uses the camera so you can save items you want to revisit later.";
@@ -1046,7 +1046,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.prism.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism;
 				PRODUCT_NAME = Prism;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
