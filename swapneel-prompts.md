@@ -50,3 +50,21 @@ Update Prism vision to goals (aspiration → goal → plan → contribution → 
 **Key decisions:** Home leads with goals; aspirations remain the save feed; pace from user-entered targets only; soft active-goal limit of 3.
 
 **Errors encountered:** SavedItemCard dropped on Home rewrite (restored); monthly pace test flaky on calendar month count (fixed with pinned dates).
+
+### Prompt 3 — 2026-09-19
+make this the onboarding 1st page + splash screen + use the logo as the favicon also
+
+**TL;DR:** Wired the brand hero as Launch Screen + onboarding page 0, and set AppIcon from the pyramid mark (iOS favicon equivalent).
+
+**Files changed:**
+- `Prism/Resources/Assets.xcassets/BrandSplash.imageset/` — [NEW] full brand hero for splash/onboarding
+- `Prism/Resources/Assets.xcassets/PrismMark.imageset/` — [NEW] pyramid mark for in-app logo
+- `Prism/Resources/Assets.xcassets/AppIcon.appiconset/` — AppIcon from brand pyramid crop
+- `Prism/Resources/LaunchScreen.storyboard` — [NEW] full-bleed BrandSplash launch screen
+- `Prism/Features/Onboarding/OnboardingFlowView.swift` — page 0 brand hero; PrismLogoMark uses PrismMark
+- `project.yml` + `Prism.xcodeproj` — UILaunchStoryboardName + LaunchScreen resource
+- `scratchpad/brand-splash-onboarding-v1.md` — [NEW] plan
+
+**Key decisions:** iOS AppIcon stands in for favicon (no web target); first onboarding page uses the composite hero image so typography matches the design; UITest ids preserved.
+
+**Errors encountered:** None (xcodebuild succeeded).

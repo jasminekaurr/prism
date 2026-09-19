@@ -262,19 +262,7 @@ struct SavedItemCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: PrismSpacing.xs) {
             ZStack(alignment: .bottomTrailing) {
-                RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous)
-                    .fill(PrismColors.violet.opacity(0.35))
-                    .frame(height: 140)
-                    .overlay {
-                        if let domain = item.sourceDomain {
-                            Text(domain)
-                                .font(PrismTypography.caption())
-                                .foregroundStyle(PrismColors.textSecondary)
-                        } else {
-                            Image(systemName: "photo")
-                                .foregroundStyle(PrismColors.textTertiary)
-                        }
-                    }
+                AspirationMediaView(item: item, height: 140)
                 if item.sourceDomain != nil {
                     Image(systemName: "link")
                         .font(.caption2)

@@ -132,23 +132,8 @@ struct SavedItemDetailView: View {
 
     @ViewBuilder
     private func mediaBlock(_ item: SavedItem) -> some View {
-        RoundedRectangle(cornerRadius: PrismRadius.lg)
-            .fill(PrismColors.violet.opacity(0.3))
-            .frame(height: 280)
-            .overlay {
-                VStack {
-                    if let domain = item.sourceDomain {
-                        Text(domain).foregroundStyle(PrismColors.textSecondary)
-                    } else {
-                        Image(systemName: "photo").font(.largeTitle)
-                    }
-                }
-            }
-            .overlay(alignment: .bottom) {
-                LinearGradient(colors: [.clear, .black.opacity(PrismMaterials.scrimOpacity)], startPoint: .top, endPoint: .bottom)
-                    .frame(height: 80)
-                    .clipShape(RoundedRectangle(cornerRadius: PrismRadius.lg))
-            }
+        AspirationMediaView(item: item, height: 280)
+            .accessibilityIdentifier("detail.media")
     }
 
     private func load() async {

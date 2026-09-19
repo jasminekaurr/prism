@@ -4,7 +4,7 @@
 
 1. [ ] `xcodegen generate` && open `Prism.xcodeproj`
 2. [ ] Set your Development Team on Prism + PrismShareExtension
-3. [ ] Update bundle IDs if needed (`com.prism.app` / `com.prism.app.share`)
+3. [ ] Confirm bundle IDs (`com.jasminekaur.prism` / `com.jasminekaur.prism.share`)
 4. [ ] Run on a physical device or Simulator; complete onboarding in demo mode
 5. [ ] Verify save → reflect → review → Money Story / spending pocket
 6. [ ] Verify Settings export + delete local data
@@ -13,7 +13,7 @@
 ## Before cloud / production TestFlight
 
 1. [ ] Apple Developer App IDs for app + Share Extension
-2. [ ] App Group `group.com.prism.app` on both targets
+2. [ ] App Group `group.com.jasminekaur.prism` on both targets
 3. [ ] Sign in with Apple capability
 4. [ ] Push / notification capability if using remote later (local notifications work without)
 5. [ ] Supabase project + redirect URLs ([SUPABASE_SETUP.md](SUPABASE_SETUP.md))
