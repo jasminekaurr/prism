@@ -60,7 +60,7 @@ Copy [`.env.example`](.env.example) when cloud is enabled. Never commit service-
 
 ## Share Extension
 
-Target `PrismShareExtension` is scaffolded. Bundle ID is `com.jasminekaur.prism` (share: `com.jasminekaur.prism.share`). Configure App Group `group.com.jasminekaur.prism` in the Apple Developer portal before TestFlight. See [TESTFLIGHT_CHECKLIST.md](TESTFLIGHT_CHECKLIST.md).
+Target `PrismShareExtension` is scaffolded. Bundle IDs: `com.jasminekaur.prism` / `com.jasminekaur.prism.share`. Configure App Group `group.com.jasminekaur.prism` before TestFlight. See [TESTFLIGHT_CHECKLIST.md](TESTFLIGHT_CHECKLIST.md).
 
 ## Documentation
 

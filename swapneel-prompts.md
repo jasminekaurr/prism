@@ -51,18 +51,20 @@ Update Prism vision to goals (aspiration → goal → plan → contribution → 
 
 **Errors encountered:** SavedItemCard dropped on Home rewrite (restored); monthly pace test flaky on calendar month count (fixed with pinned dates).
 
-### Prompt 4 — 2026-09-19
-in the mmn_dev com.jasminekaur.prism - make this the bundle
+### Prompt 3 — 2026-09-19
+make this the onboarding 1st page + splash screen + use the logo as the favicon also
 
-**TL;DR:** Set canonical bundle ID to `com.jasminekaur.prism` on `mmn_dev` (share/tests/app group aligned; team `84UWSJTPV6`).
+**TL;DR:** Wired the brand hero as Launch Screen + onboarding page 0, and set AppIcon from the pyramid mark (iOS favicon equivalent).
 
 **Files changed:**
-- `project.yml` — bundle IDs + DEVELOPMENT_TEAM
-- `Prism.xcodeproj/project.pbxproj` — regenerated from project.yml
-- `ShareInbox.swift`, `ShareViewController.swift` — App Group `group.com.jasminekaur.prism`
-- `.env.example`, `README.md`, `TESTFLIGHT_CHECKLIST.md` — docs/IDs
-- `scratchpad/bundle-id-mmn-dev-v1.md` — [NEW] plan
+- `Prism/Resources/Assets.xcassets/BrandSplash.imageset/` — [NEW] full brand hero for splash/onboarding
+- `Prism/Resources/Assets.xcassets/PrismMark.imageset/` — [NEW] pyramid mark for in-app logo
+- `Prism/Resources/Assets.xcassets/AppIcon.appiconset/` — AppIcon from brand pyramid crop
+- `Prism/Resources/LaunchScreen.storyboard` — [NEW] full-bleed BrandSplash launch screen
+- `Prism/Features/Onboarding/OnboardingFlowView.swift` — page 0 brand hero; PrismLogoMark uses PrismMark
+- `project.yml` + `Prism.xcodeproj` — UILaunchStoryboardName + LaunchScreen resource
+- `scratchpad/brand-splash-onboarding-v1.md` — [NEW] plan
 
-**Key decisions:** Share/tests use `com.jasminekaur.prism.*` suffix; kept existing team ID from Xcode signing.
+**Key decisions:** iOS AppIcon stands in for favicon (no web target); first onboarding page uses the composite hero image so typography matches the design; UITest ids preserved.
 
-**Errors encountered:** None
+**Errors encountered:** None (xcodebuild succeeded).

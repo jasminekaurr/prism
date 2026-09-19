@@ -38,12 +38,13 @@ targets:
     resources:
       - path: Prism/Resources/Assets.xcassets
       - path: Prism/Resources/PrivacyInfo.xcprivacy
+      - path: Prism/Resources/LaunchScreen.storyboard
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism
         PRODUCT_NAME: Prism
         INFOPLIST_KEY_CFBundleDisplayName: Prism
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_NSCameraUsageDescription: Prism uses the camera so you can save items you want to revisit later.
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Prism uses your photo library so you can save images and screenshots of things you want to revisit.

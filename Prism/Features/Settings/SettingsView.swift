@@ -47,7 +47,7 @@ struct SettingsView: View {
                             .keyboardType(.decimalPad)
                             .accessibilityIdentifier("settings.pocket.amount")
                         Text("Prism never calculates what you can afford. This is your guardrail.")
-                            .font(.caption)
+                            .font(PrismTypography.caption())
                         Button("Save pocket") { Task { await savePocket() } }
                             .accessibilityIdentifier("settings.pocket.save")
                     }
@@ -56,7 +56,7 @@ struct SettingsView: View {
                         Toggle("Automatic review dates", isOn: $coolingEnabled)
                             .accessibilityIdentifier("settings.cooling")
                         Text("$ 24h · $$ 3d · $$$ 7d · Not sure 3d (defaults)")
-                            .font(.caption)
+                            .font(PrismTypography.caption())
                         Button("Save cooling-off") { Task { await saveCooling() } }
                     }
 
@@ -67,7 +67,7 @@ struct SettingsView: View {
                             Task { await enableNotifications() }
                         }
                         Text("Reminders say an item is ready — not the item title.")
-                            .font(.caption)
+                            .font(PrismTypography.caption())
                     }
 
                     Section("Reflection nudges") {
@@ -112,14 +112,14 @@ struct SettingsView: View {
                         Button("Sign in with Apple") {}
                             .disabled(true)
                         Text("Cloud accounts and Sign in with Apple arrive in a later build.")
-                            .font(.caption)
+                            .font(PrismTypography.caption())
                     }
 
                     Section("Legal") {
                         Text(PrismCopy.financialBoundary)
-                            .font(.caption)
+                            .font(PrismTypography.caption())
                         Text(PrismCopy.privacySummary)
-                            .font(.caption)
+                            .font(PrismTypography.caption())
                     }
 
                     if let statusMessage {

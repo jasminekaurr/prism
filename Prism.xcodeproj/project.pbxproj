@@ -29,8 +29,10 @@
 		7220A01D75DA160B6F7A2385 /* PrismUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A1F701F292E7C3239343E /* PrismUtilities.swift */; };
 		7C23FE0E818CCDA01622C11B /* GoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64A12EF52A1C088F31F097E /* GoalDetailView.swift */; };
 		7C3435D8AF50931D77183B2B /* SupabaseStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48221965EC9B33F0B815639C /* SupabaseStubs.swift */; };
+		8A39A226113E91FD9DF649E3 /* AspirationMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80BBF9FFC901A4565B47840 /* AspirationMediaView.swift */; };
 		8AE8693F7F3D50AD1A6D8031 /* LocalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710641E47D279F23DC6F3ED /* LocalStore.swift */; };
 		93119062237C529DC598225E /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8085232F550794EDE7EA8C9 /* NotificationScheduler.swift */; };
+		99FB59BEB9CC638F7A162B0B /* LinkPreviewFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7DB413F62C150F2C14E81 /* LinkPreviewFetcher.swift */; };
 		9A001168593E9D957BF4D9D1 /* PrismCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF395B6A901BEE67F776993 /* PrismCoreTests.swift */; };
 		9CAF762D8EFD95EC86469C7F /* MoneyStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A7C680F6BB8194312B1A74 /* MoneyStoryView.swift */; };
 		9D07CC72D94E0F084FAC3126 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B438803C6E4BEA5508B407 /* SettingsView.swift */; };
@@ -100,7 +102,7 @@
 		381F0B79FE050ECE0F23A78F /* ReflectionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionEditorView.swift; sourceTree = "<group>"; };
 		3B26B1DC733D2E211912F087 /* ReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViews.swift; sourceTree = "<group>"; };
 		3C77344BC18D1248D4E201C3 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExporter.swift; sourceTree = "<group>"; };
-		3CBECDC40DB2F7D8BF88B956 /* Prism.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Prism.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CBECDC40DB2F7D8BF88B956 /* Prism.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Prism.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		44687FF37F397BBC58BC4AE7 /* AddProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProgressView.swift; sourceTree = "<group>"; };
 		48221965EC9B33F0B815639C /* SupabaseStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseStubs.swift; sourceTree = "<group>"; };
 		546BC6EFDFE09A52DCBF0816 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -111,17 +113,19 @@
 		668E6A56E0FEB5176CDFE4F4 /* DecisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionService.swift; sourceTree = "<group>"; };
 		87B438803C6E4BEA5508B407 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedItemDetailView.swift; sourceTree = "<group>"; };
+		8DA7DB413F62C150F2C14E81 /* LinkPreviewFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewFetcher.swift; sourceTree = "<group>"; };
 		946A1954BA1622BDCF2017EA /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		94952FC4F297F9DFC7E03251 /* GoalPlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalPlanningService.swift; sourceTree = "<group>"; };
 		9585ED74EE865E61D73B9C08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		99277F620BB3AD4DA8784CDD /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		9A4384F5A7C926ED119A9405 /* Security.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security.swift; sourceTree = "<group>"; };
 		9CBF52F3FA1A816060503D43 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
-		9F0477CDC9412077CFF6A416 /* PrismShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PrismShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F0477CDC9412077CFF6A416 /* PrismShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PrismShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FC40857258D606DE72FCD97 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		A64A12EF52A1C088F31F097E /* GoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailView.swift; sourceTree = "<group>"; };
 		A8085232F550794EDE7EA8C9 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		B29578EE8E1607F5816296D7 /* GoalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalModels.swift; sourceTree = "<group>"; };
+		B80BBF9FFC901A4565B47840 /* AspirationMediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspirationMediaView.swift; sourceTree = "<group>"; };
 		BE4200B95B05FDE1C371669C /* DependencyContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		BE51C482C6F52F65C9D46CDB /* RepositoryProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryProtocols.swift; sourceTree = "<group>"; };
 		BFE7222E6F7FE1B4127FAACE /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
@@ -187,6 +191,14 @@
 				22F819625379C8FED237C8E9 /* OnboardingFlowView.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		2961442D35E01C52740219BE /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				8DA7DB413F62C150F2C14E81 /* LinkPreviewFetcher.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 		329356AF485B426F2CD0C4D1 /* PrismTests */ = {
@@ -353,6 +365,7 @@
 		C2C6D3A871544EDE6A1F82A6 /* Saves */ = {
 			isa = PBXGroup;
 			children = (
+				B80BBF9FFC901A4565B47840 /* AspirationMediaView.swift */,
 				8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */,
 			);
 			path = Saves;
@@ -427,6 +440,7 @@
 			children = (
 				7B5CF085FDA75CD2CA7C21B8 /* Analytics */,
 				AC7E49B760228F570A8B6E57 /* DesignSystem */,
+				2961442D35E01C52740219BE /* Networking */,
 				340C56C4E84917B7C5C0EB92 /* Security */,
 				7097D86F2B0A88E21C350AA0 /* Utilities */,
 			);
@@ -518,11 +532,9 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					354E9E00C35439418CFE0A18 = {
-						DevelopmentTeam = 84UWSJTPV6;
 						ProvisioningStyle = Automatic;
 					};
 					CDFC0F00FA9F3945D4407FE1 = {
-						DevelopmentTeam = 84UWSJTPV6;
 						ProvisioningStyle = Automatic;
 					};
 					E4FDFF3727A5ABDE970ACA5D = {
@@ -569,6 +581,7 @@
 				70045AC2D4271A320D22A9F6 /* Analytics.swift in Sources */,
 				34EEEE322F023C36A4281F7E /* AppEnvironment.swift in Sources */,
 				22AA83F22606F0429DE5F117 /* AppRouter.swift in Sources */,
+				8A39A226113E91FD9DF649E3 /* AspirationMediaView.swift in Sources */,
 				D9DE10812D089A76681516DE /* CaptureFlowView.swift in Sources */,
 				42EA900B3F6CB7F9881F7C7C /* CollectionsView.swift in Sources */,
 				BA2F1F9F83519AD975DCD957 /* DataExporter.swift in Sources */,
@@ -581,6 +594,7 @@
 				59B853C3D1C3FE97550F5412 /* GoalPlanningService.swift in Sources */,
 				B68ECCAB9FED26B7CD14A36A /* GoalSetupFlowView.swift in Sources */,
 				43C7E49704A1A4B9EFF5CC39 /* HomeView.swift in Sources */,
+				99FB59BEB9CC638F7A162B0B /* LinkPreviewFetcher.swift in Sources */,
 				8AE8693F7F3D50AD1A6D8031 /* LocalStore.swift in Sources */,
 				19A528789A40CC32308DDDB3 /* MoneyStoryService.swift in Sources */,
 				9CAF762D8EFD95EC86469C7F /* MoneyStoryView.swift in Sources */,
@@ -738,7 +752,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Prism uses the camera so you can save items you want to revisit later.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Prism can lock the app with Face ID to keep your reflections private.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Prism uses your photo library so you can save images and screenshots of things you want to revisit.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -886,7 +900,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
@@ -907,7 +925,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Prism uses the camera so you can save items you want to revisit later.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Prism can lock the app with Face ID to keep your reflections private.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Prism uses your photo library so you can save images and screenshots of things you want to revisit.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -926,7 +944,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
@@ -941,7 +963,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
@@ -1040,7 +1066,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Prism uses the camera so you can save items you want to revisit later.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Prism can lock the app with Face ID to keep your reflections private.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Prism uses your photo library so you can save images and screenshots of things you want to revisit.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

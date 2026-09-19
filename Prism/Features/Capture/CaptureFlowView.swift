@@ -1,4 +1,4 @@
-// Summary: Capture flow — collection, intent, cost significance, optional photo/URL/manual title.
+// Summary: Capture flow — collection, intent, cost, URL with automatic link preview image.
 
 import SwiftUI
 import PhotosUI
@@ -16,8 +16,19 @@ struct CaptureFlowView: View {
     @State private var urlText = ""
     @State private var photoItem: PhotosPickerItem?
     @State private var imageData: Data?
+    @State private var previewFromLink = false
+    @State private var isLoadingPreview = false
+    @State private var previewFailed = false
     @State private var errorText: String?
     @State private var isSaving = false
+    @State private var previewTask: Task<Void, Never>?
+
+    private var canSave: Bool {
+        guard !isSaving, selectedCollectionID != nil else { return false }
+        let hasTitle = !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let hasLink = URLHelpers.normalizedURL(from: urlText) != nil
+        return hasTitle || hasLink
+    }
 
     var body: some View {
         NavigationStack {
@@ -29,10 +40,16 @@ struct CaptureFlowView: View {
                             .font(PrismTypography.title())
                             .accessibilityIdentifier("capture.title")
 
+                        linkPreviewSection
+
                         SectionMicroLabel(text: "Collection")
                         if collections.isEmpty {
                             Text("Create a collection first from the Collections tab.")
                                 .foregroundStyle(PrismColors.textSecondary)
+                            Button("Create a collection") {
+                                dismiss()
+                            }
+                            .font(PrismTypography.caption())
                         } else {
                             Picker("Collection", selection: $selectedCollectionID) {
                                 ForEach(collections) { c in
@@ -86,12 +103,20 @@ struct CaptureFlowView: View {
                         TextField("https://…", text: $urlText)
                             .textInputAutocapitalization(.never)
                             .keyboardType(.URL)
+                            .textContentType(.URL)
+                            .autocorrectionDisabled()
                             .padding()
                             .background(RoundedRectangle(cornerRadius: PrismRadius.md).stroke(PrismColors.glassStroke))
                             .accessibilityIdentifier("capture.url")
+                            .onChange(of: urlText) { _, newValue in
+                                schedulePreviewFetch(for: newValue)
+                            }
+                            .onSubmit {
+                                schedulePreviewFetch(for: urlText, immediate: true)
+                            }
 
                         PhotosPicker(selection: $photoItem, matching: .images) {
-                            Label("Add from Photos", systemImage: "photo")
+                            Label(imageData == nil ? "Add from Photos" : "Replace photo", systemImage: "photo")
                                 .frame(maxWidth: .infinity, minHeight: 44)
                         }
                         .accessibilityIdentifier("capture.photos")
@@ -99,27 +124,35 @@ struct CaptureFlowView: View {
                             Task {
                                 if let data = try? await item?.loadTransferable(type: Data.self) {
                                     imageData = data
+                                    previewFromLink = false
+                                    previewFailed = false
                                 }
                             }
-                        }
-
-                        if imageData != nil {
-                            Text("Photo attached")
-                                .font(PrismTypography.caption())
-                                .foregroundStyle(PrismColors.successSoft)
                         }
 
                         if let errorText {
                             Text(errorText).foregroundStyle(PrismColors.danger)
                         }
 
-                        PrismPrimaryButton(title: "Save") {
+                        Button {
                             Task { await save() }
+                        } label: {
+                            Text("Save")
+                                .font(PrismTypography.headline())
+                                .foregroundStyle(PrismColors.textPrimary)
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                                .padding(.horizontal, PrismSpacing.lg)
+                                .background {
+                                    RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous)
+                                        .fill(Color.black.opacity(canSave ? 0.85 : 0.35))
+                                        .shadow(color: PrismColors.violet.opacity(canSave ? 0.55 : 0), radius: 12, y: 2)
+                                }
                         }
-                        .disabled(isSaving || selectedCollectionID == nil || title.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .buttonStyle(.plain)
+                        .disabled(!canSave)
                         .accessibilityIdentifier("capture.save")
 
-                        Text("Everything else can wait. Reflection is optional.")
+                        Text("Paste a link to load a preview automatically. A title is filled in for you when possible.")
                             .font(PrismTypography.caption())
                             .foregroundStyle(PrismColors.textTertiary)
                     }
@@ -133,6 +166,117 @@ struct CaptureFlowView: View {
             }
         }
         .task { await loadCollections() }
+        .onDisappear { previewTask?.cancel() }
+    }
+
+    @ViewBuilder
+    private var linkPreviewSection: some View {
+        if isLoadingPreview {
+            GlassCard {
+                HStack(spacing: PrismSpacing.sm) {
+                    ProgressView()
+                    Text("Loading link preview…")
+                        .font(PrismTypography.body())
+                        .foregroundStyle(PrismColors.textSecondary)
+                }
+                .frame(maxWidth: .infinity, minHeight: 120)
+            }
+            .accessibilityIdentifier("capture.preview.loading")
+        } else if let imageData, let uiImage = UIImage(data: imageData) {
+            GlassCard(padding: PrismSpacing.xs) {
+                VStack(alignment: .leading, spacing: PrismSpacing.xs) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 220)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous))
+                        .accessibilityIdentifier("capture.preview.image")
+
+                    if previewFromLink, let domain = URLHelpers.domain(from: URLHelpers.normalizedURL(from: urlText)) {
+                        Text(domain)
+                            .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.textTertiary)
+                            .padding(.horizontal, PrismSpacing.xs)
+                            .padding(.bottom, PrismSpacing.xs)
+                    }
+                }
+            }
+        } else if previewFailed, URLHelpers.normalizedURL(from: urlText) != nil {
+            GlassCard {
+                VStack(spacing: PrismSpacing.sm) {
+                    Image(systemName: "link")
+                        .font(.system(size: 28))
+                        .foregroundStyle(PrismColors.lavender)
+                    Text(URLHelpers.domain(from: URLHelpers.normalizedURL(from: urlText)) ?? "Link attached")
+                        .font(PrismTypography.headline())
+                    Text("No preview image was available. You can still save, or add a photo.")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, minHeight: 120)
+            }
+            .accessibilityIdentifier("capture.preview.fallback")
+        }
+    }
+
+    private func schedulePreviewFetch(for raw: String, immediate: Bool = false) {
+        previewTask?.cancel()
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URLHelpers.normalizedURL(from: trimmed) else {
+            if trimmed.isEmpty {
+                if previewFromLink {
+                    imageData = nil
+                    previewFromLink = false
+                }
+                previewFailed = false
+                isLoadingPreview = false
+            }
+            return
+        }
+
+        // Immediately give a usable title from the domain so Save is enabled while preview loads.
+        if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           let host = url.host {
+            title = host.replacingOccurrences(of: "www.", with: "")
+        }
+
+        previewTask = Task {
+            if !immediate {
+                try? await Task.sleep(nanoseconds: 350_000_000)
+            }
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                isLoadingPreview = true
+                previewFailed = false
+                errorText = nil
+            }
+            let result = await LinkPreviewFetcher.fetch(for: url)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                isLoadingPreview = false
+                let currentTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+                let isPlaceholderTitle = currentTitle.isEmpty
+                    || currentTitle == url.host?.replacingOccurrences(of: "www.", with: "")
+                if isPlaceholderTitle, let previewTitle = result.title, !previewTitle.isEmpty {
+                    title = previewTitle
+                }
+                if let data = result.imageData, UIImage(data: data) != nil {
+                    if imageData == nil || previewFromLink {
+                        imageData = data
+                        previewFromLink = true
+                        previewFailed = false
+                    }
+                } else {
+                    if previewFromLink {
+                        imageData = nil
+                    }
+                    previewFailed = imageData == nil
+                }
+            }
+        }
     }
 
     private func loadCollections() async {
@@ -141,26 +285,47 @@ struct CaptureFlowView: View {
         if selectedCollectionID == nil {
             selectedCollectionID = collections.first?.id
         }
+        if collections.isEmpty {
+            errorText = "Create a collection first, then come back to save."
+        }
     }
 
     private func save() async {
-        guard let profile = environment.profile,
-              let collectionID = selectedCollectionID else { return }
+        errorText = nil
+        guard let profile = environment.profile else {
+            errorText = "Session missing. Close and open Add again."
+            return
+        }
+        guard let collectionID = selectedCollectionID else {
+            errorText = "Create a collection first, then save."
+            return
+        }
+
         isSaving = true
         defer { isSaving = false }
 
-        let url = URLHelpers.validatedHTTPSURL(from: urlText)
-            ?? (urlText.isEmpty ? nil : URL(string: urlText))
-        if !urlText.isEmpty && url == nil {
-            errorText = "That link doesn’t look valid. You can still save without it."
-            return
+        let trimmedURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let url = URLHelpers.normalizedURL(from: trimmedURL)
+        if !trimmedURL.isEmpty && url == nil {
+            // Don’t block save — keep going without a link.
+            errorText = nil
+        }
+
+        var resolvedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        if resolvedTitle.isEmpty {
+            resolvedTitle = url.flatMap { URLHelpers.domain(from: $0)?.replacingOccurrences(of: "www.", with: "") }
+                ?? "Saved item"
         }
 
         var mediaID: UUID?
         if let imageData {
             let assetID = UUID()
-            if let asset = try? await container.mediaRepository.saveImageData(imageData, userID: profile.id, assetID: assetID) {
+            do {
+                let asset = try await container.mediaRepository.saveImageData(imageData, userID: profile.id, assetID: assetID)
                 mediaID = asset.id
+            } catch {
+                // Still save the item even if media write fails.
+                container.crashReporter.record(error: error, context: "capture.media")
             }
         }
 
@@ -173,7 +338,7 @@ struct CaptureFlowView: View {
             id: UUID(),
             userID: profile.id,
             collectionID: collectionID,
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+            title: resolvedTitle,
             notes: nil,
             reflection: nil,
             sourceURL: url,
