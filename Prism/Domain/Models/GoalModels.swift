@@ -23,6 +23,8 @@ struct PrismGoal: Identifiable, Codable, Equatable, Sendable {
     var updatedAt: Date
     var completedAt: Date?
     var pausedAt: Date?
+    var outcomeRating: GoalOutcomeRating? = nil
+    var outcomeNote: String? = nil
 }
 
 struct GoalMilestone: Identifiable, Codable, Equatable, Sendable {

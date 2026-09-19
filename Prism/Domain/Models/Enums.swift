@@ -245,3 +245,39 @@ enum AspirationLinkRole: String, Codable, CaseIterable, Identifiable, Sendable {
         }
     }
 }
+
+// MARK: - Reflection outcomes
+
+/// How a user felt about a finished goal. Stored on the goal, never shared.
+enum GoalOutcomeRating: String, Codable, CaseIterable, Identifiable, Sendable {
+    case worthIt
+    case mixed
+    case notReally
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .worthIt: return "Worth it"
+        case .mixed: return "Mixed"
+        case .notReally: return "Not really"
+        }
+    }
+}
+
+/// Answer to the post-purchase "still glad you bought it?" check-in.
+enum RegretAnswer: String, Codable, CaseIterable, Identifiable, Sendable {
+    case glad
+    case neutral
+    case regret
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .glad: return "Glad"
+        case .neutral: return "Neutral"
+        case .regret: return "Regret"
+        }
+    }
+}

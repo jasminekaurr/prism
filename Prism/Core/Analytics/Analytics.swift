@@ -15,6 +15,12 @@ enum AnalyticsEvent: String, Sendable {
     case notificationEnabled = "notification_enabled"
     case goalCreated = "goal_created"
     case goalContributionAdded = "goal_contribution_added"
+    case goalCompleted = "goal_completed"
+    case goalOutcomeRecorded = "goal_outcome_recorded"
+    case regretCheckInAnswered = "regret_check_in_answered"
+    case weeklyRecapEnabled = "weekly_recap_enabled"
+    case redirectNudgeAccepted = "redirect_nudge_accepted"
+    case goalFromCollectionCreated = "goal_from_collection_created"
 }
 
 /// Never attaches titles, reflections, prices, URLs, or media.

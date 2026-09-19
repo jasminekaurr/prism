@@ -109,6 +109,9 @@ struct AddProgressView: View {
                 let pace = container.goalPlanningService.pace(for: goal)
                 goal.trackStatus = pace.trackStatus
                 try await container.goalRepository.upsert(goal)
+                if goal.trackStatus == .completed {
+                    container.analytics.track(.goalCompleted)
+                }
             }
             container.analytics.track(.goalContributionAdded)
             PrismHaptics.save()

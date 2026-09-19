@@ -19,7 +19,8 @@ struct DecisionService: Sendable {
         purchaseConfirmed: Bool,
         confirmedPrice: Decimal?,
         currencyCode: String?,
-        now: Date = .now
+        now: Date = .now,
+        checkInInterval: TimeInterval = RegretCheckIn.interval
     ) throws -> DecisionTransitionResult {
         guard item.status == .considering || item.status == .readyForReview || item.status == .letGo else {
             throw DecisionServiceError.invalidTransition
@@ -32,6 +33,9 @@ struct DecisionService: Sendable {
             updated.confirmedPurchaseCurrencyCode = currencyCode
             updated.decidedAt = now
             updated.archivedAt = nil
+            updated.regretCheckInAt = now.addingTimeInterval(checkInInterval)
+            updated.regretAnswer = nil
+            updated.regretAnsweredAt = nil
         } else {
             // User chose Buy but said purchase did not happen — keep considering with a note via event.
             updated.status = .considering
@@ -136,6 +140,9 @@ struct DecisionService: Sendable {
             if lastEvent.decision == .buy {
                 updated.confirmedPurchasePrice = nil
                 updated.confirmedPurchaseCurrencyCode = nil
+                updated.regretCheckInAt = nil
+                updated.regretAnswer = nil
+                updated.regretAnsweredAt = nil
             }
         }
         let undoID = UUID()
@@ -154,5 +161,37 @@ struct DecisionService: Sendable {
         )
         // Caller should also mark lastEvent.undoneByEventID = undoID when persisting.
         return DecisionTransitionResult(item: updated, event: event)
+    }
+}
+
+/// Post-purchase "still glad you bought it?" check-in rules.
+enum RegretCheckIn {
+    static let defaultInterval: TimeInterval = 30 * 24 * 60 * 60
+    static let demoInterval: TimeInterval = 60
+    static let demoDefaultsKey = "prism.debug.shortRegret"
+
+    /// 30 days, or 1 minute when the DEBUG demo switch in Settings is on.
+    static var interval: TimeInterval {
+        UserDefaults.standard.bool(forKey: demoDefaultsKey) ? demoInterval : defaultInterval
+    }
+
+    /// Purchased items whose check-in date has passed and that have no answer yet.
+    static func due(items: [SavedItem], now: Date = .now) -> [SavedItem] {
+        items.filter { item in
+            guard item.deletedAt == nil,
+                  item.status == .purchased,
+                  item.regretAnswer == nil,
+                  let due = item.regretCheckInAt else { return false }
+            return due <= now
+        }
+        .sorted { ($0.regretCheckInAt ?? .distantPast) < ($1.regretCheckInAt ?? .distantPast) }
+    }
+
+    static func answer(_ answer: RegretAnswer, for item: SavedItem, now: Date = .now) -> SavedItem {
+        var updated = item
+        updated.regretAnswer = answer
+        updated.regretAnsweredAt = now
+        updated.updatedAt = now
+        return updated
     }
 }

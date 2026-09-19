@@ -20,6 +20,10 @@ struct MoneyStoryView: View {
     @State private var letGoItems: [SavedItem] = []
     @State private var insight: String = ""
     @State private var primaryGoalLine: String?
+    @State private var goalsCompleted = 0
+    @State private var goalsRated = 0
+    @State private var goalsWorthIt = 0
+    @State private var shareImage: Image?
 
     var body: some View {
         NavigationStack {
@@ -45,6 +49,19 @@ struct MoneyStoryView: View {
                         .pickerStyle(.segmented)
                         .onChange(of: filter) { _, _ in
                             Task { await reload() }
+                        }
+
+                        if let shareImage {
+                            ShareLink(
+                                item: shareImage,
+                                preview: SharePreview("My Prism story", image: shareImage)
+                            ) {
+                                Label("Share my story", systemImage: "square.and.arrow.up")
+                                    .font(PrismTypography.caption())
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                            }
+                            .buttonStyle(.bordered)
+                            .accessibilityIdentifier("moneyStory.share")
                         }
 
                         pocketCard
@@ -139,6 +156,16 @@ struct MoneyStoryView: View {
                 metric("Items let go", "\(snapshot.itemsLetGo)")
                 metric("Still considering", "\(snapshot.itemsStillConsidering)")
                 metric("Impulses paused", "\(snapshot.impulsesPaused)")
+                if snapshot.regretAnswered > 0 {
+                    metric("Glad you bought", "\(snapshot.regretGlad) of \(snapshot.regretAnswered)")
+                        .accessibilityIdentifier("moneyStory.regret")
+                }
+                if goalsCompleted > 0 {
+                    metric("Goals completed", "\(goalsCompleted)")
+                    if goalsRated > 0 {
+                        metric("Goals that felt worth it", "\(goalsWorthIt) of \(goalsRated)")
+                    }
+                }
                 if let avg = snapshot.averageHoursToDecision {
                     metric("Avg. hours to decide", String(format: "%.0f", avg))
                 }
@@ -187,6 +214,14 @@ struct MoneyStoryView: View {
         }
     }
 
+    @MainActor
+    private func renderShareImage(_ data: ShareCardData) -> Image? {
+        let renderer = ImageRenderer(content: MoneyStoryShareCard(data: data))
+        renderer.scale = 3
+        guard let uiImage = renderer.uiImage else { return nil }
+        return Image(uiImage: uiImage)
+    }
+
     private func metric(_ title: String, _ value: String) -> some View {
         HStack {
             Text(title).foregroundStyle(PrismColors.textSecondary)
@@ -208,6 +243,11 @@ struct MoneyStoryView: View {
         letGoItems = items.filter { $0.status == .letGo }
 
         let goals = (try? await container.goalRepository.fetchAll(userID: profile.id)) ?? []
+        let completedGoals = goals.filter { $0.trackStatus == .completed }
+        let ratings = completedGoals.compactMap(\.outcomeRating)
+        goalsCompleted = completedGoals.count
+        goalsRated = ratings.count
+        goalsWorthIt = ratings.filter { $0 == .worthIt }.count
         if let primary = goals.first(where: { $0.priority == .primary }) {
             let pace = container.goalPlanningService.pace(for: primary)
             let contribs = (try? await container.goalRepository.fetchContributions(goalID: primary.id)) ?? []
@@ -233,6 +273,19 @@ struct MoneyStoryView: View {
             primaryGoalLine = nil
         }
 
+        let primaryForCard = goals.first { $0.priority == .primary && $0.trackStatus != .abandoned }
+        let percent = primaryForCard.flatMap { container.goalPlanningService.percentFunded(for: $0) }
+        shareImage = await renderShareImage(
+            ShareCardData(
+                period: filter.displayName,
+                paused: snapshot.impulsesPaused,
+                letGo: snapshot.itemsLetGo,
+                purchased: snapshot.purchasesConfirmed,
+                goalsCompleted: goalsCompleted,
+                primaryGoalPercent: percent.map { Int($0.rounded()) }
+            )
+        )
+
         if let topIntent = snapshot.commonIntents.first,
            let topFeeling = snapshot.commonFeelings.first {
             insight = "You saved \(items.count) items in this period. Most were tagged “\(topFeeling.name),” and you chose to buy \(snapshot.purchasesConfirmed) after reviewing them. Top intent: \(topIntent.intent.displayName)."
@@ -240,6 +293,75 @@ struct MoneyStoryView: View {
             insight = "You’ve paused \(snapshot.impulsesPaused) impulses in this view. Patterns deepen as you add reflections and fund goals."
         } else {
             insight = ""
+        }
+    }
+}
+
+/// Counts only: no item titles, no goal titles, no prices.
+struct ShareCardData: Equatable {
+    var period: String
+    var paused: Int
+    var letGo: Int
+    var purchased: Int
+    var goalsCompleted: Int
+    var primaryGoalPercent: Int?
+}
+
+/// Rendered to an image for sharing. Uses plain shapes only; materials do not render reliably off-screen.
+struct MoneyStoryShareCard: View {
+    let data: ShareCardData
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Prism")
+                .font(PrismTypography.display(30))
+            Text("My Money Story \u{00B7} \(data.period)")
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.textSecondary)
+            VStack(spacing: 4) {
+                Text("\(data.paused)")
+                    .font(PrismTypography.display(72))
+                Text(data.paused == 1 ? "impulse paused" : "impulses paused")
+                    .font(PrismTypography.body())
+                    .foregroundStyle(PrismColors.textSecondary)
+            }
+            HStack(spacing: 28) {
+                stat(value: data.letGo, label: "let go")
+                stat(value: data.purchased, label: "chosen on purpose")
+                if data.goalsCompleted > 0 {
+                    stat(value: data.goalsCompleted, label: data.goalsCompleted == 1 ? "goal done" : "goals done")
+                }
+            }
+            if let percent = data.primaryGoalPercent {
+                VStack(spacing: 6) {
+                    Text("Primary goal \(percent)% funded")
+                        .font(PrismTypography.caption())
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.white.opacity(0.18))
+                        Capsule()
+                            .fill(PrismColors.cyan)
+                            .frame(width: 220 * CGFloat(min(max(percent, 0), 100)) / 100)
+                    }
+                    .frame(width: 220, height: 8)
+                }
+            }
+            Spacer(minLength: 0)
+            Text("Turn impulse into inspiration.")
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.textTertiary)
+        }
+        .foregroundStyle(PrismColors.textPrimary)
+        .padding(28)
+        .frame(width: 360, height: 450)
+        .background(PrismGradients.atmospheric)
+    }
+
+    private func stat(value: Int, label: String) -> some View {
+        VStack(spacing: 2) {
+            Text("\(value)").font(PrismTypography.title(28))
+            Text(label)
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.textSecondary)
         }
     }
 }

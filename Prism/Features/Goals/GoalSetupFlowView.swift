@@ -4,6 +4,8 @@ import SwiftUI
 
 struct GoalSetupFlowView: View {
     var sourceItem: SavedItem?
+    var sourceCollection: PrismCollection?
+    var collectionItems: [SavedItem] = []
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var container: DependencyContainer
     @Environment(\.dismiss) private var dismiss
@@ -22,6 +24,7 @@ struct GoalSetupFlowView: View {
     @State private var includesBuffer = false
     @State private var errorText: String?
     @State private var previewPace: GoalPaceSnapshot?
+    @State private var excludedItemIDs: Set<UUID> = []
 
     var body: some View {
         NavigationStack {
@@ -86,6 +89,12 @@ struct GoalSetupFlowView: View {
                 }
                 type = inferredType(from: sourceItem)
             }
+            if let sourceCollection {
+                title = sourceCollection.name
+                goalDescription = sourceCollection.description ?? ""
+                type = collectionItems.contains { $0.intent == .dream } ? .experience : .project
+                syncTargetFromComponents()
+            }
             refreshPreview()
         }
     }
@@ -117,7 +126,53 @@ struct GoalSetupFlowView: View {
                 }
             }
             .pickerStyle(.menu)
+            if sourceCollection != nil {
+                componentsPicker
+            }
         }
+    }
+
+    private var componentsPicker: some View {
+        VStack(alignment: .leading, spacing: PrismSpacing.xs) {
+            SectionMicroLabel(text: "Items in this plan")
+            if collectionItems.isEmpty {
+                Text("No open saves in this collection yet. You can still create the goal.")
+                    .font(PrismTypography.caption())
+                    .foregroundStyle(PrismColors.textSecondary)
+            }
+            ForEach(collectionItems) { item in
+                Toggle(isOn: Binding(
+                    get: { !excludedItemIDs.contains(item.id) },
+                    set: { included in
+                        if included { excludedItemIDs.remove(item.id) } else { excludedItemIDs.insert(item.id) }
+                        syncTargetFromComponents()
+                        refreshPreview()
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.title)
+                        Text(item.estimatedPrice.map {
+                            "Estimated \(CurrencyFormatting.string(from: $0, currencyCode: item.estimatedCurrencyCode ?? currencyCode))"
+                        } ?? "No estimate yet")
+                            .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.textSecondary)
+                    }
+                }
+                .accessibilityIdentifier("goalSetup.component.\(item.id.uuidString)")
+            }
+            Text("The target starts as the sum of your own estimates. You can change it on the Target step.")
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.textTertiary)
+        }
+    }
+
+    private var includedItems: [SavedItem] {
+        collectionItems.filter { !excludedItemIDs.contains($0.id) }
+    }
+
+    private func syncTargetFromComponents() {
+        let total = includedItems.compactMap(\.estimatedPrice).reduce(Decimal(0), +)
+        targetAmountText = total > 0 ? "\(total)" : ""
     }
 
     private var motivationStep: some View {
@@ -232,6 +287,16 @@ struct GoalSetupFlowView: View {
                         .foregroundStyle(PrismColors.textTertiary)
                 }
             }
+            if sourceCollection != nil && !includedItems.isEmpty {
+                GlassCard {
+                    VStack(alignment: .leading, spacing: 4) {
+                        SectionMicroLabel(text: "Plan components (estimated)")
+                        ForEach(includedItems) { item in
+                            Text(item.title).font(PrismTypography.body())
+                        }
+                    }
+                }
+            }
             Text("Starter milestones will be added. You can edit them anytime.")
                 .font(PrismTypography.caption())
                 .foregroundStyle(PrismColors.textSecondary)
@@ -332,12 +397,44 @@ struct GoalSetupFlowView: View {
                 )
             }
             try await seedMilestones(for: goal)
+            if sourceCollection != nil {
+                try await saveComponents(for: goal)
+                container.analytics.track(.goalFromCollectionCreated)
+            }
             container.analytics.track(.goalCreated)
             PrismHaptics.save()
             dismiss()
         } catch {
             errorText = "Couldn’t create the goal. Try again."
             container.crashReporter.record(error: error, context: "goal.setup")
+        }
+    }
+
+    private func saveComponents(for goal: PrismGoal) async throws {
+        for (index, item) in includedItems.enumerated() {
+            try await container.goalRepository.upsertComponent(
+                GoalComponent(
+                    id: UUID(),
+                    userID: goal.userID,
+                    goalID: goal.id,
+                    name: item.title,
+                    estimatedCost: item.estimatedPrice,
+                    currencyCode: item.estimatedPrice == nil ? nil : (item.estimatedCurrencyCode ?? goal.currencyCode),
+                    isOptional: false,
+                    sortOrder: index,
+                    createdAt: .now
+                )
+            )
+            try await container.goalRepository.linkAspiration(
+                GoalAspirationLink(
+                    id: UUID(),
+                    userID: goal.userID,
+                    goalID: goal.id,
+                    savedItemID: item.id,
+                    role: .essential,
+                    createdAt: .now
+                )
+            )
         }
     }
 

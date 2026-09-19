@@ -16,6 +16,12 @@ struct UserProfile: Identifiable, Codable, Equatable, Sendable {
 struct NotificationPreferences: Codable, Equatable, Sendable {
     var coolingOffRemindersEnabled: Bool
     var permissionAsked: Bool
+    /// Optional so profiles saved before these existed still decode.
+    var weeklyRecapEnabled: Bool? = nil
+    var regretCheckInsEnabled: Bool? = nil
+
+    var isWeeklyRecapOn: Bool { weeklyRecapEnabled ?? false }
+    var isRegretCheckInOn: Bool { regretCheckInsEnabled ?? false }
 
     static let `default` = NotificationPreferences(
         coolingOffRemindersEnabled: false,
@@ -103,6 +109,9 @@ struct SavedItem: Identifiable, Codable, Equatable, Sendable {
     var decidedAt: Date?
     var archivedAt: Date?
     var deletedAt: Date?
+    var regretCheckInAt: Date? = nil
+    var regretAnswer: RegretAnswer? = nil
+    var regretAnsweredAt: Date? = nil
 }
 
 struct MediaAsset: Identifiable, Codable, Equatable, Sendable {

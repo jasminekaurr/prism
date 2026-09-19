@@ -25,6 +25,11 @@ struct MoneyStorySnapshot: Equatable, Sendable {
     var estimatedLetGoSampleSize: Int
     var commonFeelings: [FeelingCount]
     var commonIntents: [IntentCount]
+    var regretGlad: Int = 0
+    var regretNeutral: Int = 0
+    var regretRegret: Int = 0
+
+    var regretAnswered: Int { regretGlad + regretNeutral + regretRegret }
 
     static let empty = MoneyStorySnapshot(
         purchasesConfirmed: 0,
@@ -142,7 +147,10 @@ struct MoneyStoryService: Sendable {
             estimatedValueOfItemsLetGo: estimatedLetGoPrices.isEmpty ? nil : estimatedLetGoPrices.reduce(0, +),
             estimatedLetGoSampleSize: estimatedLetGoPrices.count,
             commonFeelings: Array(topFeelings),
-            commonIntents: topIntents
+            commonIntents: topIntents,
+            regretGlad: purchased.filter { $0.regretAnswer == .glad }.count,
+            regretNeutral: purchased.filter { $0.regretAnswer == .neutral }.count,
+            regretRegret: purchased.filter { $0.regretAnswer == .regret }.count
         )
     }
 
@@ -199,6 +207,32 @@ struct SpendingPocketService: Sendable {
             let d = calendar.dateComponents([.year, .month], from: decided)
             guard d.year == comps.year, d.month == comps.month else { return partial }
             return partial + price
+        }
+    }
+}
+
+/// Weekly recap planning — counts only, never item names or prices.
+enum RecapPlanner {
+    /// Items saved in the last 7 days (each save is a paused impulse).
+    static func pausedCount(items: [SavedItem], now: Date = .now, calendar: Calendar = .current) -> Int {
+        guard let start = calendar.date(byAdding: .day, value: -7, to: now) else { return 0 }
+        return items.filter { $0.deletedAt == nil && $0.createdAt >= start }.count
+    }
+
+    /// Next Sunday at 18:00 local time, strictly after `now`.
+    static func nextRecapDate(after now: Date = .now, calendar: Calendar = .current) -> Date? {
+        var components = DateComponents()
+        components.weekday = 1
+        components.hour = 18
+        components.minute = 0
+        return calendar.nextDate(after: now, matching: components, matchingPolicy: .nextTime)
+    }
+
+    static func body(pausedCount: Int) -> String {
+        switch pausedCount {
+        case 0: return "A quiet week. Open Prism when you want to reflect."
+        case 1: return "You paused 1 impulse this week. Open Prism to see your story."
+        default: return "You paused \(pausedCount) impulses this week. Open Prism to see your story."
         }
     }
 }

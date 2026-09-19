@@ -18,6 +18,13 @@ Canonical vision: [PRODUCT_VISION.md](PRODUCT_VISION.md)
 | Add progress (financial / planning / behavioral) | Implemented |
 | Goal-aware trade-off copy on detail + buy confirmation | Implemented |
 | Money Story goal priority insight | Implemented |
+| Goal completion moment + outcome reflection (worth it / mixed / not really) | Implemented, not yet compiled ([HANDOFF_FEATURES.md](HANDOFF_FEATURES.md)) |
+| Goal lifecycle: complete (incl. low-cost), pause, resume, abandon; paused/finished list on Home | Implemented, not yet compiled |
+| Redirect nudge after letting go (behavioral note; optional user-entered amount) | Implemented, not yet compiled |
+| Regret check-in after purchase + Money Story "glad you bought" | Implemented, not yet compiled |
+| Weekly recap local notification (opt-in, count only) | Implemented, not yet compiled |
+| Shareable Money Story card (counts only) | Implemented, not yet compiled |
+| Goal from a collection (components from saved estimates) | Experimental, not yet compiled |
 | Item detail + optional reflection/feelings/tags/estimate | Implemented |
 | Cooling-off defaults + local notification scheduler | Implemented |
 | Review Buy / Keep considering / Let go + Undo payload | Implemented |
@@ -37,7 +44,9 @@ Canonical vision: [PRODUCT_VISION.md](PRODUCT_VISION.md)
 | Multi-goal monthly allocation editor | Deferred |
 | Auto plan cost from linked aspiration roles | Deferred |
 | Full component booking deadlines | Deferred |
-| Goal outcome reflection after complete/abandon | Partial (status only) |
+| Goal outcome reflection after complete/abandon | Completion reflection implemented; abandon reflection not done |
+| Background refresh of weekly recap count | Not done (count is computed at app open) |
+| Edit plan components after creating a goal from a collection | Not done |
 | Supabase + RLS + private media | Deferred (stubs + setup doc) |
 | Sign in with Apple + Keychain session | Stub UI only |
 | Live offline sync queue | Designed, not live |
