@@ -160,53 +160,58 @@ struct FlowLayout<Content: View>: View {
     }
 }
 
+/// Wrapping layout that reports its true size to the parent, so following
+/// content is pushed down instead of overlapping.
+struct WrappingHStack: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        arrange(width: proposal.width ?? .infinity, subviews: subviews).size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = arrange(width: bounds.width, subviews: subviews)
+        for (index, origin) in result.origins.enumerated() {
+            subviews[index].place(
+                at: CGPoint(x: bounds.minX + origin.x, y: bounds.minY + origin.y),
+                proposal: .unspecified
+            )
+        }
+    }
+
+    private func arrange(width: CGFloat, subviews: Subviews) -> (size: CGSize, origins: [CGPoint]) {
+        var origins: [CGPoint] = []
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var maxWidth: CGFloat = 0
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x > 0, x + size.width > width {
+                x = 0
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+            origins.append(CGPoint(x: x, y: y))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+            maxWidth = max(maxWidth, x - spacing)
+        }
+        return (CGSize(width: maxWidth, height: y + rowHeight), origins)
+    }
+}
+
 struct FlexibleView<Data: Collection, Content: View>: View where Data.Element: Hashable {
     let data: Data
     let spacing: CGFloat
     let content: (Data.Element) -> Content
-    @State private var totalHeight: CGFloat = .zero
 
     var body: some View {
-        GeometryReader { geo in
-            generate(in: geo)
-        }
-        .frame(height: totalHeight)
-    }
-
-    private func generate(in geo: GeometryProxy) -> some View {
-        var width: CGFloat = 0
-        var height: CGFloat = 0
-        return ZStack(alignment: .topLeading) {
+        WrappingHStack(spacing: spacing) {
             ForEach(Array(data), id: \.self) { item in
                 content(item)
-                    .padding(.trailing, spacing)
-                    .alignmentGuide(.leading) { d in
-                        if width + d.width > geo.size.width {
-                            width = 0
-                            height -= d.height + spacing
-                        }
-                        let result = width
-                        width += d.width + spacing
-                        return -result
-                    }
-                    .alignmentGuide(.top) { _ in
-                        let result = height
-                        return -result
-                    }
             }
         }
-        .background(
-            GeometryReader { g in
-                Color.clear.preference(key: HeightPreferenceKey.self, value: g.size.height)
-            }
-        )
-        .onPreferenceChange(HeightPreferenceKey.self) { totalHeight = $0 }
-    }
-}
-
-private struct HeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
