@@ -13,6 +13,8 @@ enum AnalyticsEvent: String, Sendable {
     case itemPurchasedConfirmed = "item_purchased_confirmed"
     case itemLetGo = "item_let_go"
     case notificationEnabled = "notification_enabled"
+    case goalCreated = "goal_created"
+    case goalContributionAdded = "goal_contribution_added"
 }
 
 /// Never attaches titles, reflections, prices, URLs, or media.

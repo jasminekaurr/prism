@@ -59,6 +59,20 @@ protocol SettingsRepository: Sendable {
     func save(_ settings: UserSettings) async throws
 }
 
+protocol GoalRepository: Sendable {
+    func fetchAll(userID: UUID) async throws -> [PrismGoal]
+    func fetch(id: UUID) async throws -> PrismGoal?
+    func upsert(_ goal: PrismGoal) async throws
+    func fetchMilestones(goalID: UUID) async throws -> [GoalMilestone]
+    func upsertMilestone(_ milestone: GoalMilestone) async throws
+    func fetchComponents(goalID: UUID) async throws -> [GoalComponent]
+    func upsertComponent(_ component: GoalComponent) async throws
+    func fetchContributions(goalID: UUID) async throws -> [GoalContribution]
+    func appendContribution(_ contribution: GoalContribution) async throws
+    func fetchLinks(goalID: UUID) async throws -> [GoalAspirationLink]
+    func linkAspiration(_ link: GoalAspirationLink) async throws
+}
+
 /// Future cloud auth surface — unused for local MVP.
 protocol AuthRepository: Sendable {
     var isSignedIn: Bool { get async }

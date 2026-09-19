@@ -274,6 +274,8 @@ struct BuyConfirmationView: View {
 
     @State private var didPurchase: Bool?
     @State private var priceText = ""
+    @State private var tradeoff: String?
+    @State private var motivationReminder: String?
 
     var body: some View {
         NavigationStack {
@@ -282,6 +284,18 @@ struct BuyConfirmationView: View {
                 VStack(alignment: .leading, spacing: PrismSpacing.md) {
                     Text("Did the purchase happen?")
                         .font(PrismTypography.title(22))
+                    if let tradeoff {
+                        GlassCard {
+                            Text(tradeoff)
+                                .font(PrismTypography.body())
+                                .foregroundStyle(PrismColors.textSecondary)
+                        }
+                    }
+                    if let motivationReminder {
+                        Text(motivationReminder)
+                            .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.textTertiary)
+                    }
                     HStack {
                         Button("Yes") { didPurchase = true }
                             .buttonStyle(.borderedProminent)
@@ -310,6 +324,26 @@ struct BuyConfirmationView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
             }
+        }
+        .task { await loadTradeoff() }
+    }
+
+    private func loadTradeoff() async {
+        guard let profile = environment.profile,
+              let item = try? await container.savedItemRepository.fetch(id: itemID) else { return }
+        let goals = (try? await container.goalRepository.fetchAll(userID: profile.id)) ?? []
+        guard let primary = goals.first(where: { $0.priority == .primary && $0.trackStatus != .completed })
+                ?? goals.first(where: { $0.priority == .active }) else { return }
+        let pace = container.goalPlanningService.pace(for: primary)
+        let price = item.estimatedPrice
+        tradeoff = container.goalPlanningService.tradeoffCopy(
+            itemTitle: item.title,
+            estimatedPrice: price,
+            against: primary,
+            pace: pace
+        )
+        if let motivation = primary.motivation {
+            motivationReminder = "Your goal “\(primary.title)”: \(primary.customMotivation ?? motivation.displayName)"
         }
     }
 

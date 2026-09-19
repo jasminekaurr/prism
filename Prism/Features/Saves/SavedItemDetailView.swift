@@ -14,6 +14,7 @@ struct SavedItemDetailView: View {
     @State private var feelings: [Feeling] = []
     @State private var tags: [Tag] = []
     @State private var pocketPreview: String?
+    @State private var goalTradeoff: String?
     @State private var undoMessage: String?
 
     var body: some View {
@@ -41,6 +42,20 @@ struct SavedItemDetailView: View {
                                         .foregroundStyle(PrismColors.textSecondary)
                                 }
                             }
+
+                            if let goalTradeoff {
+                                GlassCard {
+                                    SectionMicroLabel(text: "Goal trade-off")
+                                    Text(goalTradeoff)
+                                        .font(PrismTypography.body())
+                                        .foregroundStyle(PrismColors.textSecondary)
+                                }
+                            }
+
+                            PrismPrimaryButton(title: "Make this a goal") {
+                                router.sheet = .goalSetup(item.id)
+                            }
+                            .accessibilityIdentifier("detail.makeGoal")
 
                             if let reflection = item.reflection, !reflection.isEmpty {
                                 GlassCard {
@@ -141,8 +156,6 @@ struct SavedItemDetailView: View {
         feelings = (try? await container.feelingRepository.feelings(for: itemID)) ?? []
         tags = (try? await container.tagRepository.tags(for: itemID)) ?? []
         if let item, let profile = environment.profile {
-            let snap = container.spendingPocketService.snapshot(settings: profile.spendingPocket, items: [])
-            // Use pocket settings only for preview text; remaining not needed here.
             let previewSnap = SpendingPocketSnapshot(
                 isActive: profile.spendingPocket.isEnabled && profile.spendingPocket.monthlyAmount != nil,
                 monthlyAmount: profile.spendingPocket.monthlyAmount,
@@ -152,7 +165,18 @@ struct SavedItemDetailView: View {
                 isPaused: profile.spendingPocket.isPaused
             )
             pocketPreview = previewSnap.previewCopy(itemTitle: item.title, estimatedPrice: item.estimatedPrice)
-            _ = snap
+
+            let goals = (try? await container.goalRepository.fetchAll(userID: profile.id)) ?? []
+            if let primary = goals.first(where: { $0.priority == .primary && $0.trackStatus != .completed })
+                ?? goals.first(where: { $0.priority == .active && $0.trackStatus != .completed }) {
+                let pace = container.goalPlanningService.pace(for: primary)
+                goalTradeoff = container.goalPlanningService.tradeoffCopy(
+                    itemTitle: item.title,
+                    estimatedPrice: item.estimatedPrice,
+                    against: primary,
+                    pace: pace
+                )
+            }
         }
     }
 }

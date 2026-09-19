@@ -1,8 +1,18 @@
 # Prism
 
-**Turn impulse into inspiration.**
+**Save what inspires you. Work toward what matters.**
 
-Prism is a visual reflection tool that places a pause between wanting something and buying it. Save products, experiences, and aspirational content; reflect lightly; revisit after a cooling-off period; then buy, keep considering, or let go. Over time, Prism builds a visual **Money Story** and an optional **spending pocket** you define yourself.
+Prism is an intentional-spending assistant that turns social-media inspiration into clear priorities, achievable goals, and better spending decisions.
+
+Save products, experiences, and aspirational content; reflect; revisit after a cooling-off period; then buy, keep considering, or let go — or **make it a goal** and track financial, planning, and behavioral progress.
+
+## Positioning
+
+> From “I want this” to “I’m making it happen.”
+
+Core loop: **Save → Reflect → Prioritize → Set a goal → Make progress → Decide intentionally → Learn**
+
+See [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) for the full goals-era vision.
 
 ## What Prism deliberately does not do
 

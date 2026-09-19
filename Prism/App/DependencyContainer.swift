@@ -11,6 +11,7 @@ final class DependencyContainer: ObservableObject {
     let decisionService: DecisionService
     let moneyStoryService: MoneyStoryService
     let spendingPocketService: SpendingPocketService
+    let goalPlanningService: GoalPlanningService
     let notificationScheduler: NotificationScheduling
     let analytics: AnalyticsClient
     let auth: AuthRepository
@@ -25,6 +26,7 @@ final class DependencyContainer: ObservableObject {
     var decisionRepository: DecisionRepository { store }
     var reviewEventRepository: ReviewEventRepository { store }
     var settingsRepository: SettingsRepository { store }
+    var goalRepository: GoalRepository { store }
 
     init(
         modelContainer: ModelContainer,
@@ -38,6 +40,7 @@ final class DependencyContainer: ObservableObject {
         self.decisionService = DecisionService()
         self.moneyStoryService = MoneyStoryService()
         self.spendingPocketService = SpendingPocketService()
+        self.goalPlanningService = GoalPlanningService()
         self.notificationScheduler = notificationScheduler
         self.analytics = analytics
         self.auth = auth

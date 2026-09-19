@@ -212,3 +212,56 @@ final class PerformanceSanityTests: XCTestCase {
         }
     }
 }
+
+final class GoalPlanningTests: XCTestCase {
+    func testRequiredMonthlyContribution() {
+        let calendar = Calendar(identifier: .gregorian)
+        let created = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+        let target = calendar.date(from: DateComponents(year: 2027, month: 1, day: 1))!
+        let now = created
+        let goal = PrismGoal(
+            id: UUID(),
+            userID: UUID(),
+            sourceAspirationID: nil,
+            title: "Japan trip",
+            goalDescription: nil,
+            type: .travel,
+            motivation: .joy,
+            customMotivation: nil,
+            targetAmount: 4500,
+            currencyCode: "USD",
+            amountSaved: 600,
+            targetDate: target,
+            contributionFrequency: .monthly,
+            priority: .primary,
+            includesBuffer: false,
+            trackStatus: .onTrack,
+            createdAt: created,
+            updatedAt: created,
+            completedAt: nil,
+            pausedAt: nil
+        )
+        let pace = GoalPlanningService().pace(for: goal, now: now, calendar: calendar)
+        XCTAssertEqual(pace.remaining, 3900)
+        XCTAssertEqual(pace.monthsRemaining, 12)
+        let required = NSDecimalNumber(decimal: pace.requiredPerPeriod!).doubleValue
+        XCTAssertEqual(required, 325, accuracy: 1)
+    }
+
+    func testTradeoffCopy() {
+        let goal = PrismGoal(
+            id: UUID(), userID: UUID(), sourceAspirationID: nil, title: "Japan",
+            goalDescription: nil, type: .travel, motivation: .joy, customMotivation: nil,
+            targetAmount: 4500, currencyCode: "USD", amountSaved: 600,
+            targetDate: Calendar.current.date(byAdding: .month, value: 12, to: .now),
+            contributionFrequency: .monthly, priority: .primary, includesBuffer: false,
+            trackStatus: .onTrack, createdAt: .now, updatedAt: .now, completedAt: nil, pausedAt: nil
+        )
+        let service = GoalPlanningService()
+        let pace = service.pace(for: goal)
+        let copy = service.tradeoffCopy(itemTitle: "These shoes", estimatedPrice: 140, against: goal, pace: pace)
+        XCTAssertNotNil(copy)
+        XCTAssertTrue(copy!.contains("These shoes"))
+        XCTAssertTrue(copy!.contains("Japan"))
+    }
+}

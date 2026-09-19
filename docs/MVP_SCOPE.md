@@ -1,6 +1,8 @@
 # MVP Scope — Must / Nice / Skipped / Implemented
 
-Last updated: 2026-09-19
+Last updated: 2026-09-19 (Goals vision update)
+
+Canonical vision: [PRODUCT_VISION.md](PRODUCT_VISION.md)
 
 ## Must-haves (local TestFlight MVP)
 
@@ -10,7 +12,12 @@ Last updated: 2026-09-19
 | Tab shell: Home, Collections, Review, Money Story, Settings | Implemented |
 | Collections create + presets | Implemented |
 | Capture: title, collection, intent, cost, Photos, URL paste | Implemented |
-| Home masonry + search + status filters | Implemented |
+| Home leads with primary/active goals + aspiration feed | Implemented |
+| Make this a goal setup flow (define → motivate → target → priority → plan) | Implemented |
+| Goal pace (remaining + required contribution) | Implemented |
+| Add progress (financial / planning / behavioral) | Implemented |
+| Goal-aware trade-off copy on detail + buy confirmation | Implemented |
+| Money Story goal priority insight | Implemented |
 | Item detail + optional reflection/feelings/tags/estimate | Implemented |
 | Cooling-off defaults + local notification scheduler | Implemented |
 | Review Buy / Keep considering / Let go + Undo payload | Implemented |
@@ -18,15 +25,19 @@ Last updated: 2026-09-19
 | Spending pocket (soft preview; confirmed reduces remaining) | Implemented |
 | Settings: pocket, cooling, notifications, app lock, export, wipe | Implemented |
 | Design tokens + glass UI | Implemented |
-| Unit tests (cooling, money, pocket, decisions, URL, notifications mock) | Implemented |
+| Unit tests (cooling, money, pocket, decisions, goals, URL, notifications) | Implemented |
 | UITest smoke (onboarding, collection, capture open) | Implemented |
 | Privacy manifest + usage strings | Implemented |
-| Docs (README, architecture, security, privacy, scope, TestFlight) | Implemented |
+| Docs (README, vision, architecture, security, privacy, scope, TestFlight) | Implemented |
 
 ## Nice-to-haves / later
 
 | Item | Status |
 |---|---|
+| Multi-goal monthly allocation editor | Deferred |
+| Auto plan cost from linked aspiration roles | Deferred |
+| Full component booking deadlines | Deferred |
+| Goal outcome reflection after complete/abandon | Partial (status only) |
 | Supabase + RLS + private media | Deferred (stubs + setup doc) |
 | Sign in with Apple + Keychain session | Stub UI only |
 | Live offline sync queue | Designed, not live |

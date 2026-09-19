@@ -70,6 +70,9 @@ final class AppRouter: ObservableObject {
         case keepConsidering(UUID)
         case spendingPocketInfo
         case estimatedLetGoInfo
+        case goalSetup(UUID?)
+        case goalDetail(UUID)
+        case addProgress(UUID)
 
         var id: String {
             switch self {
@@ -81,6 +84,9 @@ final class AppRouter: ObservableObject {
             case .keepConsidering(let id): return "keep-\(id)"
             case .spendingPocketInfo: return "pocketInfo"
             case .estimatedLetGoInfo: return "estInfo"
+            case .goalSetup(let id): return "goalSetup-\(id?.uuidString ?? "new")"
+            case .goalDetail(let id): return "goalDetail-\(id)"
+            case .addProgress(let id): return "progress-\(id)"
             }
         }
     }

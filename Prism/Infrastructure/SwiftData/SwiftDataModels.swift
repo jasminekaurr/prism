@@ -396,6 +396,222 @@ final class SDUserSettings {
     }
 }
 
+@Model
+final class SDGoal {
+    @Attribute(.unique) var id: UUID
+    var userID: UUID
+    var sourceAspirationID: UUID?
+    var title: String
+    var goalDescription: String?
+    var typeRaw: String
+    var motivationRaw: String?
+    var customMotivation: String?
+    var targetAmount: Decimal?
+    var currencyCode: String
+    var amountSaved: Decimal
+    var targetDate: Date?
+    var contributionFrequencyRaw: String
+    var priorityRaw: String
+    var includesBuffer: Bool
+    var trackStatusRaw: String
+    var createdAt: Date
+    var updatedAt: Date
+    var completedAt: Date?
+    var pausedAt: Date?
+
+    init(from goal: PrismGoal) {
+        self.id = goal.id
+        self.userID = goal.userID
+        self.sourceAspirationID = goal.sourceAspirationID
+        self.title = goal.title
+        self.goalDescription = goal.goalDescription
+        self.typeRaw = goal.type.rawValue
+        self.motivationRaw = goal.motivation?.rawValue
+        self.customMotivation = goal.customMotivation
+        self.targetAmount = goal.targetAmount
+        self.currencyCode = goal.currencyCode
+        self.amountSaved = goal.amountSaved
+        self.targetDate = goal.targetDate
+        self.contributionFrequencyRaw = goal.contributionFrequency.rawValue
+        self.priorityRaw = goal.priority.rawValue
+        self.includesBuffer = goal.includesBuffer
+        self.trackStatusRaw = goal.trackStatus.rawValue
+        self.createdAt = goal.createdAt
+        self.updatedAt = goal.updatedAt
+        self.completedAt = goal.completedAt
+        self.pausedAt = goal.pausedAt
+    }
+
+    func toDomain() -> PrismGoal {
+        PrismGoal(
+            id: id,
+            userID: userID,
+            sourceAspirationID: sourceAspirationID,
+            title: title,
+            goalDescription: goalDescription,
+            type: GoalType(rawValue: typeRaw) ?? .purchase,
+            motivation: motivationRaw.flatMap(GoalMotivation.init(rawValue:)),
+            customMotivation: customMotivation,
+            targetAmount: targetAmount,
+            currencyCode: currencyCode,
+            amountSaved: amountSaved,
+            targetDate: targetDate,
+            contributionFrequency: ContributionFrequency(rawValue: contributionFrequencyRaw) ?? .monthly,
+            priority: GoalPriorityLevel(rawValue: priorityRaw) ?? .active,
+            includesBuffer: includesBuffer,
+            trackStatus: GoalTrackStatus(rawValue: trackStatusRaw) ?? .onTrack,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            completedAt: completedAt,
+            pausedAt: pausedAt
+        )
+    }
+
+    func apply(_ goal: PrismGoal) {
+        sourceAspirationID = goal.sourceAspirationID
+        title = goal.title
+        goalDescription = goal.goalDescription
+        typeRaw = goal.type.rawValue
+        motivationRaw = goal.motivation?.rawValue
+        customMotivation = goal.customMotivation
+        targetAmount = goal.targetAmount
+        currencyCode = goal.currencyCode
+        amountSaved = goal.amountSaved
+        targetDate = goal.targetDate
+        contributionFrequencyRaw = goal.contributionFrequency.rawValue
+        priorityRaw = goal.priority.rawValue
+        includesBuffer = goal.includesBuffer
+        trackStatusRaw = goal.trackStatus.rawValue
+        updatedAt = goal.updatedAt
+        completedAt = goal.completedAt
+        pausedAt = goal.pausedAt
+    }
+}
+
+@Model
+final class SDGoalMilestone {
+    @Attribute(.unique) var id: UUID
+    var userID: UUID
+    var goalID: UUID
+    var title: String
+    var targetAmount: Decimal?
+    var isCompleted: Bool
+    var completedAt: Date?
+    var sortOrder: Int
+    var createdAt: Date
+
+    init(from m: GoalMilestone) {
+        self.id = m.id
+        self.userID = m.userID
+        self.goalID = m.goalID
+        self.title = m.title
+        self.targetAmount = m.targetAmount
+        self.isCompleted = m.isCompleted
+        self.completedAt = m.completedAt
+        self.sortOrder = m.sortOrder
+        self.createdAt = m.createdAt
+    }
+
+    func toDomain() -> GoalMilestone {
+        GoalMilestone(
+            id: id, userID: userID, goalID: goalID, title: title,
+            targetAmount: targetAmount, isCompleted: isCompleted,
+            completedAt: completedAt, sortOrder: sortOrder, createdAt: createdAt
+        )
+    }
+}
+
+@Model
+final class SDGoalComponent {
+    @Attribute(.unique) var id: UUID
+    var userID: UUID
+    var goalID: UUID
+    var name: String
+    var estimatedCost: Decimal?
+    var currencyCode: String?
+    var isOptional: Bool
+    var sortOrder: Int
+    var createdAt: Date
+
+    init(from c: GoalComponent) {
+        self.id = c.id
+        self.userID = c.userID
+        self.goalID = c.goalID
+        self.name = c.name
+        self.estimatedCost = c.estimatedCost
+        self.currencyCode = c.currencyCode
+        self.isOptional = c.isOptional
+        self.sortOrder = c.sortOrder
+        self.createdAt = c.createdAt
+    }
+
+    func toDomain() -> GoalComponent {
+        GoalComponent(
+            id: id, userID: userID, goalID: goalID, name: name,
+            estimatedCost: estimatedCost, currencyCode: currencyCode,
+            isOptional: isOptional, sortOrder: sortOrder, createdAt: createdAt
+        )
+    }
+}
+
+@Model
+final class SDGoalContribution {
+    @Attribute(.unique) var id: UUID
+    var userID: UUID
+    var goalID: UUID
+    var kindRaw: String
+    var amount: Decimal?
+    var currencyCode: String?
+    var note: String?
+    var createdAt: Date
+
+    init(from c: GoalContribution) {
+        self.id = c.id
+        self.userID = c.userID
+        self.goalID = c.goalID
+        self.kindRaw = c.kind.rawValue
+        self.amount = c.amount
+        self.currencyCode = c.currencyCode
+        self.note = c.note
+        self.createdAt = c.createdAt
+    }
+
+    func toDomain() -> GoalContribution {
+        GoalContribution(
+            id: id, userID: userID, goalID: goalID,
+            kind: ContributionKind(rawValue: kindRaw) ?? .financial,
+            amount: amount, currencyCode: currencyCode, note: note, createdAt: createdAt
+        )
+    }
+}
+
+@Model
+final class SDGoalAspirationLink {
+    @Attribute(.unique) var id: UUID
+    var userID: UUID
+    var goalID: UUID
+    var savedItemID: UUID
+    var roleRaw: String
+    var createdAt: Date
+
+    init(from link: GoalAspirationLink) {
+        self.id = link.id
+        self.userID = link.userID
+        self.goalID = link.goalID
+        self.savedItemID = link.savedItemID
+        self.roleRaw = link.role.rawValue
+        self.createdAt = link.createdAt
+    }
+
+    func toDomain() -> GoalAspirationLink {
+        GoalAspirationLink(
+            id: id, userID: userID, goalID: goalID, savedItemID: savedItemID,
+            role: AspirationLinkRole(rawValue: roleRaw) ?? .inspiration,
+            createdAt: createdAt
+        )
+    }
+}
+
 enum PrismModelContainerFactory {
     static func make(inMemory: Bool = false) throws -> ModelContainer {
         let schema = Schema([
@@ -408,7 +624,12 @@ enum PrismModelContainerFactory {
             SDSavedItemFeeling.self,
             SDDecisionEvent.self,
             SDReviewEvent.self,
-            SDUserSettings.self
+            SDUserSettings.self,
+            SDGoal.self,
+            SDGoalMilestone.self,
+            SDGoalComponent.self,
+            SDGoalContribution.self,
+            SDGoalAspirationLink.self
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: inMemory)
         return try ModelContainer(for: schema, configurations: config)

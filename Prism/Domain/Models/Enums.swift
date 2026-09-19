@@ -102,3 +102,146 @@ enum DecisionType: String, Codable, CaseIterable, Sendable {
     case letGo
     case undo
 }
+
+// MARK: - Goals
+
+enum GoalType: String, Codable, CaseIterable, Identifiable, Sendable {
+    case purchase
+    case experience
+    case travel
+    case project
+    case recurring
+    case lowCost
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .purchase: return "Purchase"
+        case .experience: return "Experience"
+        case .travel: return "Travel"
+        case .project: return "Project"
+        case .recurring: return "Recurring"
+        case .lowCost: return "Low / no cost"
+        }
+    }
+}
+
+/// Commitment level across goals — not the same as item must-have.
+enum GoalPriorityLevel: String, Codable, CaseIterable, Identifiable, Sendable {
+    case primary
+    case active
+    case flexible
+    case someday
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .primary: return "Primary"
+        case .active: return "Active"
+        case .flexible: return "Flexible"
+        case .someday: return "Someday"
+        }
+    }
+}
+
+enum GoalTrackStatus: String, Codable, CaseIterable, Identifiable, Sendable {
+    case ahead
+    case onTrack
+    case aLittleBehind
+    case needsAdjustment
+    case paused
+    case completed
+    case abandoned
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .ahead: return "Ahead"
+        case .onTrack: return "On track"
+        case .aLittleBehind: return "A little behind"
+        case .needsAdjustment: return "Needs adjustment"
+        case .paused: return "Paused"
+        case .completed: return "Completed"
+        case .abandoned: return "Abandoned"
+        }
+    }
+}
+
+enum ContributionFrequency: String, Codable, CaseIterable, Identifiable, Sendable {
+    case weekly
+    case monthly
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .weekly: return "Weekly"
+        case .monthly: return "Monthly"
+        }
+    }
+}
+
+enum ContributionKind: String, Codable, CaseIterable, Identifiable, Sendable {
+    case financial
+    case planning
+    case behavioral
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .financial: return "Financial"
+        case .planning: return "Planning"
+        case .behavioral: return "Behavioral"
+        }
+    }
+}
+
+enum GoalMotivation: String, Codable, CaseIterable, Identifiable, Sendable {
+    case dailyLife
+    case largerPriority
+    case withSomeone
+    case personalGrowth
+    case joy
+    case practicalNeed
+    case custom
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .dailyLife: return "It would improve my daily life"
+        case .largerPriority: return "It supports a larger priority"
+        case .withSomeone: return "I want to experience it with someone"
+        case .personalGrowth: return "It represents personal growth"
+        case .joy: return "It would bring me joy"
+        case .practicalNeed: return "It solves a practical need"
+        case .custom: return "My own reason"
+        }
+    }
+}
+
+enum AspirationLinkRole: String, Codable, CaseIterable, Identifiable, Sendable {
+    case essential
+    case optional
+    case inspiration
+    case alternative
+    case booked
+    case decidedAgainst
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .essential: return "Essential"
+        case .optional: return "Optional"
+        case .inspiration: return "Inspiration"
+        case .alternative: return "Alternative"
+        case .booked: return "Booked or purchased"
+        case .decidedAgainst: return "Decided against"
+        }
+    }
+}

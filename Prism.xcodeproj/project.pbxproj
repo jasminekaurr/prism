@@ -16,23 +16,28 @@
 		21A4F84DB758AAAFEBC28950 /* Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4384F5A7C926ED119A9405 /* Security.swift */; };
 		22AA83F22606F0429DE5F117 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99277F620BB3AD4DA8784CDD /* AppRouter.swift */; };
 		2B0B5FE5C2064077DF5D00E6 /* ShareInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E29151A6DA70AE0C4E7AE2 /* ShareInbox.swift */; };
+		31EDA84BC974B70C6C2EE352 /* AddProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44687FF37F397BBC58BC4AE7 /* AddProgressView.swift */; };
 		34EEEE322F023C36A4281F7E /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D23CB1EF073B6B9C2D1B4070 /* AppEnvironment.swift */; };
 		3EB21CA3706730853D903FE8 /* DomainModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6883199F6F2F0F0247B90E1 /* DomainModels.swift */; };
 		42EA900B3F6CB7F9881F7C7C /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE7222E6F7FE1B4127FAACE /* CollectionsView.swift */; };
 		43C7E49704A1A4B9EFF5CC39 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE8314A57B4215EF823E151 /* HomeView.swift */; };
 		58DAA1CC56ADC9838619715B /* DecisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668E6A56E0FEB5176CDFE4F4 /* DecisionService.swift */; };
+		59B853C3D1C3FE97550F5412 /* GoalPlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94952FC4F297F9DFC7E03251 /* GoalPlanningService.swift */; };
 		632379F6DA3D0E11711871E1 /* PrismApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0FE572AD856E190D4583B1 /* PrismApp.swift */; };
 		64F06D95F14F25D8F84E9F08 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546BC6EFDFE09A52DCBF0816 /* ShareViewController.swift */; };
 		70045AC2D4271A320D22A9F6 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC40857258D606DE72FCD97 /* Analytics.swift */; };
 		7220A01D75DA160B6F7A2385 /* PrismUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A1F701F292E7C3239343E /* PrismUtilities.swift */; };
+		7C23FE0E818CCDA01622C11B /* GoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64A12EF52A1C088F31F097E /* GoalDetailView.swift */; };
 		7C3435D8AF50931D77183B2B /* SupabaseStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48221965EC9B33F0B815639C /* SupabaseStubs.swift */; };
 		8AE8693F7F3D50AD1A6D8031 /* LocalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710641E47D279F23DC6F3ED /* LocalStore.swift */; };
 		93119062237C529DC598225E /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8085232F550794EDE7EA8C9 /* NotificationScheduler.swift */; };
 		9A001168593E9D957BF4D9D1 /* PrismCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF395B6A901BEE67F776993 /* PrismCoreTests.swift */; };
 		9CAF762D8EFD95EC86469C7F /* MoneyStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A7C680F6BB8194312B1A74 /* MoneyStoryView.swift */; };
 		9D07CC72D94E0F084FAC3126 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B438803C6E4BEA5508B407 /* SettingsView.swift */; };
+		9F85B70815746322FDDC3EAF /* GoalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29578EE8E1607F5816296D7 /* GoalModels.swift */; };
 		AFD9389B140BD97EBB54194E /* SwiftDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387C1183E2183BEDAAC522F /* SwiftDataModels.swift */; };
 		B2E6667F3ACC8D21E7437CD1 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4200B95B05FDE1C371669C /* DependencyContainer.swift */; };
+		B68ECCAB9FED26B7CD14A36A /* GoalSetupFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13DED36F539BC7B569CBD15 /* GoalSetupFlowView.swift */; };
 		BA2F1F9F83519AD975DCD957 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77344BC18D1248D4E201C3 /* DataExporter.swift */; };
 		BE6064DF2E6E273D3DBA4349 /* SavedItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */; };
 		C313E818935949AABB8D727E /* ReflectionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381F0B79FE050ECE0F23A78F /* ReflectionEditorView.swift */; };
@@ -96,6 +101,7 @@
 		3B26B1DC733D2E211912F087 /* ReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViews.swift; sourceTree = "<group>"; };
 		3C77344BC18D1248D4E201C3 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExporter.swift; sourceTree = "<group>"; };
 		3CBECDC40DB2F7D8BF88B956 /* Prism.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Prism.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44687FF37F397BBC58BC4AE7 /* AddProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProgressView.swift; sourceTree = "<group>"; };
 		48221965EC9B33F0B815639C /* SupabaseStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseStubs.swift; sourceTree = "<group>"; };
 		546BC6EFDFE09A52DCBF0816 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		5710641E47D279F23DC6F3ED /* LocalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStore.swift; sourceTree = "<group>"; };
@@ -106,17 +112,21 @@
 		87B438803C6E4BEA5508B407 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedItemDetailView.swift; sourceTree = "<group>"; };
 		946A1954BA1622BDCF2017EA /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		94952FC4F297F9DFC7E03251 /* GoalPlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalPlanningService.swift; sourceTree = "<group>"; };
 		9585ED74EE865E61D73B9C08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		99277F620BB3AD4DA8784CDD /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		9A4384F5A7C926ED119A9405 /* Security.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security.swift; sourceTree = "<group>"; };
 		9CBF52F3FA1A816060503D43 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		9F0477CDC9412077CFF6A416 /* PrismShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PrismShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FC40857258D606DE72FCD97 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		A64A12EF52A1C088F31F097E /* GoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailView.swift; sourceTree = "<group>"; };
 		A8085232F550794EDE7EA8C9 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
+		B29578EE8E1607F5816296D7 /* GoalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalModels.swift; sourceTree = "<group>"; };
 		BE4200B95B05FDE1C371669C /* DependencyContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		BE51C482C6F52F65C9D46CDB /* RepositoryProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryProtocols.swift; sourceTree = "<group>"; };
 		BFE7222E6F7FE1B4127FAACE /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
 		C8A7C680F6BB8194312B1A74 /* MoneyStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyStoryView.swift; sourceTree = "<group>"; };
+		D13DED36F539BC7B569CBD15 /* GoalSetupFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalSetupFlowView.swift; sourceTree = "<group>"; };
 		D23CB1EF073B6B9C2D1B4070 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		DAE8314A57B4215EF823E151 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		E6883199F6F2F0F0247B90E1 /* DomainModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainModels.swift; sourceTree = "<group>"; };
@@ -224,6 +234,7 @@
 			children = (
 				E6883199F6F2F0F0247B90E1 /* DomainModels.swift */,
 				946A1954BA1622BDCF2017EA /* Enums.swift */,
+				B29578EE8E1607F5816296D7 /* GoalModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -302,6 +313,16 @@
 			path = DesignSystem;
 			sourceTree = "<group>";
 		};
+		ACCE5ED2468B7261735F9C15 /* Goals */ = {
+			isa = PBXGroup;
+			children = (
+				44687FF37F397BBC58BC4AE7 /* AddProgressView.swift */,
+				A64A12EF52A1C088F31F097E /* GoalDetailView.swift */,
+				D13DED36F539BC7B569CBD15 /* GoalSetupFlowView.swift */,
+			);
+			path = Goals;
+			sourceTree = "<group>";
+		};
 		B266D8522BDE716EFAF06F1E /* Reflection */ = {
 			isa = PBXGroup;
 			children = (
@@ -362,6 +383,7 @@
 				9A7984A7DC16E382C5917189 /* Authentication */,
 				EB40CBF52BE77FDC0926AA76 /* Capture */,
 				16862A7B3EBC5EB5A4190724 /* Collections */,
+				ACCE5ED2468B7261735F9C15 /* Goals */,
 				6008CB9CAE5E1C873626B89C /* Home */,
 				7D91DA899552264D48059A01 /* MoneyStory */,
 				279D59C67B759355CD9CEEF7 /* Onboarding */,
@@ -377,6 +399,7 @@
 			isa = PBXGroup;
 			children = (
 				668E6A56E0FEB5176CDFE4F4 /* DecisionService.swift */,
+				94952FC4F297F9DFC7E03251 /* GoalPlanningService.swift */,
 				5871341863E783BC0F0A9BA9 /* MoneyStoryService.swift */,
 			);
 			path = Services;
@@ -542,6 +565,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31EDA84BC974B70C6C2EE352 /* AddProgressView.swift in Sources */,
 				70045AC2D4271A320D22A9F6 /* Analytics.swift in Sources */,
 				34EEEE322F023C36A4281F7E /* AppEnvironment.swift in Sources */,
 				22AA83F22606F0429DE5F117 /* AppRouter.swift in Sources */,
@@ -552,6 +576,10 @@
 				B2E6667F3ACC8D21E7437CD1 /* DependencyContainer.swift in Sources */,
 				3EB21CA3706730853D903FE8 /* DomainModels.swift in Sources */,
 				15F666C5282F2482CC4864C0 /* Enums.swift in Sources */,
+				7C23FE0E818CCDA01622C11B /* GoalDetailView.swift in Sources */,
+				9F85B70815746322FDDC3EAF /* GoalModels.swift in Sources */,
+				59B853C3D1C3FE97550F5412 /* GoalPlanningService.swift in Sources */,
+				B68ECCAB9FED26B7CD14A36A /* GoalSetupFlowView.swift in Sources */,
 				43C7E49704A1A4B9EFF5CC39 /* HomeView.swift in Sources */,
 				8AE8693F7F3D50AD1A6D8031 /* LocalStore.swift in Sources */,
 				19A528789A40CC32308DDDB3 /* MoneyStoryService.swift in Sources */,

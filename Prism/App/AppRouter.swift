@@ -58,6 +58,36 @@ struct RootView: View {
                 title: "Estimated value of items let go",
                 message: "This number uses estimates you entered for items you chose not to buy. It does not mean this amount was added to your savings."
             )
+        case .goalSetup(let itemID):
+            GoalSetupSheetLoader(itemID: itemID)
+        case .goalDetail(let id):
+            GoalDetailView(goalID: id)
+        case .addProgress(let id):
+            AddProgressView(goalID: id)
+        }
+    }
+}
+
+/// Loads optional source aspiration before presenting goal setup.
+struct GoalSetupSheetLoader: View {
+    let itemID: UUID?
+    @EnvironmentObject private var container: DependencyContainer
+    @State private var item: SavedItem?
+    @State private var loaded = false
+
+    var body: some View {
+        Group {
+            if itemID != nil && !loaded {
+                ProgressView()
+                    .task {
+                        if let itemID {
+                            item = try? await container.savedItemRepository.fetch(id: itemID)
+                        }
+                        loaded = true
+                    }
+            } else {
+                GoalSetupFlowView(sourceItem: item)
+            }
         }
     }
 }
@@ -68,7 +98,7 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $router.selectedTab) {
             HomeView()
-                .tabItem { Label("Home", systemImage: "square.grid.2x2") }
+                .tabItem { Label("Home", systemImage: "flag") }
                 .tag(AppRouter.Tab.home)
                 .accessibilityIdentifier("tab.home")
 

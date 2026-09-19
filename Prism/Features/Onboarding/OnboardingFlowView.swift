@@ -10,10 +10,10 @@ struct OnboardingFlowView: View {
     @State private var errorText: String?
 
     private let pages: [(title: String, body: String)] = [
-        ("Save what catches your eye.", "Collect products, experiences, and inspiration from anywhere — without rushing to buy."),
-        ("Give the impulse space.", "Add a light reflection, tags, and a cooling-off pause that you control."),
-        ("Return when you’re ready.", "Revisit with a clear mind. Buy, keep considering, or let go."),
-        ("Your boundary, your choice.", "Prism never connects to your bank or decides what you can afford. You can set an optional spending pocket for wants — change, pause, or ignore it anytime.")
+        ("Save what inspires you.", "Collect products, experiences, and ideas from anywhere — without rushing to buy."),
+        ("Give the impulse space.", "Reflect lightly, pause with a cooling-off period you control, then revisit."),
+        ("Work toward what matters.", "When something is worth it, turn it into a goal — with a target, a date, and progress you define."),
+        ("Your boundary, your choice.", "Prism never connects to your bank or decides what you can afford. Spending pockets and goals use only numbers you enter.")
     ]
 
     var body: some View {

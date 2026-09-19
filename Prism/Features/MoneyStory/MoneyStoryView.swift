@@ -19,6 +19,7 @@ struct MoneyStoryView: View {
     )
     @State private var letGoItems: [SavedItem] = []
     @State private var insight: String = ""
+    @State private var primaryGoalLine: String?
 
     var body: some View {
         NavigationStack {
@@ -47,6 +48,15 @@ struct MoneyStoryView: View {
                         }
 
                         pocketCard
+                        if let primaryGoalLine {
+                            GlassCard {
+                                SectionMicroLabel(text: "Priorities")
+                                Text(primaryGoalLine)
+                                    .font(PrismTypography.body())
+                                    .foregroundStyle(PrismColors.textSecondary)
+                            }
+                            .accessibilityIdentifier("moneyStory.goalInsight")
+                        }
                         snapshotCard
                         patternsCard
 
@@ -197,11 +207,37 @@ struct MoneyStoryView: View {
         pocket = container.spendingPocketService.snapshot(settings: profile.spendingPocket, items: items)
         letGoItems = items.filter { $0.status == .letGo }
 
+        let goals = (try? await container.goalRepository.fetchAll(userID: profile.id)) ?? []
+        if let primary = goals.first(where: { $0.priority == .primary }) {
+            let pace = container.goalPlanningService.pace(for: primary)
+            let contribs = (try? await container.goalRepository.fetchContributions(goalID: primary.id)) ?? []
+            let monthStart = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
+            let monthFinancial = contribs
+                .filter { $0.kind == .financial && $0.createdAt >= monthStart }
+                .compactMap(\.amount)
+                .reduce(Decimal(0), +)
+            let planningCount = contribs.filter { $0.kind == .planning && $0.createdAt >= monthStart }.count
+            var parts: [String] = ["\(primary.title) is your primary goal."]
+            if monthFinancial > 0 {
+                parts.append("You contributed \(CurrencyFormatting.string(from: monthFinancial, currencyCode: primary.currencyCode)) this month.")
+            }
+            parts.append("Status: \(pace.trackStatus.displayName.lowercased()).")
+            if planningCount > 0 {
+                parts.append("You also completed \(planningCount) planning milestone\(planningCount == 1 ? "" : "s").")
+            }
+            if snapshot.itemsLetGo > 0 {
+                parts.append("You let go of \(snapshot.itemsLetGo) aspiration\(snapshot.itemsLetGo == 1 ? "" : "s") while keeping this priority in view.")
+            }
+            primaryGoalLine = parts.joined(separator: " ")
+        } else {
+            primaryGoalLine = nil
+        }
+
         if let topIntent = snapshot.commonIntents.first,
            let topFeeling = snapshot.commonFeelings.first {
             insight = "You saved \(items.count) items in this period. Most were tagged “\(topFeeling.name),” and you chose to buy \(snapshot.purchasesConfirmed) after reviewing them. Top intent: \(topIntent.intent.displayName)."
         } else if !items.isEmpty {
-            insight = "You’ve paused \(snapshot.impulsesPaused) impulses in this view. Patterns deepen as you add reflections."
+            insight = "You’ve paused \(snapshot.impulsesPaused) impulses in this view. Patterns deepen as you add reflections and fund goals."
         } else {
             insight = ""
         }

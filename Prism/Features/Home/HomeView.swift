@@ -1,4 +1,4 @@
-// Summary: Home masonry grid with search, filters, and quick-add entry.
+// Summary: Home leads with primary/active goals, then aspiration feed for saves still considering.
 
 import SwiftUI
 
@@ -9,10 +9,9 @@ struct HomeView: View {
 
     @State private var items: [SavedItem] = []
     @State private var collections: [PrismCollection] = []
+    @State private var goals: [PrismGoal] = []
     @State private var search = ""
     @State private var statusFilter: ItemStatus?
-    @State private var intentFilter: SaveIntent?
-    @StateObject private var viewModel = HomeViewModel()
 
     private let columns = [
         GridItem(.flexible(), spacing: PrismSpacing.sm),
@@ -23,35 +22,13 @@ struct HomeView: View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 PrismAtmosphericBackground()
-                VStack(spacing: PrismSpacing.sm) {
-                    header
-                    filterRow
-                    if filteredItems.isEmpty {
-                        EmptyStateView(
-                            title: "Your archive is open",
-                            message: "Save something that caught your eye. You can reflect later.",
-                            actionTitle: "Add",
-                            action: { router.sheet = .capture }
-                        )
-                        .accessibilityIdentifier("home.empty")
-                    } else {
-                        ScrollView {
-                            LazyVGrid(columns: columns, spacing: PrismSpacing.sm) {
-                                ForEach(filteredItems) { item in
-                                    Button {
-                                        router.sheet = .itemDetail(item.id)
-                                    } label: {
-                                        SavedItemCard(item: item, collectionName: collectionName(for: item))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .accessibilityIdentifier("home.item.\(item.id.uuidString)")
-                                }
-                            }
-                            .padding(.horizontal, PrismSpacing.md)
-                            .padding(.bottom, 80)
-                        }
-                        .accessibilityIdentifier("home.grid")
+                ScrollView {
+                    VStack(alignment: .leading, spacing: PrismSpacing.lg) {
+                        header
+                        goalsSection
+                        aspirationsSection
                     }
+                    .padding(.bottom, 88)
                 }
 
                 Button {
@@ -65,7 +42,7 @@ struct HomeView: View {
                 }
                 .padding(PrismSpacing.lg)
                 .accessibilityIdentifier("home.add")
-                .accessibilityLabel("Add item")
+                .accessibilityLabel("Add aspiration")
             }
             .toolbar(.hidden, for: .navigationBar)
         }
@@ -78,14 +55,18 @@ struct HomeView: View {
     private var header: some View {
         VStack(spacing: PrismSpacing.sm) {
             PrismBrandMark()
+            Text("Save what inspires you. Work toward what matters.")
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
             HStack {
                 Image(systemName: "magnifyingglass")
-                TextField("Search", text: $search)
+                TextField("Search aspirations", text: $search)
                     .textInputAutocapitalization(.never)
                     .accessibilityIdentifier("home.search")
             }
             .padding(PrismSpacing.sm)
-            .background(GlassCard(padding: 0) { Color.clear.frame(height: 1) }.opacity(0))
             .background {
                 RoundedRectangle(cornerRadius: PrismRadius.md)
                     .fill(PrismColors.glassFill)
@@ -96,20 +77,116 @@ struct HomeView: View {
         .padding(.top, PrismSpacing.sm)
     }
 
-    private var filterRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+    private var goalsSection: some View {
+        VStack(alignment: .leading, spacing: PrismSpacing.sm) {
             HStack {
-                filterChip("All", selected: statusFilter == nil && intentFilter == nil) {
-                    statusFilter = nil
-                    intentFilter = nil
+                Text("Working toward")
+                    .font(PrismTypography.title(22))
+                Spacer()
+                Button("New goal") {
+                    router.sheet = .goalSetup(nil)
                 }
-                ForEach(ItemStatus.allCases) { status in
-                    filterChip(status.displayName, selected: statusFilter == status) {
-                        statusFilter = status
-                    }
-                }
+                .font(PrismTypography.caption())
+                .accessibilityIdentifier("home.newGoal")
             }
             .padding(.horizontal, PrismSpacing.md)
+
+            if primaryGoal == nil && activeGoals.isEmpty {
+                GlassCard {
+                    EmptyStateView(
+                        title: "Turn inspiration into a goal",
+                        message: "When something matters enough, make it a goal — with a target, a date, and progress you control.",
+                        actionTitle: "Make a goal",
+                        action: { router.sheet = .goalSetup(nil) }
+                    )
+                }
+                .padding(.horizontal, PrismSpacing.md)
+                .accessibilityIdentifier("home.goalsEmpty")
+            } else {
+                if let primary = primaryGoal {
+                    Button {
+                        router.sheet = .goalDetail(primary.id)
+                    } label: {
+                        GoalCardView(goal: primary, pace: container.goalPlanningService.pace(for: primary), isPrimary: true)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, PrismSpacing.md)
+                    .accessibilityIdentifier("home.primaryGoal")
+                }
+                ForEach(activeGoals.filter { $0.id != primaryGoal?.id }) { goal in
+                    Button {
+                        router.sheet = .goalDetail(goal.id)
+                    } label: {
+                        GoalCardView(goal: goal, pace: container.goalPlanningService.pace(for: goal), isPrimary: false)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, PrismSpacing.md)
+                }
+            }
+        }
+    }
+
+    private var aspirationsSection: some View {
+        VStack(alignment: .leading, spacing: PrismSpacing.sm) {
+            Text("Aspirations")
+                .font(PrismTypography.title(22))
+                .padding(.horizontal, PrismSpacing.md)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    filterChip("All", selected: statusFilter == nil) { statusFilter = nil }
+                    ForEach([ItemStatus.considering, .readyForReview, .purchased, .letGo], id: \.self) { status in
+                        filterChip(status.displayName, selected: statusFilter == status) {
+                            statusFilter = status
+                        }
+                    }
+                }
+                .padding(.horizontal, PrismSpacing.md)
+            }
+
+            if filteredItems.isEmpty {
+                Text("Save something that caught your eye. Reflect later — or make it a goal when you’re ready.")
+                    .font(PrismTypography.body())
+                    .foregroundStyle(PrismColors.textSecondary)
+                    .padding(.horizontal, PrismSpacing.md)
+                    .accessibilityIdentifier("home.empty")
+            } else {
+                LazyVGrid(columns: columns, spacing: PrismSpacing.sm) {
+                    ForEach(filteredItems) { item in
+                        Button {
+                            router.sheet = .itemDetail(item.id)
+                        } label: {
+                            SavedItemCard(item: item, collectionName: collectionName(for: item))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("home.item.\(item.id.uuidString)")
+                    }
+                }
+                .padding(.horizontal, PrismSpacing.md)
+                .accessibilityIdentifier("home.grid")
+            }
+        }
+    }
+
+    private var primaryGoal: PrismGoal? {
+        goals.first { $0.priority == .primary && $0.trackStatus != .completed && $0.trackStatus != .abandoned }
+    }
+
+    private var activeGoals: [PrismGoal] {
+        goals.filter {
+            ($0.priority == .active || $0.priority == .primary)
+                && $0.trackStatus != .completed
+                && $0.trackStatus != .abandoned
+                && $0.trackStatus != .paused
+        }
+    }
+
+    private var filteredItems: [SavedItem] {
+        items.filter { item in
+            if let statusFilter, item.status != statusFilter { return false }
+            if search.isEmpty { return true }
+            return item.title.localizedCaseInsensitiveContains(search)
+                || (item.notes?.localizedCaseInsensitiveContains(search) ?? false)
         }
     }
 
@@ -127,16 +204,6 @@ struct HomeView: View {
         .frame(minHeight: 40)
     }
 
-    private var filteredItems: [SavedItem] {
-        items.filter { item in
-            if let statusFilter, item.status != statusFilter { return false }
-            if let intentFilter, item.intent != intentFilter { return false }
-            if search.isEmpty { return true }
-            return item.title.localizedCaseInsensitiveContains(search)
-                || (item.notes?.localizedCaseInsensitiveContains(search) ?? false)
-        }
-    }
-
     private func collectionName(for item: SavedItem) -> String? {
         collections.first { $0.id == item.collectionID }?.name
     }
@@ -145,18 +212,48 @@ struct HomeView: View {
         guard let userID = environment.profile?.id else { return }
         items = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
         collections = (try? await container.collectionRepository.fetchAll(userID: userID)) ?? []
-        // Promote due items to readyForReview status in UI list
-        let ready = (try? await container.savedItemRepository.fetchReadyForReview(userID: userID, asOf: .now)) ?? []
-        for item in ready where item.status == .readyForReview {
-            if let idx = items.firstIndex(where: { $0.id == item.id }) {
-                items[idx].status = .readyForReview
+        goals = (try? await container.goalRepository.fetchAll(userID: userID)) ?? []
+    }
+}
+
+struct GoalCardView: View {
+    let goal: PrismGoal
+    let pace: GoalPaceSnapshot
+    var isPrimary: Bool
+
+    var body: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: PrismSpacing.sm) {
+                HStack {
+                    if isPrimary {
+                        TagPill(text: "Primary", color: PrismColors.tagFashion)
+                    }
+                    TagPill(text: pace.trackStatus.displayName, color: PrismColors.lavender, filled: false)
+                    Spacer()
+                }
+                Text(goal.title)
+                    .font(PrismTypography.title(22))
+                    .foregroundStyle(PrismColors.textPrimary)
+                if let target = goal.targetAmount {
+                    Text("\(CurrencyFormatting.string(from: goal.amountSaved, currencyCode: goal.currencyCode)) of \(CurrencyFormatting.string(from: target, currencyCode: goal.currencyCode))")
+                        .font(PrismTypography.headline())
+                    ProgressView(value: (pace.percentFunded ?? 0) / 100)
+                        .tint(PrismColors.cyan)
+                }
+                if let required = pace.requiredPerPeriod {
+                    Text("\(CurrencyFormatting.string(from: required, currencyCode: goal.currencyCode)) needed this \(pace.periodLabel)")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textSecondary)
+                }
+                if let date = goal.targetDate {
+                    Text(date, style: .date)
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textTertiary)
+                }
             }
         }
     }
 }
-
-@MainActor
-final class HomeViewModel: ObservableObject {}
 
 struct SavedItemCard: View {
     let item: SavedItem

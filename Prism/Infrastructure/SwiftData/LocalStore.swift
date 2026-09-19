@@ -50,6 +50,11 @@ extension LocalStore: UserProfileRepository {
         try modelContext.delete(model: SDDecisionEvent.self)
         try modelContext.delete(model: SDReviewEvent.self)
         try modelContext.delete(model: SDUserSettings.self)
+        try modelContext.delete(model: SDGoal.self)
+        try modelContext.delete(model: SDGoalMilestone.self)
+        try modelContext.delete(model: SDGoalComponent.self)
+        try modelContext.delete(model: SDGoalContribution.self)
+        try modelContext.delete(model: SDGoalAspirationLink.self)
         try saveContext()
         try? FileManager.default.removeItem(at: mediaDirectory)
         try? FileManager.default.createDirectory(at: mediaDirectory, withIntermediateDirectories: true)
@@ -331,6 +336,107 @@ extension LocalStore: SettingsRepository {
         } else {
             modelContext.insert(SDUserSettings(from: settings))
         }
+        try saveContext()
+    }
+}
+
+extension LocalStore: GoalRepository {
+    func fetchAll(userID: UUID) async throws -> [PrismGoal] {
+        let descriptor = FetchDescriptor<SDGoal>(
+            predicate: #Predicate { $0.userID == userID },
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        return try modelContext.fetch(descriptor).map { $0.toDomain() }
+    }
+
+    func fetch(id: UUID) async throws -> PrismGoal? {
+        let descriptor = FetchDescriptor<SDGoal>(predicate: #Predicate { $0.id == id })
+        return try modelContext.fetch(descriptor).first?.toDomain()
+    }
+
+    func upsert(_ goal: PrismGoal) async throws {
+        if goal.priority == .primary {
+            let uid = goal.userID
+            let all = FetchDescriptor<SDGoal>(predicate: #Predicate { $0.userID == uid })
+            for existing in try modelContext.fetch(all) where existing.id != goal.id {
+                if existing.priorityRaw == GoalPriorityLevel.primary.rawValue {
+                    existing.priorityRaw = GoalPriorityLevel.active.rawValue
+                    existing.updatedAt = .now
+                }
+            }
+        }
+        let id = goal.id
+        let descriptor = FetchDescriptor<SDGoal>(predicate: #Predicate { $0.id == id })
+        if let existing = try modelContext.fetch(descriptor).first {
+            existing.apply(goal)
+        } else {
+            modelContext.insert(SDGoal(from: goal))
+        }
+        try saveContext()
+    }
+
+    func fetchMilestones(goalID: UUID) async throws -> [GoalMilestone] {
+        let descriptor = FetchDescriptor<SDGoalMilestone>(
+            predicate: #Predicate { $0.goalID == goalID },
+            sortBy: [SortDescriptor(\.sortOrder)]
+        )
+        return try modelContext.fetch(descriptor).map { $0.toDomain() }
+    }
+
+    func upsertMilestone(_ milestone: GoalMilestone) async throws {
+        let id = milestone.id
+        let descriptor = FetchDescriptor<SDGoalMilestone>(predicate: #Predicate { $0.id == id })
+        if let existing = try modelContext.fetch(descriptor).first {
+            existing.title = milestone.title
+            existing.targetAmount = milestone.targetAmount
+            existing.isCompleted = milestone.isCompleted
+            existing.completedAt = milestone.completedAt
+            existing.sortOrder = milestone.sortOrder
+        } else {
+            modelContext.insert(SDGoalMilestone(from: milestone))
+        }
+        try saveContext()
+    }
+
+    func fetchComponents(goalID: UUID) async throws -> [GoalComponent] {
+        let descriptor = FetchDescriptor<SDGoalComponent>(
+            predicate: #Predicate { $0.goalID == goalID },
+            sortBy: [SortDescriptor(\.sortOrder)]
+        )
+        return try modelContext.fetch(descriptor).map { $0.toDomain() }
+    }
+
+    func upsertComponent(_ component: GoalComponent) async throws {
+        let id = component.id
+        let descriptor = FetchDescriptor<SDGoalComponent>(predicate: #Predicate { $0.id == id })
+        if try modelContext.fetch(descriptor).first == nil {
+            modelContext.insert(SDGoalComponent(from: component))
+            try saveContext()
+        }
+    }
+
+    func fetchContributions(goalID: UUID) async throws -> [GoalContribution] {
+        let descriptor = FetchDescriptor<SDGoalContribution>(
+            predicate: #Predicate { $0.goalID == goalID },
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        return try modelContext.fetch(descriptor).map { $0.toDomain() }
+    }
+
+    func appendContribution(_ contribution: GoalContribution) async throws {
+        modelContext.insert(SDGoalContribution(from: contribution))
+        try saveContext()
+    }
+
+    func fetchLinks(goalID: UUID) async throws -> [GoalAspirationLink] {
+        let descriptor = FetchDescriptor<SDGoalAspirationLink>(
+            predicate: #Predicate { $0.goalID == goalID }
+        )
+        return try modelContext.fetch(descriptor).map { $0.toDomain() }
+    }
+
+    func linkAspiration(_ link: GoalAspirationLink) async throws {
+        modelContext.insert(SDGoalAspirationLink(from: link))
         try saveContext()
     }
 }
