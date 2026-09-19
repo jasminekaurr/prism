@@ -37,15 +37,21 @@ enum LinkPreviewFetcher {
 
     private static func loadImageData(from itemProvider: NSItemProvider) async -> Data? {
         await withCheckedContinuation { continuation in
-            // Prefer JPEG for consistent local storage.
+            var resumed = false
+            let finish: (Data?) -> Void = { data in
+                guard !resumed else { return }
+                resumed = true
+                continuation.resume(returning: data)
+            }
+
             itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
                 if let data, UIImage(data: data) != nil {
-                    continuation.resume(returning: data)
+                    finish(data)
                     return
                 }
                 itemProvider.loadObject(ofClass: UIImage.self) { object, _ in
                     let image = object as? UIImage
-                    continuation.resume(returning: image?.jpegData(compressionQuality: 0.85))
+                    finish(image?.jpegData(compressionQuality: 0.85))
                 }
             }
         }
