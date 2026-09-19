@@ -1,0 +1,127 @@
+# XcodeGen project definition for Prism iOS MVP.
+# Generate with: xcodegen generate
+
+name: Prism
+options:
+  bundleIdPrefix: com.prism
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.0.0"
+    GENERATE_INFOPLIST_FILE: YES
+    SWIFT_STRICT_CONCURRENCY: targeted
+
+configs:
+  Debug: debug
+  Staging: release
+  Release: release
+
+targets:
+  Prism:
+    type: application
+    platform: iOS
+    sources:
+      - path: Prism
+        excludes:
+          - "**/.DS_Store"
+          - "**/Resources/**"
+    resources:
+      - path: Prism/Resources/Assets.xcassets
+      - path: Prism/Resources/PrivacyInfo.xcprivacy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app
+        PRODUCT_NAME: Prism
+        INFOPLIST_KEY_CFBundleDisplayName: Prism
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_NSCameraUsageDescription: Prism uses the camera so you can save items you want to revisit later.
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Prism uses your photo library so you can save images and screenshots of things you want to revisit.
+        INFOPLIST_KEY_NSFaceIDUsageDescription: Prism can lock the app with Face ID to keep your reflections private.
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+    dependencies:
+      - target: PrismShareExtension
+        embed: true
+        codeSign: true
+    scheme:
+      testTargets:
+        - PrismTests
+        - PrismUITests
+      gatherCoverageData: false
+
+  PrismShareExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PrismShareExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app.share
+        PRODUCT_NAME: PrismShareExtension
+        INFOPLIST_FILE: PrismShareExtension/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        SKIP_INSTALL: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+
+  PrismTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PrismTests
+    dependencies:
+      - target: Prism
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Prism.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Prism"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  PrismUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PrismUITests
+    dependencies:
+      - target: Prism
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Prism
+
+schemes:
+  Prism:
+    build:
+      targets:
+        Prism: all
+        PrismShareExtension: all
+        PrismTests: [test]
+        PrismUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - PrismTests
+        - PrismUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

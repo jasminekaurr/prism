@@ -1,0 +1,43 @@
+# Xcode / macOS
+.DS_Store
+*.swp
+*~
+
+# Build
+build/
+DerivedData/
+*.xcuserdata
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods / SPM
+Pods/
+Carthage/Build/
+.swiftpm/
+Package.resolved
+
+# Secrets / local config
+.env
+.env.local
+**/Secrets.xcconfig
+**/Local.xcconfig
+Config/Secrets.local.xcconfig
+**/GoogleService-Info.plist
+
+# Signing
+*.mobileprovision
+*.p12
+*.cer
+*.certSigningRequest
+
+# Misc
+.idea/
+*.log
+fastlane/report.xml
+fastlane/Preview.html
