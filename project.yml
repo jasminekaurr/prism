@@ -38,12 +38,13 @@ targets:
     resources:
       - path: Prism/Resources/Assets.xcassets
       - path: Prism/Resources/PrivacyInfo.xcprivacy
+      - path: Prism/Resources/LaunchScreen.storyboard
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism
         PRODUCT_NAME: Prism
         INFOPLIST_KEY_CFBundleDisplayName: Prism
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_NSCameraUsageDescription: Prism uses the camera so you can save items you want to revisit later.
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Prism uses your photo library so you can save images and screenshots of things you want to revisit.
@@ -69,7 +70,7 @@ targets:
       - path: PrismShareExtension
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app.share
+        PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism.share
         PRODUCT_NAME: PrismShareExtension
         INFOPLIST_FILE: PrismShareExtension/Info.plist
         CODE_SIGN_STYLE: Automatic
@@ -86,7 +87,7 @@ targets:
       - target: Prism
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism.tests
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Prism.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Prism"
         BUNDLE_LOADER: "$(TEST_HOST)"
@@ -100,7 +101,7 @@ targets:
       - target: Prism
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.prism.app.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: Prism
 

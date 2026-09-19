@@ -66,7 +66,7 @@ final class SharePayload: Codable {
 }
 
 enum ShareInbox {
-    static let appGroupID = "group.com.prism.app"
+    static let appGroupID = "group.com.jasminekaur.prism"
 
     static func store(_ payload: SharePayload) {
         guard let defaults = UserDefaults(suiteName: appGroupID) else {

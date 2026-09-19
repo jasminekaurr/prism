@@ -13,22 +13,42 @@ enum CurrencyFormatting {
 }
 
 enum URLHelpers {
-    /// Extracts a displayable domain; returns nil for invalid or non-https schemes when requiring HTTPS.
+    /// Extracts a displayable domain.
     static func domain(from url: URL?) -> String? {
         guard let url else { return nil }
         return url.host
     }
 
+    /// Normalizes pasted text into an http(s) URL, adding `https://` when the scheme is missing.
+    static func normalizedURL(from string: String) -> URL? {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        if let url = validatedHTTPSURL(from: trimmed) {
+            return url
+        }
+
+        // Common paste: "www.example.com/path" or "example.com/path"
+        let withScheme: String
+        if trimmed.lowercased().hasPrefix("http://") || trimmed.lowercased().hasPrefix("https://") {
+            withScheme = trimmed
+        } else {
+            withScheme = "https://\(trimmed)"
+        }
+        return validatedHTTPSURL(from: withScheme)
+    }
+
     static func validatedHTTPSURL(from string: String) -> URL? {
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let url = URL(string: trimmed),
-              let scheme = url.scheme?.lowercased(),
+        guard var components = URLComponents(string: trimmed),
+              let scheme = components.scheme?.lowercased(),
               scheme == "https" || scheme == "http",
-              url.host != nil else {
+              let host = components.host,
+              !host.isEmpty else {
             return nil
         }
-        // Prefer https; allow http only for paste of http links but open via system browser later.
-        return url
+        components.scheme = scheme
+        return components.url
     }
 }
 

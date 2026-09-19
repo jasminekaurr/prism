@@ -35,7 +35,7 @@ struct HomeView: View {
                     router.sheet = .capture
                 } label: {
                     Image(systemName: "plus")
-                        .font(.title2.weight(.semibold))
+                        .font(PrismTypography.title(22))
                         .foregroundStyle(.white)
                         .frame(width: 56, height: 56)
                         .background(Circle().fill(Color.black.opacity(0.85)).shadow(color: PrismColors.violet.opacity(0.5), radius: 12))
@@ -284,22 +284,10 @@ struct SavedItemCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: PrismSpacing.xs) {
             ZStack(alignment: .bottomTrailing) {
-                RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous)
-                    .fill(PrismColors.violet.opacity(0.35))
-                    .frame(height: 140)
-                    .overlay {
-                        if let domain = item.sourceDomain {
-                            Text(domain)
-                                .font(PrismTypography.caption())
-                                .foregroundStyle(PrismColors.textSecondary)
-                        } else {
-                            Image(systemName: "photo")
-                                .foregroundStyle(PrismColors.textTertiary)
-                        }
-                    }
+                AspirationMediaView(item: item, height: 140)
                 if item.sourceDomain != nil {
                     Image(systemName: "link")
-                        .font(.caption2)
+                        .font(PrismTypography.micro())
                         .padding(6)
                         .background(Circle().fill(Color.black.opacity(0.5)))
                         .padding(8)

@@ -55,31 +55,90 @@ enum PrismGradients {
     )
 }
 
+/// Bundled brand fonts, loaded from the asset catalog (see scripts/fetch_fonts.sh).
+/// If a font has not been installed yet, typography falls back to the system fonts.
+enum PrismFonts {
+    fileprivate struct Family {
+        let postScriptName: String
+    }
+
+    fileprivate static let fraunces: Family? = register(dataAsset: "FrauncesVariable")
+    fileprivate static let inter: Family? = register(dataAsset: "InterVariable")
+
+    private static func register(dataAsset name: String) -> Family? {
+        guard let asset = NSDataAsset(name: name),
+              let provider = CGDataProvider(data: asset.data as CFData),
+              let cgFont = CGFont(provider),
+              let psName = cgFont.postScriptName as String? else { return nil }
+        var error: Unmanaged<CFError>?
+        // Ignore "already registered" errors; the font is usable either way.
+        CTFontManagerRegisterGraphicsFont(cgFont, &error)
+        return Family(postScriptName: psName)
+    }
+
+    private static func tag(_ s: String) -> NSNumber {
+        NSNumber(value: s.utf8.reduce(0) { ($0 << 8) | UInt32($1) })
+    }
+
+    fileprivate static func font(_ family: Family, size: CGFloat, variations: [String: CGFloat]) -> Font {
+        var axes: [NSNumber: NSNumber] = [:]
+        for (key, value) in variations { axes[tag(key)] = NSNumber(value: Double(value)) }
+        let variationKey = UIFontDescriptor.AttributeName(rawValue: kCTFontVariationAttribute as String)
+        let descriptor = UIFontDescriptor(fontAttributes: [
+            .name: family.postScriptName,
+            variationKey: axes
+        ])
+        return Font(UIFont(descriptor: descriptor, size: size) as CTFont)
+    }
+
+    fileprivate static func wght(_ weight: Font.Weight) -> CGFloat {
+        switch weight {
+        case .ultraLight: return 200
+        case .thin: return 250
+        case .light: return 300
+        case .regular: return 400
+        case .medium: return 500
+        case .semibold: return 600
+        case .bold: return 700
+        case .heavy: return 800
+        case .black: return 900
+        default: return 400
+        }
+    }
+}
+
 enum PrismTypography {
-    /// Editorial titles — New York system serif (Fraunces may be bundled later if licensed).
+    /// Titles and wordmark — Fraunces Light (falls back to the system serif).
     static func display(_ size: CGFloat, weight: Font.Weight = .light) -> Font {
-        .system(size: size, weight: weight, design: .serif)
+        if let family = PrismFonts.fraunces {
+            return PrismFonts.font(family, size: size, variations: [
+                "wght": PrismFonts.wght(weight),
+                "opsz": min(max(size, 9), 144),
+                "SOFT": 0,
+                "WONK": 0
+            ])
+        }
+        return .system(size: size, weight: weight, design: .serif)
     }
 
     static func title(_ size: CGFloat = 28) -> Font {
-        .system(size: size, weight: .light, design: .serif)
+        display(size, weight: .light)
     }
 
-    static func headline() -> Font {
-        .system(size: 17, weight: .semibold, design: .default)
+    /// Body font — Inter (falls back to the system font).
+    static func body(_ size: CGFloat = 16, weight: Font.Weight = .regular) -> Font {
+        if let family = PrismFonts.inter {
+            return PrismFonts.font(family, size: size, variations: [
+                "wght": PrismFonts.wght(weight),
+                "opsz": min(max(size, 14), 32)
+            ])
+        }
+        return .system(size: size, weight: weight, design: .default)
     }
 
-    static func body() -> Font {
-        .system(size: 16, weight: .regular, design: .default)
-    }
-
-    static func caption() -> Font {
-        .system(size: 12, weight: .medium, design: .default)
-    }
-
-    static func micro() -> Font {
-        .system(size: 10, weight: .semibold, design: .default)
-    }
+    static func headline() -> Font { body(17, weight: .semibold) }
+    static func caption() -> Font { body(12, weight: .medium) }
+    static func micro() -> Font { body(10, weight: .semibold) }
 }
 
 enum PrismSpacing {
@@ -119,6 +178,13 @@ enum PrismHaptics {
     static func soft() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
+}
+
+enum PrismBackdrop {
+    /// Uniform Gaussian blur applied to the app-wide background so text stays readable.
+    static let blurRadius: CGFloat = 80
+    /// Slight darkening on top of the blurred art (0 to disable).
+    static let scrimOpacity: Double = 0.18
 }
 
 enum PrismMaterials {
