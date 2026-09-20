@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@400;500&amp;family=Figtree:wght@400;500&amp;family=Fraunces:opsz,wght@9..144,300;9..144,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#141118}
+a{color:#cdbcff;text-decoration:none}
+a:hover{color:#fff}
+::-webkit-scrollbar{height:0;width:0}
+</style>
+</helmet>
+<div style="display:flex;gap:56px;padding:64px;box-sizing:border-box;width:max-content;align-items:flex-start;background:#141118;font-family:Inter,system-ui,sans-serif">
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">01</span><span>Launch</span></div>
+<div data-screen-label="01 Launch" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#000;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:-116px;top:0;width:625px;height:884px;object-fit:cover">
+<div style="position:absolute;left:55px;top:265px;width:282px;height:323px;overflow:hidden">
+<svg width="282" height="201" viewBox="0 0 282 201" style="position:absolute;left:0;top:0">
+<path d="M 138.5 0 L 0 151.523 L 89.54 201 L 138.5 0 Z" fill="rgba(217,217,217,0.45)"></path>
+<path d="M 282 179.354 L 138.564 0 L 88 201 L 282 179.354 Z" fill="rgba(255,255,255,0.25)"></path>
+</svg>
+<span style="position:absolute;left:32px;top:304px;font-family:Inter,sans-serif;font-weight:300;font-size:16px;line-height:19px;color:#fff">Turn impulse into inspiration</span>
+</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">02</span><span>Home — everything you saved</span></div>
+<div data-screen-label="02 Home" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<div style="position:absolute;left:1px;top:100px;width:390px;height:80px;box-sizing:border-box;padding:16px;display:flex;flex-direction:row;gap:8px;align-items:flex-start">
+<div style="position:relative;width:302px;height:48px;box-sizing:border-box;border-radius:32px;background:rgba(255,255,255,0.5);padding:12px 16px;display:flex;flex-direction:row;align-items:center;gap:10px">
+<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#2C2C2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex:none"><path d="M 16 8 C 16 12.418 12.418 16 8 16 M 8 0 C 12.418 0 16 3.582 16 8 M 0 8 C 0 3.582 3.582 0 8 0 M 8 16 C 3.582 16 0 12.418 0 8 Z" transform="matrix(1 0 0 1 3 3)"></path><path d="M 16.65 16.65 L 21 21"></path></svg>
+<span style="flex:1;font-size:17px;line-height:24px;color:#2C2C2C">Search your saves</span>
+</div>
+<div style="position:relative;width:48px;height:48px;border-radius:52px;background:rgba(241,241,241,0.5);display:flex;align-items:center;justify-content:center">
+<div style="width:26px;height:26px;position:relative"><div style="position:absolute;left:8px;top:3px;width:10px;height:10px;border-radius:50%;background:#0D1F2C"></div><div style="position:absolute;left:3px;top:15px;width:20px;height:11px;border-radius:10px 10px 0 0;background:#0D1F2C"></div></div>
+</div>
+</div>
+
+<div style="position:absolute;left:16px;top:170px;width:361px;display:flex;flex-direction:row;gap:7px">
+<sc-for list="{{ homeFilters }}" as="c" hint-placeholder-count="4">
+<div onClick="{{ c.onPick }}" style="height:32px;padding:0 13px;border-radius:9999px;display:flex;align-items:center;font-size:12.5px;cursor:pointer;color:#fff;background:{{ c.bg }};border:1px solid {{ c.bd }}" style-hover="border-color:#fff">{{ c.t }}</div>
+</sc-for>
+</div>
+<div style="position:absolute;left:18px;top:220px;width:357px;display:flex;flex-direction:row;align-items:baseline;justify-content:space-between">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.06em;color:rgba(255,255,255,0.65)">{{ homeCount }}</span>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.5)">newest first</span>
+</div>
+<div style="position:absolute;left:10px;top:242px;width:373px;height:512px;overflow:hidden;display:flex;flex-wrap:wrap;gap:20px 16px;align-content:flex-start">
+<sc-for list="{{ homeCards }}" as="card" hint-placeholder-count="6">
+<div style="position:relative;width:178px;height:251px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:8px;display:flex;flex-direction:column;gap:5px">
+<div style="position:relative;width:162px;height:162px;overflow:hidden;border-radius:16px;background-image:url({{ card.img }});background-size:cover;background-position:center">
+<div style="position:absolute;left:0;top:0;width:162px;height:162px;background:linear-gradient(180deg,rgba(0,0,0,0) 46.91%,rgba(0,0,0,0.85) 100%)"></div>
+<sc-if value="{{ card.play }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:63px;top:63px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center">
+<div style="width:30px;height:30px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:9px solid #fff;border-top:5.5px solid transparent;border-bottom:5.5px solid transparent;margin-left:3px"></div></div>
+</div>
+</sc-if>
+</div>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;width:162px">
+<sc-for list="{{ card.tags }}" as="tag" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:26px;box-sizing:border-box;padding:0 9px;border-radius:9999px;font-size:12px;line-height:1;background:{{ tag.bg }};border:1px solid {{ tag.bd }};color:{{ tag.fg }}">
+<span>{{ tag.t }}</span>
+<sc-if value="{{ tagsEditable }}" hint-placeholder-val="{{ true }}">
+<span onClick="{{ tag.onRemove }}" style="cursor:pointer;font-size:11px;opacity:0.75" style-hover="opacity:1">✕</span>
+</sc-if>
+</div>
+</sc-for>
+<span style="font-size:14px;color:#fff">{{ card.more }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="position:absolute;left:16px;top:770px;width:361px;height:64px;box-sizing:border-box;border-radius:20px;background:rgba(20,17,24,0.72);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;flex-direction:row;align-items:center;z-index:8">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:1" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 0 7 L 9 0 L 18 7 L 18 18 C 18 18.53 17.789 19.039 17.414 19.414 C 17.039 19.789 16.53 20 16 20 L 2 20 C 1.47 20 0.961 19.789 0.586 19.414 C 0.211 19.039 0 18.53 0 18 L 0 7 Z" transform="matrix(1 0 0 1 3 2)"></path><path d="M 6 20 L 6 10 L 12 10 L 12 20 Z" transform="matrix(1 0 0 1 3 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Home</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 10 0 L 0 5 L 10 10 L 20 5 L 10 0 Z" transform="matrix(1 0 0 1 2 4.500)"></path><path d="M 0 10 L 10 15 L 20 10" transform="matrix(1 0 0 1 2 4.500)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Collections</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 20 10 C 20 15.523 15.523 20 10 20 M 10 0 C 15.523 0 20 4.477 20 10 M 0 10 C 0 4.477 4.477 0 10 0 M 10 20 C 4.477 20 0 15.523 0 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 16 10 C 16 13.314 13.314 16 10 16 M 10 4 C 13.314 4 16 6.686 16 10 M 4 10 C 4 6.686 6.686 4 10 4 M 10 16 C 6.686 16 4 13.314 4 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 12 10 C 12 11.105 11.105 12 10 12 M 10 8 C 11.105 8 12 8.895 12 10 M 8 10 C 8 8.895 8.895 8 10 8 M 10 12 C 8.895 12 8 11.105 8 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Goals</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 19.21 13.89 C 18.574 15.394 17.579 16.72 16.312 17.751 C 15.045 18.782 13.545 19.487 11.943 19.805 C 10.341 20.122 8.685 20.042 7.121 19.572 C 5.556 19.101 4.131 18.255 2.969 17.107 C 1.808 15.958 0.945 14.543 0.457 12.984 C -0.031 11.425 -0.13 9.77 0.169 8.165 C 0.468 6.559 1.156 5.051 2.172 3.772 C 3.189 2.493 4.503 1.483 6 0.83 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 20 10 C 20 8.687 19.742 7.386 19.239 6.173 C 18.737 4.96 18 3.858 17.071 2.929 C 16.143 2 15.04 1.264 13.827 0.761 C 12.614 0.259 11.314 0 10 0 L 10 10 L 20 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Money Story</span>
+</div>
+</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">03</span><span>Saved item — why do I want this?</span></div>
+<div data-screen-label="03 Item detail" style="position:relative;width:393px;height:1201px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:1201px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:1201px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<div onClick="{{ toggleBought }}" style="position:absolute;left:306px;top:99px;width:63px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;background:{{ boughtBg }};color:{{ boughtFg }}">{{ boughtLabel }}</div>
+<span style="position:absolute;left:0;top:131px;width:393px;text-align:center;font-family:Fraunces,serif;font-weight:400;font-size:24px;line-height:24px;color:#fff">Flats to heels</span>
+
+<div style="position:absolute;left:58px;top:193px;width:274px;height:466px;border-radius:24px;overflow:hidden">
+<img src="assets/reel.jpg" alt="" style="width:274px;height:466px;object-fit:cover">
+<div style="position:absolute;left:105px;top:197px;width:73px;height:73px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center">
+<div style="width:62px;height:62px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:19px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:6px"></div></div>
+</div>
+</div>
+
+<div style="position:absolute;left:33px;top:675px;width:324px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:10px;line-height:1;color:#fff">AI DESCRIPTION</span>
+<div style="width:324px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);padding:14px;font-size:14px;line-height:19px;color:#fff">A Instagram reel about shoes for the summer from the brand viceversa. This is a convertible sandal that can swap between flats mode and heel mode.</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:10px;line-height:1;color:#fff">TAGS</span>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px">
+<sc-for list="{{ detailTags }}" as="tag" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:30px;box-sizing:border-box;padding:0 12px;border-radius:9999px;font-size:13px;line-height:1;background:{{ tag.bg }};border:1px solid {{ tag.bd }};color:{{ tag.fg }}">
+<span>{{ tag.t }}</span>
+<sc-if value="{{ tagsEditable }}" hint-placeholder-val="{{ true }}">
+<span onClick="{{ tag.onRemove }}" style="cursor:pointer;font-size:11px;opacity:0.75" style-hover="opacity:1">✕</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center">
+<div style="width:177px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:10px;line-height:1;color:#fff">WHY DO I WANT THIS?</span>
+<div style="height:168px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);padding:14px 12px;display:flex;align-items:center;justify-content:center"><span style="font-size:14px;line-height:18px;color:#fff">I think it would be a versatile shoe for the summer. I don’t have to worry about my feet hurting.</span></div>
+</div>
+<div style="width:112px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:10px;line-height:1;color:#fff">FEELING ATTACHED</span>
+<div style="height:168px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+<div style="display:flex;flex-direction:row;gap:4px">
+<sc-for list="{{ ratingStars }}" as="star" hint-placeholder-count="3">
+<img src="assets/icon-star.svg" alt="" onClick="{{ star.onPick }}" style="width:26px;height:25px;cursor:pointer;filter:brightness(0) invert(1);opacity:{{ star.op }}">
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:14px;line-height:28px;letter-spacing:0.005em;color:#fff">Joy</span>
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:14px;line-height:28px;letter-spacing:0.005em;color:#fff">Excitement</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="position:absolute;left:178px;top:1133px;width:84px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">DELETE</div>
+<div style="position:absolute;left:281px;top:1133px;width:65px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">SAVE</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">04</span><span>Save into a collection</span></div>
+<div data-screen-label="04 Save to collection" style="position:relative;width:393px;height:866px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:866px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:866px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<span style="position:absolute;left:21px;top:111px;font-size:10px;line-height:1;color:#fff">COLLECTION</span>
+<div style="position:absolute;left:22px;top:127px;width:342px;height:40px;box-sizing:border-box;border-radius:12px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:space-between;padding:0 13px">
+<span style="font-size:16px;line-height:22px;letter-spacing:-0.408px;color:#fff">Summer Fashion</span>
+<img src="assets/icon-star.svg" alt="" style="width:19px;height:18px;filter:brightness(0) invert(1);opacity:0.9">
+</div>
+
+<div style="position:absolute;left:39px;top:250px;width:315px;height:490px">
+<sc-for list="{{ stack }}" as="c" hint-placeholder-count="4">
+<div onPointerDown="{{ c.onDown }}" onPointerMove="{{ c.onMove }}" onPointerUp="{{ c.onUp }}" onPointerCancel="{{ c.onUp }}" style="position:absolute;left:14px;top:0;width:279px;height:474px;border-radius:24px;overflow:hidden;transform:{{ c.tf }};z-index:{{ c.z }};box-shadow:0 12px 40px rgba(0,0,0,0.35);opacity:{{ c.op }};transition:{{ c.tr }};background-image:url({{ c.img }});background-size:cover;background-position:center;touch-action:none;cursor:grab">
+<div style="position:absolute;left:18px;top:18px;padding:6px 12px;border-radius:9999px;border:2px solid #40962A;background:rgba(0,0,0,0.45);font-size:13px;letter-spacing:0.1em;color:#9CD98C;opacity:{{ c.keepOp }}">KEEP</div>
+<div style="position:absolute;right:18px;top:18px;padding:6px 12px;border-radius:9999px;border:2px solid #F79420;background:rgba(0,0,0,0.45);font-size:13px;letter-spacing:0.1em;color:#F7B463;opacity:{{ c.dropOp }}">DELETE</div>
+<div style="position:absolute;left:103px;top:201px;width:73px;height:73px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center">
+<div style="width:62px;height:62px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:19px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:6px"></div></div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="position:absolute;left:24px;top:752px;width:345px;display:flex;flex-direction:row;align-items:center;justify-content:space-between;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.6)">
+<span>← swipe left to delete</span><span>swipe right to keep →</span>
+</div>
+<sc-if value="{{ stackEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:24px;top:430px;width:345px;text-align:center;font-family:Fraunces,serif;font-weight:300;font-size:24px;color:rgba(255,255,255,0.75)">Nothing left to sort</div>
+</sc-if>
+
+<div style="position:absolute;left:284px;top:777px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Review</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">05</span><span>Review — buy or let go</span></div>
+<div data-screen-label="05 Review" style="position:relative;width:393px;height:1020px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:1020px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:51px;width:393px;height:969px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<span style="position:absolute;left:0;top:104px;width:393px;text-align:center;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:32px;color:#fff">Review</span>
+<span style="position:absolute;left:132px;top:166px;width:121px;text-align:center;font-size:16px;line-height:22px;letter-spacing:-0.408px;color:#fff">Summer Fashion</span>
+
+<span style="position:absolute;left:16px;top:214px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:32px;color:#fff">Buy Options</span>
+<div style="position:absolute;left:0;top:254px;width:393px;height:251px;overflow-x:auto;overflow-y:hidden;display:flex;flex-direction:row;gap:8px;padding:0 16px;box-sizing:border-box">
+<sc-for list="{{ buyRow }}" as="card" hint-placeholder-count="3">
+<div style="position:relative;flex:none;width:178px;height:251px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:8px;display:flex;flex-direction:column;gap:5px">
+<div style="position:relative;width:162px;height:162px;overflow:hidden;border-radius:16px;background-image:url({{ card.img }});background-size:cover;background-position:center">
+<div style="position:absolute;left:0;top:0;width:162px;height:162px;background:linear-gradient(180deg,rgba(0,0,0,0) 46.91%,rgba(0,0,0,0.85) 100%)"></div>
+<sc-if value="{{ card.play }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:63px;top:63px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center">
+<div style="width:30px;height:30px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:9px solid #fff;border-top:5.5px solid transparent;border-bottom:5.5px solid transparent;margin-left:3px"></div></div>
+</div>
+</sc-if>
+</div>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;width:162px">
+<sc-for list="{{ card.tags }}" as="tag" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:26px;box-sizing:border-box;padding:0 9px;border-radius:9999px;font-size:12px;line-height:1;background:{{ tag.bg }};border:1px solid {{ tag.bd }};color:{{ tag.fg }}">
+<span>{{ tag.t }}</span>
+<sc-if value="{{ tagsEditable }}" hint-placeholder-val="{{ true }}">
+<span onClick="{{ tag.onRemove }}" style="cursor:pointer;font-size:11px;opacity:0.75" style-hover="opacity:1">✕</span>
+</sc-if>
+</div>
+</sc-for>
+<span style="font-size:14px;color:#fff">{{ card.more }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<span style="position:absolute;left:16px;top:539px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:32px;color:#fff">Discarded</span>
+<div style="position:absolute;left:0;top:579px;width:393px;height:251px;overflow-x:auto;overflow-y:hidden;display:flex;flex-direction:row;gap:8px;padding:0 16px;box-sizing:border-box">
+<sc-for list="{{ discardRow }}" as="card" hint-placeholder-count="3">
+<div style="position:relative;flex:none;width:178px;height:251px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:8px;display:flex;flex-direction:column;gap:5px">
+<div style="position:relative;width:162px;height:162px;overflow:hidden;border-radius:16px;background-image:url({{ card.img }});background-size:cover;background-position:center">
+<div style="position:absolute;left:0;top:0;width:162px;height:162px;background:linear-gradient(180deg,rgba(0,0,0,0) 46.91%,rgba(0,0,0,0.85) 100%)"></div>
+</div>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;width:162px">
+<sc-for list="{{ card.tags }}" as="tag" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:26px;box-sizing:border-box;padding:0 9px;border-radius:9999px;font-size:12px;line-height:1;background:{{ tag.bg }};border:1px solid {{ tag.bd }};color:{{ tag.fg }}">
+<span>{{ tag.t }}</span>
+<sc-if value="{{ tagsEditable }}" hint-placeholder-val="{{ true }}">
+<span onClick="{{ tag.onRemove }}" style="cursor:pointer;font-size:11px;opacity:0.75" style-hover="opacity:1">✕</span>
+</sc-if>
+</div>
+</sc-for>
+<span style="font-size:14px;color:#fff">{{ card.more }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="position:absolute;left:203px;top:860px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Review</div>
+<div style="position:absolute;left:298px;top:860px;width:61px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Save</div>
+<div style="position:absolute;left:16px;top:938px;width:361px;height:64px;box-sizing:border-box;border-radius:20px;background:rgba(20,17,24,0.72);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;flex-direction:row;align-items:center;z-index:8">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 0 7 L 9 0 L 18 7 L 18 18 C 18 18.53 17.789 19.039 17.414 19.414 C 17.039 19.789 16.53 20 16 20 L 2 20 C 1.47 20 0.961 19.789 0.586 19.414 C 0.211 19.039 0 18.53 0 18 L 0 7 Z" transform="matrix(1 0 0 1 3 2)"></path><path d="M 6 20 L 6 10 L 12 10 L 12 20 Z" transform="matrix(1 0 0 1 3 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Home</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:1" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 10 0 L 0 5 L 10 10 L 20 5 L 10 0 Z" transform="matrix(1 0 0 1 2 4.500)"></path><path d="M 0 10 L 10 15 L 20 10" transform="matrix(1 0 0 1 2 4.500)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Collections</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 20 10 C 20 15.523 15.523 20 10 20 M 10 0 C 15.523 0 20 4.477 20 10 M 0 10 C 0 4.477 4.477 0 10 0 M 10 20 C 4.477 20 0 15.523 0 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 16 10 C 16 13.314 13.314 16 10 16 M 10 4 C 13.314 4 16 6.686 16 10 M 4 10 C 4 6.686 6.686 4 10 4 M 10 16 C 6.686 16 4 13.314 4 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 12 10 C 12 11.105 11.105 12 10 12 M 10 8 C 11.105 8 12 8.895 12 10 M 8 10 C 8 8.895 8.895 8 10 8 M 10 12 C 8.895 12 8 11.105 8 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Goals</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 19.21 13.89 C 18.574 15.394 17.579 16.72 16.312 17.751 C 15.045 18.782 13.545 19.487 11.943 19.805 C 10.341 20.122 8.685 20.042 7.121 19.572 C 5.556 19.101 4.131 18.255 2.969 17.107 C 1.808 15.958 0.945 14.543 0.457 12.984 C -0.031 11.425 -0.13 9.77 0.169 8.165 C 0.468 6.559 1.156 5.051 2.172 3.772 C 3.189 2.493 4.503 1.483 6 0.83 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 20 10 C 20 8.687 19.742 7.386 19.239 6.173 C 18.737 4.96 18 3.858 17.071 2.929 C 16.143 2 15.04 1.264 13.827 0.761 C 12.614 0.259 11.314 0 10 0 L 10 10 L 20 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Money Story</span>
+</div>
+</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">07</span><span>New goal · 1 of 5 — define</span></div>
+<div data-screen-label="07 Goal step 1" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+<span style="position:absolute;left:24px;top:106px;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">NEW GOAL · STEP 1 OF 5</span>
+<span style="position:absolute;left:24px;top:142px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Define the goal</span>
+<div style="position:absolute;left:24px;top:188px;display:flex;flex-direction:row;gap:6px"><div style="width:30px;height:3px;border-radius:2px;background:#fff"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div></div>
+
+<div style="position:absolute;left:44px;top:206px;width:305px;height:40px;border-radius:24px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14)"></div>
+<div style="position:absolute;left:34px;top:214px;width:325px;height:40px;border-radius:24px;background:#1A1521;border:1px solid rgba(255,255,255,0.3)"></div>
+<div style="position:absolute;left:24px;top:222px;width:345px;height:540px;box-sizing:border-box;border-radius:24px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:10px">
+<div style="width:52px;height:52px;border-radius:12px;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.18) 0 5px,rgba(255,255,255,0.05) 5px 10px);display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,Menlo,monospace;font-size:7px;color:rgba(255,255,255,0.78)">shot</span></div>
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">FROM YOUR SAVE</span>
+<span style="font-size:13px;color:#fff">@apple · M4 Air announcement</span>
+</div>
+</div>
+<div style="height:1px;background:rgba(255,255,255,0.22)"></div>
+<sc-for list="{{ goalFields }}" as="f" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;gap:5px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">{{ f.label }}</span>
+<div style="display:flex;flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap">
+<div style="flex:1;min-width:150px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.55);padding:8px 11px;font-size:15px;color:#fff">{{ f.value }}</div>
+<sc-if value="{{ f.chip }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:26px;padding:0 9px;border-radius:9999px;background:rgba(126,87,194,0.85);color:#fff;font-size:11px">
+<span>{{ f.chip }}</span>
+<span onClick="{{ f.onDismiss }}" style="cursor:pointer;font-size:10px;opacity:0.8" style-hover="opacity:1">✕</span>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-for>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;line-height:15px;color:rgba(255,255,255,0.6)">Prism filled these in from the post. Dismiss anything that isn’t right — nothing is locked.</span>
+</div>
+<div style="position:absolute;left:24px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">Back</div>
+<div style="position:absolute;left:290px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Next</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">08</span><span>New goal · 2 of 5 — motivation</span></div>
+<div data-screen-label="08 Goal step 2" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+<span style="position:absolute;left:24px;top:106px;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">NEW GOAL · STEP 2 OF 5</span>
+<span style="position:absolute;left:24px;top:142px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Why this matters</span>
+<div style="position:absolute;left:24px;top:188px;display:flex;flex-direction:row;gap:6px"><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:#fff"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div></div>
+
+<div style="position:absolute;left:44px;top:206px;width:305px;height:40px;border-radius:24px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14)"></div>
+<div style="position:absolute;left:34px;top:214px;width:325px;height:40px;border-radius:24px;background:#1A1521;border:1px solid rgba(255,255,255,0.3)"></div>
+<div style="position:absolute;left:24px;top:222px;width:345px;height:540px;box-sizing:border-box;border-radius:24px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px;display:flex;flex-direction:column;gap:10px">
+<span style="font-size:17px;line-height:23px;color:#fff">Why does a new laptop matter to you?</span>
+<sc-for list="{{ motivations }}" as="m" hint-placeholder-count="7">
+<div onClick="{{ m.onPick }}" style="display:flex;flex-direction:row;align-items:center;gap:10px;box-sizing:border-box;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14px;background:{{ m.bg }};border:1px solid {{ m.bd }};color:#fff" style-hover="border-color:#fff">
+<div style="width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:#fff;opacity:{{ m.dot }}"></div></div>
+<span>{{ m.t }}</span>
+</div>
+</sc-for>
+<div style="margin-top:2px;border-radius:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(69,29,114,0.25);padding:10px 12px;display:flex;flex-direction:column;gap:4px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">WE’LL BRING THIS BACK</span>
+<span style="font-size:12.5px;line-height:17px;color:#fff">Next time something tempts you, Prism shows you this sentence before the price.</span>
+</div>
+</div>
+<div style="position:absolute;left:24px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">Back</div>
+<div style="position:absolute;left:290px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Next</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">09</span><span>New goal · 3 of 5 — target</span></div>
+<div data-screen-label="09 Goal step 3" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+<span style="position:absolute;left:24px;top:106px;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">NEW GOAL · STEP 3 OF 5</span>
+<span style="position:absolute;left:24px;top:142px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Set the target</span>
+<div style="position:absolute;left:24px;top:188px;display:flex;flex-direction:row;gap:6px"><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:#fff"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div></div>
+
+<div style="position:absolute;left:44px;top:206px;width:305px;height:40px;border-radius:24px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14)"></div>
+<div style="position:absolute;left:34px;top:214px;width:325px;height:40px;border-radius:24px;background:#1A1521;border:1px solid rgba(255,255,255,0.3)"></div>
+<div style="position:absolute;left:24px;top:222px;width:345px;height:540px;box-sizing:border-box;border-radius:24px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:2px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">TARGET AMOUNT</span>
+<span style="font-family:Figtree,sans-serif;font-size:40px;line-height:46px;color:#fff">{{ targetAmount }}</span>
+</div>
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:9999px;background:rgba(126,87,194,0.85);font-size:11px;color:#fff"><span>from your save</span></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:12px">
+<div style="flex:1;display:flex;flex-direction:column;gap:5px"><span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">TARGET DATE</span><div style="border-radius:8px;border:1px solid rgba(255,255,255,0.55);padding:8px 11px;font-size:15px;color:#fff">Mar 2027</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:5px"><span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">SAVED SO FAR</span><div style="border-radius:8px;border:1px solid rgba(255,255,255,0.55);padding:8px 11px;font-size:15px;color:#fff">$150</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">CONTRIBUTION FREQUENCY</span>
+<div style="display:flex;flex-direction:row;gap:6px">
+<sc-for list="{{ freqs }}" as="f" hint-placeholder-count="3">
+<div onClick="{{ f.onPick }}" style="flex:1;text-align:center;border-radius:8px;padding:9px 0;font-size:13px;cursor:pointer;color:#fff;background:{{ f.bg }};border:1px solid {{ f.bd }}" style-hover="border-color:#fff">{{ f.t }}</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">SPENDING CATEGORY · OPTIONAL</span><div style="border-radius:8px;border:1px solid rgba(255,255,255,0.55);padding:8px 11px;font-size:15px;color:#fff">Tech &amp; equipment</div></div>
+<div onClick="{{ toggleBuffer }}" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-radius:10px;border:1px solid rgba(255,255,255,0.3);padding:11px 12px;cursor:pointer">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13.5px;color:#fff">Include an 8% buffer</span><span style="font-size:11px;color:rgba(255,255,255,0.7)">Tax, a case, the thing you forgot</span></div>
+<div style="width:42px;height:24px;border-radius:12px;padding:2px;box-sizing:border-box;display:flex;align-items:center;background:{{ bufferTrack }};justify-content:{{ bufferAlign }}"><div style="width:20px;height:20px;border-radius:50%;background:#fff"></div></div>
+</div>
+<div style="margin-top:auto;border-radius:10px;background:rgba(255,255,255,0.07);padding:11px 12px;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">THAT WORKS OUT TO</span>
+<span style="font-family:Figtree,sans-serif;font-size:22px;line-height:28px;color:#fff">{{ perPeriod }}</span>
+</div>
+</div>
+<div style="position:absolute;left:24px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">Back</div>
+<div style="position:absolute;left:290px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Next</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">10</span><span>New goal · 4 of 5 — priority</span></div>
+<div data-screen-label="10 Goal step 4" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+<span style="position:absolute;left:24px;top:106px;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">NEW GOAL · STEP 4 OF 5</span>
+<span style="position:absolute;left:24px;top:142px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Where it ranks</span>
+<div style="position:absolute;left:24px;top:188px;display:flex;flex-direction:row;gap:6px"><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:#fff"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div></div>
+
+<div style="position:absolute;left:44px;top:206px;width:305px;height:40px;border-radius:24px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14)"></div>
+<div style="position:absolute;left:34px;top:214px;width:325px;height:40px;border-radius:24px;background:#1A1521;border:1px solid rgba(255,255,255,0.3)"></div>
+<div style="position:absolute;left:24px;top:222px;width:345px;height:540px;box-sizing:border-box;border-radius:24px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ priorities }}" as="p" hint-placeholder-count="4">
+<div onClick="{{ p.onPick }}" style="display:flex;flex-direction:row;align-items:flex-start;gap:10px;border-radius:12px;padding:11px 12px;cursor:pointer;background:{{ p.bg }};border:1px solid {{ p.bd }}" style-hover="border-color:#fff">
+<div style="margin-top:2px;width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:#fff;opacity:{{ p.dot }}"></div></div>
+<div style="display:flex;flex-direction:column;gap:3px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:8px"><span style="font-size:15px;color:#fff">{{ p.t }}</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:rgba(255,255,255,0.65)">{{ p.limit }}</span></div>
+<span style="font-size:12px;line-height:16px;color:rgba(255,255,255,0.82)">{{ p.sub }}</span>
+</div>
+</div>
+</sc-for>
+<div style="margin-top:2px;border-radius:12px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.07);padding:12px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">YOUR $500 A MONTH, AFTER THIS</span>
+<sc-for list="{{ allocation }}" as="a" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;font-size:12.5px;color:#fff"><span>{{ a.name }}</span><span>{{ a.amt }}</span></div>
+<div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.22)"><div style="height:5px;border-radius:3px;background:#fff;width:{{ a.w }}"></div></div>
+</div>
+</sc-for>
+<span style="font-size:11.5px;line-height:16px;color:rgba(255,255,255,0.8)">{{ allocationNote }}</span>
+</div>
+</div>
+<div style="position:absolute;left:24px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">Back</div>
+<div style="position:absolute;left:290px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Next</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">11</span><span>New goal · 5 of 5 — the plan</span></div>
+<div data-screen-label="11 Goal step 5" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+<span style="position:absolute;left:24px;top:106px;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">NEW GOAL · STEP 5 OF 5</span>
+<span style="position:absolute;left:24px;top:142px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Your plan</span>
+<div style="position:absolute;left:24px;top:188px;display:flex;flex-direction:row;gap:6px"><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:rgba(255,255,255,0.28)"></div><div style="width:30px;height:3px;border-radius:2px;background:#fff"></div></div>
+
+<div style="position:absolute;left:44px;top:206px;width:305px;height:40px;border-radius:24px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14)"></div>
+<div style="position:absolute;left:34px;top:214px;width:325px;height:40px;border-radius:24px;background:#1A1521;border:1px solid rgba(255,255,255,0.3)"></div>
+<div style="position:absolute;left:24px;top:222px;width:345px;height:540px;box-sizing:border-box;border-radius:24px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px;display:flex;flex-direction:column;gap:10px">
+<span style="font-size:12px;line-height:16px;color:rgba(255,255,255,0.82)">Built from what you entered. Every line stays yours to change.</span>
+<sc-for list="{{ planItems }}" as="p" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;gap:3px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.15)">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">{{ p.label }}</span>
+<span style="font-size:14.5px;line-height:19px;color:#fff">{{ p.t }}</span>
+<span style="font-size:11.5px;line-height:15px;color:rgba(255,255,255,0.72)">{{ p.sub }}</span>
+</div>
+</sc-for>
+<div style="margin-top:auto;border-radius:10px;background:rgba(255,255,255,0.07);padding:11px 12px;display:flex;flex-direction:row;align-items:baseline;justify-content:space-between">
+<span style="font-size:11.5px;color:rgba(255,255,255,0.8)">Every line stays editable</span>
+<span style="font-family:Figtree,sans-serif;font-size:20px;color:#fff">{{ perPeriod }}</span>
+</div>
+</div>
+<div style="position:absolute;left:24px;top:775px;width:79px;height:40px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">Back</div>
+<div style="position:absolute;left:266px;top:775px;width:103px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Create goal</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">12</span><span>Saves attached to the goal</span></div>
+<div data-screen-label="12 Saves in goal" style="position:relative;width:393px;height:938px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:938px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:51px;width:393px;height:887px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<span style="position:absolute;left:0;top:104px;width:393px;text-align:center;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:32px;color:#fff">New Laptop</span>
+<span style="position:absolute;left:0;top:166px;width:393px;text-align:center;font-size:16px;line-height:22px;letter-spacing:-0.408px;color:#fff">Active goal · Mar 2027</span>
+
+<div style="position:absolute;left:16px;top:206px;width:361px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;flex-direction:row;align-items:baseline;justify-content:space-between">
+<div style="display:flex;flex-direction:column"><span style="font-family:'Encode Sans',sans-serif;font-size:13px;line-height:20px;color:rgba(255,255,255,0.7)">Projected cost of this plan</span><span style="font-family:Figtree,sans-serif;font-size:32px;line-height:38px;color:#fff">{{ projected }}</span></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:12px;line-height:18px;color:{{ projectedColor }}">{{ projectedDelta }}</span>
+</div>
+<div style="height:6px;border-radius:3px;background:rgba(255,255,255,0.2)"><div style="height:6px;border-radius:3px;background:#40962A;width:{{ projectedBar }}"></div></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:11.5px;line-height:16px;color:rgba(255,255,255,0.88)">{{ projectedNote }}</span>
+</div>
+
+<span style="position:absolute;left:16px;top:352px;font-family:Fraunces,serif;font-weight:300;font-size:28px;line-height:32px;color:#fff">Saves in this goal</span>
+<span style="position:absolute;left:16px;top:386px;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.55)">tap to reclassify · swipe left to remove · {{ savesCount }} saves</span>
+
+<div style="position:absolute;left:16px;top:412px;width:361px;height:440px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ goalSaves }}" as="s" hint-placeholder-count="6">
+<div style="position:relative">
+<div style="position:absolute;right:0;top:0;bottom:0;width:130px;border-radius:16px;background:rgba(247,148,32,0.9);display:flex;align-items:center;justify-content:flex-end;padding-right:16px;box-sizing:border-box;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.08em;color:#2C2C2C;opacity:{{ s.dropOp }}">REMOVE</div>
+<div onClick="{{ s.onCycle }}" onPointerDown="{{ s.onDown }}" onPointerMove="{{ s.onMove }}" onPointerUp="{{ s.onUp }}" onPointerCancel="{{ s.onUp }}" style="position:relative;display:flex;flex-direction:row;align-items:center;gap:11px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.18);padding:10px;cursor:pointer;transform:translateX({{ s.dx }});transition:{{ s.tr }};touch-action:pan-y" style-hover="border-color:#fff">
+<div style="flex:none;width:52px;height:52px;border-radius:10px;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.18) 0 5px,rgba(255,255,255,0.05) 5px 10px);display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,Menlo,monospace;font-size:7px;color:rgba(255,255,255,0.78)">save</span></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px">
+<span style="font-size:13.5px;line-height:17px;color:#fff">{{ s.t }}</span>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:rgba(255,255,255,0.6)">{{ s.src }}</span>
+<div style="display:flex;flex-direction:row;align-items:center;gap:7px">
+<div style="height:22px;padding:0 9px;border-radius:9999px;display:flex;align-items:center;font-size:11px;background:{{ s.clsBg }};border:1px solid {{ s.clsBd }};color:{{ s.clsFg }}">{{ s.cls }}</div>
+<span style="font-size:12px;color:rgba(255,255,255,0.88)">{{ s.cost }}</span>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">13</span><span>Share a link → new save (step 0)</span></div>
+<div data-screen-label="13 Share a link" style="position:relative;width:393px;height:852px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:852px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:852px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<span style="position:absolute;left:24px;top:106px;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">SHARED TO PRISM</span>
+<span style="position:absolute;left:24px;top:142px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Paste anything</span>
+
+<div style="position:absolute;left:24px;top:200px;width:345px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);padding:12px;display:flex;flex-direction:row;align-items:center;gap:10px">
+<span style="flex:1;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:17px;color:{{ linkUrlColor }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ linkUrl }}</span>
+<div onClick="{{ linkAction }}" style="flex:none;height:30px;padding:0 13px;border-radius:8px;background:#2C2C2C;display:flex;align-items:center;font-size:13px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">{{ linkBtn }}</div>
+</div>
+
+
+
+<div style="position:absolute;left:24px;top:362px;width:345px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);padding:14px;display:flex;flex-direction:column;gap:12px;opacity:{{ previewOp }};transition:opacity .4s ease">
+<div style="position:relative;width:317px;height:150px;border-radius:14px;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.18) 0 7px,rgba(255,255,255,0.05) 7px 14px);display:flex;align-items:center;justify-content:center">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.8)">cover image from og:image</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:5px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">TITLE</span>
+<span style="font-family:Fraunces,serif;font-weight:400;font-size:21px;line-height:26px;color:#fff">MacBook Air 13” M4</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">TYPE · PRISM’S GUESS, TAP TO CHANGE</span>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:7px">
+<sc-for list="{{ linkTypes }}" as="t" hint-placeholder-count="4">
+<div onClick="{{ t.onPick }}" style="height:28px;padding:0 12px;border-radius:9999px;display:flex;align-items:center;font-size:12.5px;cursor:pointer;color:#fff;background:{{ t.bg }};border:1px solid {{ t.bd }}" style-hover="border-color:#fff">{{ t.t }}</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div style="position:absolute;left:24px;top:735px;width:345px;display:flex;flex-direction:row;gap:10px;opacity:{{ previewOp }}">
+<div style="flex:1;height:44px;border-radius:8px;border:1px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">Save to All saves</div>
+<div style="flex:1;height:44px;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:15px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Make it a goal</div>
+</div>
+<span style="position:absolute;left:24px;top:793px;width:345px;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;line-height:14px;color:rgba(255,255,255,0.5)">Saved links land in All saves first. Nothing becomes a goal until you say so.</span>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">14</span><span>Saved item → start a goal</span></div>
+<div data-screen-label="14 Save to goal" style="position:relative;width:393px;height:1520px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:1520px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:0;width:393px;height:1520px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<div onClick="{{ toggleBought }}" style="position:absolute;left:306px;top:99px;width:63px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;background:{{ boughtBg }};color:{{ boughtFg }}">{{ boughtLabel }}</div>
+<span style="position:absolute;left:0;top:131px;width:393px;text-align:center;font-family:Fraunces,serif;font-weight:400;font-size:24px;line-height:24px;color:#fff">MacBook Air 13” M4</span>
+
+<div style="position:absolute;left:58px;top:193px;width:274px;height:466px;border-radius:24px;overflow:hidden;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.16) 0 8px,rgba(255,255,255,0.05) 8px 16px);display:flex;align-items:center;justify-content:center">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.8)">cover image from the link</span>
+</div>
+
+<div style="position:absolute;left:33px;top:675px;width:324px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:10px;line-height:1;color:#fff">AI DESCRIPTION</span>
+<div style="width:324px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);padding:14px;font-size:14px;line-height:19px;color:#fff">An Instagram post from @apple announcing the M4 MacBook Air. 13-inch, from $1,199, and a refurbished version of the same specs runs $1,019.</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:10px;line-height:1;color:#fff">TAGS</span>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px">
+<sc-for list="{{ laptopTags }}" as="tag" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:row;align-items:center;gap:6px;height:30px;box-sizing:border-box;padding:0 12px;border-radius:9999px;font-size:13px;line-height:1;background:{{ tag.bg }};border:1px solid {{ tag.bd }};color:{{ tag.fg }}">
+<span>{{ tag.t }}</span>
+<sc-if value="{{ tagsEditable }}" hint-placeholder-val="{{ true }}">
+<span onClick="{{ tag.onRemove }}" style="cursor:pointer;font-size:11px;opacity:0.75" style-hover="opacity:1">✕</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center">
+<div style="width:177px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:10px;line-height:1;color:#fff">WHY DO I WANT THIS?</span>
+<div style="height:168px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);padding:14px 12px;display:flex;align-items:center;justify-content:center"><span style="font-size:14px;line-height:18px;color:#fff">My 2019 Air can’t handle the video edits for class. A 40-minute export would take five.</span></div>
+</div>
+<div style="width:112px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:10px;line-height:1;color:#fff">FEELING ATTACHED</span>
+<div style="height:168px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+<div style="display:flex;flex-direction:row;gap:4px">
+<sc-for list="{{ laptopStars }}" as="star" hint-placeholder-count="3">
+<img src="assets/icon-star.svg" alt="" onClick="{{ star.onPick }}" style="width:26px;height:25px;cursor:pointer;filter:brightness(0) invert(1);opacity:{{ star.op }}">
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:14px;line-height:28px;letter-spacing:0.005em;color:#fff">Practical</span>
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:14px;line-height:28px;letter-spacing:0.005em;color:#fff">Determined</span>
+</div>
+</div>
+</div>
+</div>
+
+<div style="box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:16px;display:flex;flex-direction:column;gap:11px">
+<span style="font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.7)">$1,199 · NOT SAVED FOR YET</span>
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:24px;line-height:29px;color:#fff">Worth saving for?</span>
+<span style="font-size:12.5px;line-height:17px;color:rgba(255,255,255,0.85)">Turn this save into a goal, to start saving towards it. Research shows that saving towards a goal increases the satisfaction attached to it.</span>
+<div style="height:44px;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:15px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Make it a goal</div>
+
+</div>
+</div>
+
+<div style="position:absolute;left:178px;top:1425px;width:84px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Delete</div>
+<div style="position:absolute;left:281px;top:1425px;width:65px;height:40px;box-sizing:border-box;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:16px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Save</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">15</span><span>Goals dashboard</span></div>
+<div data-screen-label="15 Goals dashboard" style="position:relative;width:393px;height:1020px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:1020px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:51px;width:393px;height:969px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<span style="position:absolute;left:24px;top:104px;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:38px;color:#fff">Goals</span>
+<span style="position:absolute;left:24px;top:164px;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.6)">{{ allocatedLine }}</span>
+
+<div style="position:absolute;left:16px;top:192px;width:361px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:16px;display:flex;flex-direction:column;gap:13px">
+<div style="display:flex;flex-direction:row;align-items:flex-start;gap:12px">
+<div style="flex:none;width:64px;height:64px;border-radius:14px;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.18) 0 6px,rgba(255,255,255,0.05) 6px 12px);display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,Menlo,monospace;font-size:7px;color:rgba(255,255,255,0.78)">cover</span></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:9.5px;letter-spacing:0.08em;color:rgba(255,255,255,0.65)">{{ leadKind }}</span>
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:27px;line-height:31px;color:#fff">{{ leadName }}</span>
+<span style="font-size:12.5px;color:rgba(255,255,255,0.8)">{{ leadDate }}</span>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;flex-direction:row;align-items:baseline;justify-content:space-between">
+<span style="font-family:Figtree,sans-serif;font-size:26px;line-height:30px;color:#fff">{{ leadSaved }}</span>
+<span style="font-size:12.5px;color:rgba(255,255,255,0.8)">of {{ leadTarget }} · {{ leadPct }}</span>
+</div>
+<div style="height:8px;border-radius:4px;background:rgba(255,255,255,0.2)"><div style="height:8px;border-radius:4px;background:#fff;width:{{ leadPct }}"></div></div>
+<div style="display:flex;flex-direction:row;justify-content:space-between;font-size:11.5px;color:rgba(255,255,255,0.78)"><span>{{ leadRemaining }} to go</span><span>{{ leadMonthly }} needed this month</span></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:10px;align-items:center">
+<div style="flex:1;height:38px;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:14px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">Add progress</div>
+<div style="flex:1;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,0.55);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.14)">{{ leadSavesLine }}</div>
+</div>
+<span style="font-size:11.5px;line-height:16px;color:rgba(255,255,255,0.78)">{{ leadNote }}</span>
+</div>
+
+
+<span style="position:absolute;left:24px;top:470px;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.06em;color:rgba(255,255,255,0.55)">YOUR OTHER GOALS · TAP TO EXPAND</span>
+<div style="position:absolute;left:16px;top:{{ listBody }};width:361px;display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ goalList }}" as="g" hint-placeholder-count="5">
+<div onClick="{{ g.onPick }}" style="display:flex;flex-direction:row;align-items:center;gap:11px;box-sizing:border-box;border-radius:14px;padding:10px 12px;cursor:pointer;background:{{ g.bg }};border:1px solid {{ g.bd }}" style-hover="border-color:#fff">
+<div style="flex:none;width:42px;height:42px;border-radius:10px;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.18) 0 5px,rgba(255,255,255,0.05) 5px 10px)"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:5px">
+<div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px">
+<span style="font-size:14px;color:#fff">{{ g.name }}</span>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:rgba(255,255,255,0.6)">{{ g.kind }}</span>
+</div>
+<div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.2)"><div style="height:5px;border-radius:3px;background:{{ g.barColor }};width:{{ g.pct }}"></div></div>
+<div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px">
+<span style="font-size:11.5px;color:rgba(255,255,255,0.8)">{{ g.money }}</span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="position:absolute;left:16px;top:874px;width:361px;height:46px;border-radius:8px;border:1px dashed rgba(255,255,255,0.55);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;color:#fff;cursor:pointer" style-hover="background:rgba(255,255,255,0.12)"><span style="font-size:18px;line-height:1">+</span><span>New goal from a save</span></div>
+<div style="position:absolute;left:16px;top:938px;width:361px;height:64px;box-sizing:border-box;border-radius:20px;background:rgba(20,17,24,0.72);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;flex-direction:row;align-items:center;z-index:8">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 0 7 L 9 0 L 18 7 L 18 18 C 18 18.53 17.789 19.039 17.414 19.414 C 17.039 19.789 16.53 20 16 20 L 2 20 C 1.47 20 0.961 19.789 0.586 19.414 C 0.211 19.039 0 18.53 0 18 L 0 7 Z" transform="matrix(1 0 0 1 3 2)"></path><path d="M 6 20 L 6 10 L 12 10 L 12 20 Z" transform="matrix(1 0 0 1 3 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Home</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 10 0 L 0 5 L 10 10 L 20 5 L 10 0 Z" transform="matrix(1 0 0 1 2 4.500)"></path><path d="M 0 10 L 10 15 L 20 10" transform="matrix(1 0 0 1 2 4.500)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Collections</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:1" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 20 10 C 20 15.523 15.523 20 10 20 M 10 0 C 15.523 0 20 4.477 20 10 M 0 10 C 0 4.477 4.477 0 10 0 M 10 20 C 4.477 20 0 15.523 0 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 16 10 C 16 13.314 13.314 16 10 16 M 10 4 C 13.314 4 16 6.686 16 10 M 4 10 C 4 6.686 6.686 4 10 4 M 10 16 C 6.686 16 4 13.314 4 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 12 10 C 12 11.105 11.105 12 10 12 M 10 8 C 11.105 8 12 8.895 12 10 M 8 10 C 8 8.895 8.895 8 10 8 M 10 12 C 8.895 12 8 11.105 8 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Goals</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 19.21 13.89 C 18.574 15.394 17.579 16.72 16.312 17.751 C 15.045 18.782 13.545 19.487 11.943 19.805 C 10.341 20.122 8.685 20.042 7.121 19.572 C 5.556 19.101 4.131 18.255 2.969 17.107 C 1.808 15.958 0.945 14.543 0.457 12.984 C -0.031 11.425 -0.13 9.77 0.169 8.165 C 0.468 6.559 1.156 5.051 2.172 3.772 C 3.189 2.493 4.503 1.483 6 0.83 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 20 10 C 20 8.687 19.742 7.386 19.239 6.173 C 18.737 4.96 18 3.858 17.071 2.929 C 16.143 2 15.04 1.264 13.827 0.761 C 12.614 0.259 11.314 0 10 0 L 10 10 L 20 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Money Story</span>
+</div>
+</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,0.45)"><span style="color:rgba(255,255,255,0.9)">16</span><span>My Money Story — MVP</span></div>
+<div data-screen-label="16 Money Story MVP" style="position:relative;width:393px;height:2740px;overflow:hidden;border-radius:44px;background:#1a1620;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+<sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ true }}">
+<img src="assets/bg.jpg" alt="" style="position:absolute;left:0;top:0;width:393px;height:2740px;object-fit:cover;transform:scale(-1,-1)">
+</sc-if>
+<div style="position:absolute;left:0;top:51px;width:393px;height:2689px;background:rgba(0,0,0,0.05);backdrop-filter:blur(80px);-webkit-backdrop-filter:blur(80px)"></div>
+<div style="position:absolute;left:0;top:0;width:393px;height:106px;border-radius:0 0 16px 16px;background:rgba(69,29,114,0.05)"></div>
+<svg width="34" height="24" viewBox="0 0 45 32.074" style="position:absolute;left:180px;top:63px"><path d="M 22.101 0 L 0 24.179 L 14.288 32.074 L 22.101 0 Z" fill="rgba(217,217,217,0.55)"/><path d="M 45 28.62 L 22.112 0 L 14.043 32.074 L 45 28.62 Z" fill="rgba(255,255,255,0.35)"/></svg>
+
+<span style="position:absolute;left:0;top:104px;width:393px;text-align:center;font-family:Fraunces,serif;font-weight:300;font-size:32px;line-height:32px;color:#fff">My Money Story</span>
+<div style="position:absolute;left:16px;top:170px;width:361px;display:flex;flex-direction:row;gap:6px">
+<sc-for list="{{ storyViews }}" as="v" hint-placeholder-count="3">
+<div onClick="{{ v.onPick }}" style="flex:1;text-align:center;border-radius:9999px;padding:8px 0;font-size:12.5px;cursor:pointer;color:#fff;background:{{ v.bg }};border:1px solid {{ v.bd }}" style-hover="border-color:#fff">{{ v.t }}</div>
+</sc-for>
+</div>
+
+<div style="position:absolute;left:16px;top:222px;width:361px;display:flex;flex-direction:column;gap:20px">
+
+<div style="display:flex;flex-direction:column;gap:9px">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:30px;line-height:36px;color:#fff;text-wrap:pretty">{{ storyHeadline }}</span>
+<span style="font-size:14px;line-height:20px;color:rgba(255,255,255,0.88);text-wrap:pretty">{{ storySub }}</span>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:rgba(255,255,255,0.5)">{{ storyBasis }}</span>
+</div>
+
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ storyMetrics }}" as="m" hint-placeholder-count="5">
+<div style="flex:1 1 108px;box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.22);padding:11px 12px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:Figtree,sans-serif;font-size:24px;line-height:28px;color:#fff">{{ m.n }}</span>
+<span style="font-family:'Encode Sans',sans-serif;font-size:10.5px;line-height:14px;color:rgba(255,255,255,0.78)">{{ m.l }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.06em;color:rgba(255,255,255,0.55)">GOAL PROGRESS · {{ viewLabel }}</span>
+<sc-for list="{{ storyGoals }}" as="g" hint-placeholder-count="2">
+<div style="padding:4px 0 18px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:8px">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:22px;line-height:26px;color:#fff">{{ g.name }}</span>
+</div>
+<div style="height:7px;border-radius:4px;background:rgba(255,255,255,0.2)"><div style="height:7px;border-radius:4px;background:{{ g.barColor }};width:{{ g.pct }}"></div></div>
+<div style="display:flex;flex-direction:row;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.88)"><span>{{ g.contributed }} this month</span><span>{{ g.pct }} funded</span></div>
+
+</div>
+</sc-for>
+</div>
+
+<div style="box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:16px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-family:'Encode Sans',sans-serif;font-size:11px;letter-spacing:0.06em;color:rgba(255,255,255,0.7)">WHAT CAUGHT YOUR ATTENTION</span>
+<span style="font-family:Fraunces,serif;font-weight:400;font-size:20px;line-height:25px;color:#fff">Style caught your attention most.</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ attention }}" as="a" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:row;align-items:center;gap:10px">
+<span style="width:88px;font-family:'Encode Sans',sans-serif;font-size:12px;color:#fff">{{ a.t }}</span>
+<div style="flex:1;height:14px;border-radius:4px;background:rgba(255,255,255,0.2)"><div style="height:14px;border-radius:4px;background:{{ a.c }};width:{{ a.w }}"></div></div>
+<span style="width:18px;text-align:right;font-family:Figtree,sans-serif;font-size:14px;color:#fff">{{ a.n }}</span>
+</div>
+</sc-for>
+</div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:12px;line-height:17px;color:rgba(255,255,255,0.88);text-wrap:pretty">Products dominated your feed, but experiences were more likely to become goals.</span>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:rgba(255,255,255,0.7)">Based on 18 saves</span>
+</div>
+
+<div style="box-sizing:border-box;border-radius:16px;background:rgba(28,28,31,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:16px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-family:'Encode Sans',sans-serif;font-size:11px;letter-spacing:0.06em;color:rgba(255,255,255,0.7)">WHAT INFLUENCED YOU</span>
+<span style="font-family:Fraunces,serif;font-weight:400;font-size:20px;line-height:25px;color:#fff">TikTok inspired the most saves. Pinterest ideas lasted longest.</span>
+</div>
+<div style="display:flex;flex-direction:row;gap:8px;font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.04em;color:rgba(255,255,255,0.7)">
+<span style="flex:1.2">SOURCE</span><span style="width:42px;text-align:right">SAVED</span><span style="width:74px;text-align:right">STILL LIVE · 14D</span><span style="width:44px;text-align:right">GOALS</span>
+</div>
+<sc-for list="{{ influence }}" as="i" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;flex-direction:row;gap:8px;align-items:baseline;font-family:Figtree,sans-serif;font-size:14px;color:#fff">
+<span style="flex:1.2;font-family:'Encode Sans',sans-serif;font-size:13px">{{ i.src }}</span><span style="width:42px;text-align:right">{{ i.saved }}</span><span style="width:74px;text-align:right">{{ i.live }}</span><span style="width:44px;text-align:right">{{ i.goals }}</span>
+</div>
+<div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.2)"><div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.85);width:{{ i.live }}"></div></div>
+</div>
+</sc-for>
+<span style="font-family:'Encode Sans',sans-serif;font-size:12px;line-height:17px;color:rgba(255,255,255,0.88);text-wrap:pretty">Prism can say a platform preceded a decision — not that it caused one.</span>
+</div>
+
+<div style="padding:4px 0 18px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;flex-direction:column;gap:12px">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:22px;line-height:26px;color:#fff">Attention vs intention</span>
+<div style="display:flex;flex-direction:row;gap:10px">
+<div style="flex:1;border-radius:12px;background:rgba(255,255,255,0.07);padding:12px;display:flex;flex-direction:column;gap:7px">
+<span style="font-family:Figtree,sans-serif;font-size:26px;line-height:28px;color:#fff">11</span>
+<span style="font-family:'Encode Sans',sans-serif;font-size:10.5px;letter-spacing:0.06em;color:rgba(255,255,255,0.7)">ATTENTION</span>
+<span style="font-size:11.5px;line-height:16px;color:rgba(255,255,255,0.88)">Saved fast · novelty · Curious or Impulse · often removed</span>
+</div>
+<div style="flex:1;border-radius:12px;background:rgba(126,87,194,0.4);border:1px solid rgba(255,255,255,0.3);padding:12px;display:flex;flex-direction:column;gap:7px">
+<span style="font-family:Figtree,sans-serif;font-size:26px;line-height:28px;color:#fff">7</span>
+<span style="font-family:'Encode Sans',sans-serif;font-size:10.5px;letter-spacing:0.06em;color:rgba(255,255,255,0.8)">INTENTION</span>
+<span style="font-size:11.5px;line-height:16px;color:#fff">Revisited · tied to a goal · High or Meaningful · planned or funded</span>
+</div>
+</div>
+<span style="font-size:12.5px;line-height:17px;color:rgba(255,255,255,0.88);text-wrap:pretty">You saved fewer travel ideas than products, but revisited them three times more often.</span>
+</div>
+
+<div style="padding:4px 0 18px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;flex-direction:column;gap:12px">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:22px;line-height:26px;color:#fff">How you decided</span>
+<div style="display:flex;flex-direction:row;align-items:center;gap:8px">
+<div style="flex:none;width:74px;border-radius:12px;background:rgba(255,255,255,0.07);padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-family:Figtree,sans-serif;font-size:22px;color:#fff">18</span><span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;color:rgba(255,255,255,0.78)">saved</span></div>
+<span style="color:rgba(255,255,255,0.6);font-size:14px">→</span>
+<div style="flex:none;width:74px;border-radius:12px;background:rgba(255,255,255,0.07);padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-family:Figtree,sans-serif;font-size:22px;color:#fff">9</span><span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;color:rgba(255,255,255,0.78)">reviewed</span></div>
+<span style="color:rgba(255,255,255,0.6);font-size:14px">→</span>
+<div style="flex:1;display:flex;flex-direction:column;gap:5px">
+<sc-for list="{{ outcomes }}" as="o" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-radius:8px;background:{{ o.bg }};padding:5px 9px"><span style="font-family:'Encode Sans',sans-serif;font-size:10.5px;color:{{ o.fg }}">{{ o.t }}</span><span style="font-family:Figtree,sans-serif;font-size:14px;color:{{ o.fg }}">{{ o.n }}</span></div>
+</sc-for>
+</div>
+</div>
+<span style="font-size:12.5px;line-height:17px;color:rgba(255,255,255,0.88);text-wrap:pretty">Waiting changed your mind on 60% of what you reviewed after seven days.</span>
+</div>
+
+<div style="padding:4px 0 18px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;flex-direction:column;gap:11px">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:22px;line-height:26px;color:#fff">How saves felt</span>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:7px">
+<sc-for list="{{ feelings }}" as="f" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:row;align-items:center;gap:7px;height:28px;padding:0 11px;border-radius:9999px;font-size:12px;background:{{ f.bg }};border:1px solid {{ f.bd }};color:{{ f.fg }}"><span>{{ f.t }}</span><span style="font-family:Figtree,sans-serif;font-size:13px">{{ f.n }}</span></div>
+</sc-for>
+</div>
+<span style="font-size:12.5px;line-height:17px;color:rgba(255,255,255,0.88);text-wrap:pretty">You marked six saves Impulse, compared with three last month.</span>
+</div>
+
+<div style="padding:4px 0 18px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;flex-direction:column;gap:11px">
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:22px;line-height:26px;color:#fff">Trade-offs you made</span>
+<sc-for list="{{ tradeoffs }}" as="t" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:5px;border-radius:12px;background:rgba(255,255,255,0.07);padding:11px 12px">
+<span style="font-size:13.5px;line-height:18px;color:#fff">{{ t.decision }}</span>
+<div style="display:flex;flex-direction:row;align-items:center;gap:7px"><span style="color:rgba(255,255,255,0.55);font-size:12px">→</span><span style="font-size:12.5px;line-height:17px;color:{{ t.fg }}">{{ t.effect }}</span></div>
+<sc-if value="{{ t.after }}" hint-placeholder-val="{{ true }}">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:rgba(255,255,255,0.6)">{{ t.after }}</span>
+</sc-if>
+</div>
+</sc-for>
+
+</div>
+
+<div style="box-sizing:border-box;border-radius:16px;background:rgba(69,29,114,0.42);border:1px solid rgba(255,255,255,0.45);padding:16px;display:flex;flex-direction:column;gap:11px">
+<span style="font-family:'Encode Sans',sans-serif;font-size:10.5px;letter-spacing:0.06em;color:rgba(255,255,255,0.8)">ONE NEXT STEP</span>
+<span style="font-family:Fraunces,serif;font-weight:300;font-size:24px;line-height:30px;color:#fff;text-wrap:pretty">{{ nextStep }}</span>
+<span style="font-size:12.5px;line-height:17px;color:rgba(255,255,255,0.88)">{{ nextWhy }}</span>
+<div style="height:44px;border-radius:8px;background:#2C2C2C;border:1px solid #2C2C2C;display:flex;align-items:center;justify-content:center;font-size:15px;color:#F5F5F5;cursor:pointer" style-hover="background:#3a3a3a">{{ nextCta }}</div>
+</div>
+
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;line-height:14px;color:rgba(255,255,255,0.45);padding-bottom:8px">Built from your Prism activity only — no connected accounts yet. Spending alignment and post-purchase satisfaction unlock once you confirm purchases.</span>
+
+</div>
+<div style="position:absolute;left:16px;top:2658px;width:361px;height:64px;box-sizing:border-box;border-radius:20px;background:rgba(20,17,24,0.72);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;flex-direction:row;align-items:center;z-index:8">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 0 7 L 9 0 L 18 7 L 18 18 C 18 18.53 17.789 19.039 17.414 19.414 C 17.039 19.789 16.53 20 16 20 L 2 20 C 1.47 20 0.961 19.789 0.586 19.414 C 0.211 19.039 0 18.53 0 18 L 0 7 Z" transform="matrix(1 0 0 1 3 2)"></path><path d="M 6 20 L 6 10 L 12 10 L 12 20 Z" transform="matrix(1 0 0 1 3 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Home</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 10 0 L 0 5 L 10 10 L 20 5 L 10 0 Z" transform="matrix(1 0 0 1 2 4.500)"></path><path d="M 0 10 L 10 15 L 20 10" transform="matrix(1 0 0 1 2 4.500)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Collections</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:0.5" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 20 10 C 20 15.523 15.523 20 10 20 M 10 0 C 15.523 0 20 4.477 20 10 M 0 10 C 0 4.477 4.477 0 10 0 M 10 20 C 4.477 20 0 15.523 0 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 16 10 C 16 13.314 13.314 16 10 16 M 10 4 C 13.314 4 16 6.686 16 10 M 4 10 C 4 6.686 6.686 4 10 4 M 10 16 C 6.686 16 4 13.314 4 10 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 12 10 C 12 11.105 11.105 12 10 12 M 10 8 C 11.105 8 12 8.895 12 10 M 8 10 C 8 8.895 8.895 8 10 8 M 10 12 C 8.895 12 8 11.105 8 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Goals</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;cursor:pointer;opacity:1" style-hover="opacity:1">
+<div style="height:17px;display:flex;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M 19.21 13.89 C 18.574 15.394 17.579 16.72 16.312 17.751 C 15.045 18.782 13.545 19.487 11.943 19.805 C 10.341 20.122 8.685 20.042 7.121 19.572 C 5.556 19.101 4.131 18.255 2.969 17.107 C 1.808 15.958 0.945 14.543 0.457 12.984 C -0.031 11.425 -0.13 9.77 0.169 8.165 C 0.468 6.559 1.156 5.051 2.172 3.772 C 3.189 2.493 4.503 1.483 6 0.83 Z" transform="matrix(1 0 0 1 2 2)"></path><path d="M 20 10 C 20 8.687 19.742 7.386 19.239 6.173 C 18.737 4.96 18 3.858 17.071 2.929 C 16.143 2 15.04 1.264 13.827 0.761 C 12.614 0.259 11.314 0 10 0 L 10 10 L 20 10 Z" transform="matrix(1 0 0 1 2 2)"></path></svg></div>
+<span style="font-family:'Encode Sans',sans-serif;font-size:9.5px;letter-spacing:0.02em;color:#fff">Money Story</span>
+</div>
+</div>
+<sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;top:0;width:393px;height:47px;z-index:9;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;padding:0 28px 0 34px;color:#fff">
+<span style="font-weight:600;font-size:17px;letter-spacing:-0.3px">9:41</span>
+<div style="display:flex;align-items:center;gap:7px">
+<div style="display:flex;align-items:flex-end;gap:2px;height:11px"><div style="width:3px;height:4px;background:#fff;border-radius:1px"></div><div style="width:3px;height:6px;background:#fff;border-radius:1px"></div><div style="width:3px;height:9px;background:#fff;border-radius:1px"></div><div style="width:3px;height:11px;background:#fff;border-radius:1px"></div></div>
+<img src="assets/icon-wifi.svg" alt="" style="width:16px;height:12px;filter:brightness(0) invert(1)">
+<div style="width:25px;height:12px;border:1px solid rgba(255,255,255,0.45);border-radius:3.5px;box-sizing:border-box;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:1.5px"></div></div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showStatusBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showBackdrop&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;tagsEditable&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+// intent = purple, priority = amber, topic = neutral outline, done = green, off = muted
+const TONE = {
+  intent:   { bg: "#7E57C2", bd: "#7E57C2", fg: "#fff" },
+  intentO:  { bg: "transparent", bd: "#B39DDB", fg: "#D9CCF5" },
+  priority: { bg: "#F79420", bd: "#F79420", fg: "#2C2C2C" },
+  topic:    { bg: "rgba(255,255,255,0.1)", bd: "rgba(255,255,255,0.5)", fg: "#fff" },
+  done:     { bg: "#40962A", bd: "#40962A", fg: "#fff" },
+  off:      { bg: "rgba(0,0,0,0.45)", bd: "rgba(255,255,255,0.28)", fg: "rgba(255,255,255,0.9)" }
+};
+const T = (t, tone) => ({ t, ...TONE[tone] });
+
+class Component extends DCLogic {
+  state = {
+    tab: 0,
+    homeStar: false,
+    bought: false,
+    rating: 3,
+    stackList: ["assets/reel.jpg", "assets/item-d.png", "assets/item-f.jpg", "assets/item-a.png"],
+    dragX: 0,
+    dragging: false,
+    dragFrom: 0,
+    rowDrag: -1,
+    rowX: 0,
+    goalFields: [
+      { label: "GOAL NAME", value: "MacBook Air 13” M4", chip: "from your save" },
+      { label: "TYPE", value: "Tech · one-time purchase", chip: "suggested" },
+      { label: "ESTIMATED COST", value: "$1,199", chip: "from post" },
+      { label: "WHERE", value: "Apple · online", chip: null },
+      { label: "RELEVANT DATE", value: "Before spring term", chip: "suggested" }
+    ],
+    storyView: "Monthly",
+    linkStage: 2,
+    linkType: 0,
+    lead: 0,
+    motivation: 3,
+    freq: "Monthly",
+    buffer: true,
+    priority: 1,
+    saves: [
+      { t: "M4 MacBook Air 13”", src: "instagram · @apple", val: 1199, cost: "$1,199", cls: 0 },
+      { t: "Refurbished M4 Air, same specs", src: "web · apple refurb", val: 1019, cost: "$1,019", cls: 3 },
+      { t: "Student pricing, explained", src: "youtube · 6 min", val: 0, cost: "—", cls: 2 },
+      { t: "Hard case + two dongles", src: "tiktok · @desksetup", val: 45, cost: "$45", cls: 1 },
+      { t: "AppleCare — worth it?", src: "reddit · r/mac", val: 95, cost: "$95", cls: 1 },
+      { t: "Trade in the 2019 Air", src: "web · apple trade-in", val: -240, cost: "−$240", cls: 5 }
+    ],
+    home: [
+      { img: "assets/item-a.png", play: true, more: "+3", tags: [T("Want", "intent"), T("Fashion", "topic"), T("Low Priority", "priority")] },
+      { img: "assets/item-b.jpg", play: false, more: "", tags: [T("Home Cleaning", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-c.png", play: false, more: "+4", tags: [T("Want", "intent"), T("Fashion", "topic"), T("Medium Priority", "priority")] },
+      { img: "assets/item-d.png", play: false, more: "", tags: [T("Dream", "intent"), T("Concert", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-a.png", play: true, more: "+3", tags: [T("Want", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-e.png", play: false, more: "+2", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] }
+    ],
+    buy: [
+      { img: "assets/item-a.png", play: true, more: "+3", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-b.jpg", play: false, more: "+3", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-d.png", play: false, more: "+1", tags: [T("Dream", "intent"), T("Concert", "topic"), T("High Priority", "priority")] }
+    ],
+    discard: [
+      { img: "assets/item-c.png", play: false, more: "+3", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-e.png", play: false, more: "+3", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-f.jpg", play: false, more: "+2", tags: [T("Want", "intent"), T("Fashion", "topic"), T("Low Priority", "priority")] }
+    ],
+    money: [
+      { img: "assets/item-c.png", play: false, more: "+3", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-e.png", play: false, more: "+3", tags: [T("Gift", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] },
+      { img: "assets/item-f.jpg", play: false, more: "+1", tags: [T("Want", "intent"), T("Fashion", "topic"), T("High Priority", "priority")] }
+    ],
+    rating2: 2,
+    laptop: [T("Want", "intent"), T("Tech", "topic"), T("High Priority", "priority"), T("Student deal", "topic"), T("Refurb option", "topic"), T("Apple", "topic")],
+    detail: [T("Want", "intent"), T("Fashion", "topic"), T("High Priority", "priority"), T("Sandals", "topic"), T("Summer", "topic"), T("viceversa", "topic")]
+  };
+
+  removeTag(key, ci, ti) {
+    this.setState(s => {
+      const list = s[key].map((c, i) => i !== ci ? c : { ...c, tags: c.tags.filter((_, j) => j !== ti) });
+      return { [key]: list };
+    });
+  }
+
+  wire(key) {
+    return this.state[key].map((c, ci) => ({
+      ...c,
+      tags: c.tags.map((t, ti) => ({ ...t, onRemove: () => this.removeTag(key, ci, ti) }))
+    }));
+  }
+
+  renderVals() {
+    const tf = ["rotate(2.7deg)", "rotate(-3.5deg) translate(-6px,6px)", "rotate(5deg) translate(8px,10px)", "rotate(-6deg) translate(-10px,16px)"];
+    const dx = this.state.dragX;
+    const clamp = v => Math.max(0, Math.min(1, v));
+    const stack = this.state.stackList.map((img, i) => ({
+      img,
+      tf: i === 0 ? "translate(" + dx + "px,0) rotate(" + (2.7 + dx / 22).toFixed(2) + "deg)" : tf[i],
+      tr: i === 0 && this.state.dragging ? "none" : "transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s ease",
+      z: 4 - i,
+      op: i === 0 ? 1 : 0.55 - i * 0.12,
+      keepOp: i === 0 ? clamp(dx / 90) : 0,
+      dropOp: i === 0 ? clamp(-dx / 90) : 0,
+      onDown: i === 0 ? e => { e.currentTarget.setPointerCapture(e.pointerId); this.setState({ dragging: true, dragFrom: e.clientX, dragX: 0 }); } : null,
+      onMove: i === 0 ? e => { if (this.state.dragging) this.setState({ dragX: e.clientX - this.state.dragFrom }); } : null,
+      onUp: i === 0 ? () => {
+        const d = this.state.dragX;
+        if (d > 90) this.setState(s => ({ stackList: [...s.stackList.slice(1), s.stackList[0]], dragX: 0, dragging: false }));
+        else if (d < -90) this.setState(s => ({ stackList: s.stackList.slice(1), dragX: 0, dragging: false }));
+        else this.setState({ dragX: 0, dragging: false });
+      } : null
+    }));
+    const heights = [42, 87, 64, 27, 95, 82, 42];
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const money = n => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US");
+    const sel = on => ({ bg: on ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.06)", bd: on ? "#fff" : "rgba(255,255,255,0.3)", dot: on ? 1 : 0 });
+    const selPhoto = on => ({ bg: on ? "rgba(255,255,255,0.22)" : "transparent", bd: on ? "#fff" : "rgba(255,255,255,0.35)", dot: on ? 1 : 0 });
+    const target = this.state.buffer ? 1295 : 1199;
+    const periods = { Monthly: 6, Biweekly: 13, Weekly: 26 }[this.state.freq];
+    const unit = { Monthly: "month", Biweekly: "2 weeks", Weekly: "week" }[this.state.freq];
+    const per = Math.round((target - 150) / periods);
+    const monthly = Math.round((target - 150) / 6);
+    const prioNames = ["Primary goal", "Active goal", "Flexible goal", "Someday goal"];
+    const prioSubs = ["Funded before anything else, every month.", "Funded alongside Japan and the concert.", "Tracked and visible, but not funded yet.", "Parked. No money moves until you say so."];
+    const prioLimits = ["limit 1", "up to 3", "unlimited", "unlimited"];
+    const prioNotes = [
+      "Making this primary drops Japan to $175 a month and pushes it to Aug 2027.",
+      "Japan stays primary. This fits inside your $500 without touching it.",
+      "Nothing is allocated yet — Japan and the concert keep their full share.",
+      "Someday goals don’t take a share. Prism will still price it for you."
+    ];
+    const japan = this.state.priority === 0 ? 175 : this.state.priority === 1 ? Math.max(0, 450 - monthly) : 450;
+    const lap = this.state.priority === 0 ? 275 : this.state.priority === 1 ? monthly : 0;
+    const alloc = [
+      { name: "Japan, Apr 2027", v: japan },
+      { name: "New laptop", v: lap },
+      { name: "Concert tickets", v: 50 }
+    ];
+    const planText = [
+      ["CONTRIBUTION", money(per) + " every " + unit, "Auto-transfer on the 1st, adjustable any time"],
+      ["MILESTONES", "$474 · $797 · $1,120", "A short check-in every two months"],
+      ["TARGET DATE", "1 Mar 2027", "Before spring term starts"],
+      ["BUFFER", this.state.buffer ? "8% — $96" : "None", "Carried over from your target"],
+      ["PROGRESS WITHOUT MONEY", "Check student pricing · list the old Air", "Counts as progress too"]
+    ];
+    const clsNames = ["Essential", "Optional", "Inspiration", "Alternative", "Booked", "Decided against"];
+    const clsTone = ["intent", "intentO", "topic", "priority", "done", "off"];
+    const projectedVal = this.state.saves.reduce((n, s) => n + (s.cls === 0 || s.cls === 1 || s.cls === 4 ? s.val : 0), 0);
+    const over = projectedVal - 1199;
+    const stage = this.state.linkStage;
+    const goals = [
+      { name: "Japan", kind: "PRIMARY GOAL", date: "April 2027", saved: 1575, target: 4500, monthly: 325, status: "On track", saves: 12, note: "You contributed $325 this month and still saved 14 new products. The goal held." },
+      { name: "New laptop", kind: "ACTIVE GOAL", date: "March 2027", saved: 150, target: 1295, monthly: 191, status: "A little behind", saves: 6, note: "One contribution missed. Adding $60 this week puts it back on pace — not a failure, just a signal." },
+      { name: "Concert tickets", kind: "ACTIVE GOAL", date: "June 2027", saved: 200, target: 240, monthly: 50, status: "Ahead", saves: 3, note: "Funded next month. Presale opens 3 Feb — worth a calendar hold." },
+      { name: "New sofa", kind: "FLEXIBLE GOAL", date: "No date yet", saved: 0, target: 1200, monthly: 0, status: "Paused", saves: 9, note: "Tracked, not funded. Nine saves attached, estimated at $1,200." },
+      { name: "Kyoto cooking class", kind: "SOMEDAY", date: "Someday", saved: 0, target: 180, monthly: 0, status: "Paused", saves: 2, note: "Parked alongside the Japan trip. Prism will price it when you activate it." }
+    ];
+    const statusBg = { "Ahead": "#40962A", "On track": "#40962A", "A little behind": "#F79420", "Paused": "rgba(255,255,255,0.18)" };
+    const statusFg = { "Ahead": "#fff", "On track": "#fff", "A little behind": "#2C2C2C", "Paused": "rgba(255,255,255,0.9)" };
+    const statusInk = { "Ahead": "#9CD98C", "On track": "#9CD98C", "A little behind": "#F7B463", "Paused": "rgba(255,255,255,0.6)" };
+    const barInk = { "Ahead": "#40962A", "On track": "#fff", "A little behind": "#F79420", "Paused": "rgba(255,255,255,0.45)" };
+    const lead = goals[this.state.lead];
+    const pct = g => Math.round(g.saved / g.target * 100) + "%";
+    const story = {
+      Weekly: {
+        headline: "Three decisions, one contribution.",
+        sub: "You saved 4 ideas and reviewed 3. The $60 you added kept the laptop goal from slipping further.",
+        basis: "Based on 4 saves this week",
+        metrics: [["4", "ideas saved"], ["3", "decisions made"], ["$60", "added to goals"], ["1", "purchase reconsidered"], ["0", "milestones"]],
+        next: "Decide between your two High-priority saves.",
+        why: "Both have been open for nine days. Neither is funded.",
+        cta: "Open the two saves"
+      },
+      Monthly: {
+        headline: "You chose the goal over the feed.",
+        sub: "You saved 18 ideas this month, mostly products. The three you kept were tied to goals, and $190 of what you didn’t spend went to Japan.",
+        basis: "Based on 18 saves and 9 decisions",
+        metrics: [["18", "ideas saved"], ["9", "decisions made"], ["$190", "redirected to goals"], ["7", "purchases reconsidered"], ["2", "milestones done"]],
+        next: "Turn your most revisited save into a goal.",
+        why: "The Kyoto ryokan has been opened four times in three weeks and still isn’t attached to anything.",
+        cta: "Review that save"
+      },
+      "Over time": {
+        headline: "Travel keeps winning your attention back.",
+        sub: "Across six months, travel saves are revisited three times more often than products — and travel is the only category you have funded every single month.",
+        basis: "Based on 112 saves since March",
+        metrics: [["112", "ideas saved"], ["58", "decisions made"], ["$1,740", "redirected to goals"], ["31", "purchases reconsidered"], ["9", "milestones done"]],
+        next: "Archive 14 Someday saves you haven’t opened since June.",
+        why: "None were revisited, and none became goals. Clearing them makes the live ones easier to see.",
+        cta: "Review the archive"
+      }
+    }[this.state.storyView];
+    const tabVals = i => ({
+      bg: this.state.tab === i ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.06)",
+      bd: this.state.tab === i ? "#fff" : "rgba(255,255,255,0.3)",
+      onPick: () => this.setState({ tab: i })
+    });
+    return {
+      showStatusBar: this.props.showStatusBar ?? true,
+      showBackdrop: this.props.showBackdrop ?? true,
+      tagsEditable: this.props.tagsEditable ?? true,
+      homeCards: this.wire("home"),
+      buyRow: this.wire("buy"),
+      discardRow: this.wire("discard"),
+      moneyRow: this.wire("money"),
+      detailTags: this.state.detail.map((t, ti) => ({ ...t, onRemove: () => this.setState(s => ({ detail: s.detail.filter((_, j) => j !== ti) })) })),
+      homeFilters: ["All", "High priority", "Undecided", "Videos"].map((t, i) => ({ t, ...tabVals(i) })),
+      homeCount: "18 SAVES",
+      homeStarOp: this.state.homeStar ? 1 : 0.55,
+      toggleHomeStar: () => this.setState(s => ({ homeStar: !s.homeStar })),
+      boughtLabel: this.state.bought ? "Bought" : "Bought?",
+      boughtBg: this.state.bought ? "#F2EEF9" : "rgba(242,238,249,0.5)",
+      boughtFg: "#2C2C2C",
+      toggleBought: () => this.setState(s => ({ bought: !s.bought })),
+      ratingStars: [0, 1, 2].map(i => ({ op: i < this.state.rating ? 1 : 0.35, onPick: () => this.setState({ rating: i + 1 }) })),
+      stack,
+      stackEmpty: this.state.stackList.length === 0,
+      bars: heights.map((h, i) => ({ h: h + "px", d: days[i] })),
+      goalFields: this.state.goalFields.map((f, i) => ({
+        ...f,
+        onDismiss: () => this.setState(s => ({ goalFields: s.goalFields.map((g, j) => j === i ? { ...g, chip: null } : g) }))
+      })),
+      motivations: [
+        "It would improve my daily life",
+        "It supports a larger priority",
+        "I want to experience it with someone",
+        "It represents personal growth",
+        "It would bring me joy",
+        "It solves a practical need",
+        "My own reason"
+      ].map((t, i) => ({ t, ...sel(this.state.motivation === i), onPick: () => this.setState({ motivation: i }) })),
+      targetAmount: money(target),
+      freqs: ["Weekly", "Biweekly", "Monthly"].map(t => ({ t, ...sel(this.state.freq === t), onPick: () => this.setState({ freq: t }) })),
+      bufferTrack: this.state.buffer ? "#40962A" : "rgba(255,255,255,0.28)",
+      bufferAlign: this.state.buffer ? "flex-end" : "flex-start",
+      toggleBuffer: () => this.setState(s => ({ buffer: !s.buffer })),
+      perPeriod: money(per) + " / " + unit,
+      priorities: prioNames.map((t, i) => ({ t, sub: prioSubs[i], limit: prioLimits[i], ...sel(this.state.priority === i), onPick: () => this.setState({ priority: i }) })),
+      allocation: alloc.map(a => ({ name: a.name, amt: money(a.v), w: Math.round(a.v / 5) + "%" })),
+      allocationNote: prioNotes[this.state.priority],
+
+      planItems: planText.map(p => ({ label: p[0], t: p[1], sub: p[2] })),
+      goalSaves: this.state.saves.map((s, i) => ({
+        ...s,
+        dx: this.state.rowDrag === i ? Math.min(0, this.state.rowX) + "px" : "0px",
+        tr: this.state.rowDrag === i ? "none" : "transform .3s cubic-bezier(.2,.8,.2,1)",
+        dropOp: this.state.rowDrag === i ? Math.max(0, Math.min(1, -this.state.rowX / 100)) : 0,
+        onDown: e => { e.currentTarget.setPointerCapture(e.pointerId); this.setState({ rowDrag: i, rowX: 0, rowFrom: e.clientX }); },
+        onMove: e => { if (this.state.rowDrag === i) this.setState({ rowX: e.clientX - this.state.rowFrom }); },
+        onUp: () => {
+          const d = this.state.rowX;
+          if (d < -100) this.setState(st => ({ saves: st.saves.filter((_, j) => j !== i), rowDrag: -1, rowX: 0 }));
+          else this.setState({ rowDrag: -1, rowX: 0 });
+        },
+        cls: clsNames[s.cls], clsBg: TONE[clsTone[s.cls]].bg, clsBd: TONE[clsTone[s.cls]].bd, clsFg: TONE[clsTone[s.cls]].fg,
+        onCycle: () => this.setState(st => ({ saves: st.saves.map((x, j) => j === i ? { ...x, cls: (x.cls + 1) % 6 } : x) }))
+      })),
+      savesCount: this.state.saves.length,
+      projected: money(projectedVal),
+      projectedDelta: over > 0 ? money(over) + " over target" : money(-over) + " under target",
+      projectedColor: over > 0 ? "#F7B463" : "#9CD98C",
+      projectedBar: Math.min(100, Math.round(projectedVal / 1199 * 100)) + "%",
+      projectedNote: over > 0
+        ? "Switching to the refurbished Air or trading in the 2019 model brings this back under $1,199."
+        : "This plan sits inside your target. Anything you add will show up here first.",
+      linkUrl: stage === 0 ? "paste a link, or share to Prism" : "https://www.apple.com/macbook-air/",
+      linkUrlColor: stage === 0 ? "rgba(255,255,255,0.5)" : "#fff",
+      linkBtn: stage === 0 ? "Paste" : stage === 1 ? "Reading…" : "Clear",
+      linkAction: () => {
+        if (stage === 0) {
+          this.setState({ linkStage: 1 });
+          setTimeout(() => this.setState({ linkStage: 2 }), 900);
+        } else if (stage === 2) {
+          this.setState({ linkStage: 0 });
+        }
+      },
+      linkChecks: [
+        { label: "TITLE", value: "MacBook Air 13” M4" },
+        { label: "COVER IMAGE", value: "pulled from og:image" },
+        { label: "TYPE", value: "Product page · Apple" }
+      ].map(c => ({ ...c, op: stage === 0 ? 0.25 : stage === 1 ? 0.5 : 1, tick: stage === 2 ? 1 : 0 })),
+      previewOp: stage === 2 ? 1 : 0.22,
+      linkTypes: ["Product", "Trip", "Event", "Inspiration"].map((t, i) => ({ t, ...sel(this.state.linkType === i), onPick: () => this.setState({ linkType: i }) })),
+      laptopTags: this.state.laptop.map((t, ti) => ({ ...t, onRemove: () => this.setState(s => ({ laptop: s.laptop.filter((_, j) => j !== ti) })) })),
+      laptopStars: [0, 1, 2].map(i => ({ op: i < this.state.rating2 ? 1 : 0.35, onPick: () => this.setState({ rating2: i + 1 }) })),
+      carryOver: [
+        { label: "NAME", value: "MacBook Air 13” M4" },
+        { label: "COVER", value: "from the shared link" },
+        { label: "TYPE", value: "Tech · one-time purchase" },
+        { label: "ESTIMATED COST", value: "$1,199" }
+      ],
+      storyViews: ["Weekly", "Monthly", "Over time"].map(t => ({ t, ...selPhoto(this.state.storyView === t), onPick: () => this.setState({ storyView: t }) })),
+      storyHeadline: story.headline,
+      storySub: story.sub,
+      storyBasis: story.basis,
+      storyMetrics: story.metrics.map(m => ({ n: m[0], l: m[1] })),
+      viewLabel: this.state.storyView.toUpperCase(),
+      nextStep: story.next,
+      nextWhy: story.why,
+      nextCta: story.cta,
+      storyGoals: [
+        { name: "Japan, Apr 2027", status: "On track", pct: "35%", contributed: "$325", note: "You contributed $325 and picked your travel dates. Both moved it forward." },
+        { name: "New laptop", status: "A little behind", pct: "12%", contributed: "$60", note: "$86 of this came from three items you decided against. One more contribution clears the gap." }
+      ].map(g => ({ ...g, statusFg: statusInk[g.status], barColor: barInk[g.status] })),
+      attention: [
+        { t: "Products", n: 9, w: "100%", c: "#7E57C2" },
+        { t: "Experiences", n: 5, w: "56%", c: "rgba(126,87,194,0.75)" },
+        { t: "Trips", n: 3, w: "33%", c: "rgba(126,87,194,0.5)" },
+        { t: "Places", n: 1, w: "11%", c: "rgba(126,87,194,0.3)" }
+      ],
+      influence: [
+        { src: "TikTok", saved: 9, live: "30%", goals: 1 },
+        { src: "Instagram", saved: 6, live: "67%", goals: 2 },
+        { src: "Pinterest", saved: 3, live: "100%", goals: 1 }
+      ],
+      outcomes: [
+        { t: "became goals", n: 4, bg: TONE.done.bg, fg: TONE.done.fg },
+        { t: "deferred", n: 3, bg: TONE.priority.bg, fg: TONE.priority.fg },
+        { t: "removed", n: 2, bg: TONE.off.bg, fg: TONE.off.fg }
+      ],
+      feelings: [
+        { t: "Joy", n: 6, ...TONE.intent },
+        { t: "Impulse", n: 6, ...TONE.priority },
+        { t: "Curious", n: 5, ...TONE.topic },
+        { t: "Practical", n: 4, ...TONE.topic },
+        { t: "Meaningful", n: 3, ...TONE.intent },
+        { t: "Someday", n: 2, ...TONE.off }
+      ],
+      tradeoffs: [
+        { decision: "You deferred the $140 sneakers", effect: "Japan stayed on track", fg: "#9CD98C", after: null },
+        { decision: "You booked the concert", effect: "Laptop goal moved back two weeks", fg: "#F7B463", after: "You marked it Meaningful afterward." },
+        { decision: "You chose the refurbished Air", effect: "Laptop target down $180", fg: "#9CD98C", after: null }
+      ],
+      allocatedLine: "$500 a month allocated · 1 primary · 2 active · 2 paused",
+      leadKind: lead.kind,
+      leadName: lead.name,
+      leadDate: lead.date,
+      leadStatus: lead.status,
+      leadStatusBg: statusBg[lead.status],
+      leadStatusFg: statusFg[lead.status],
+      leadSaved: money(lead.saved),
+      leadTarget: money(lead.target),
+      leadPct: pct(lead),
+      leadRemaining: money(lead.target - lead.saved),
+      leadMonthly: lead.monthly ? money(lead.monthly) : "not funded yet",
+      leadSavesLine: lead.saves + " saves attached",
+      leadNote: lead.note,
+      listBody: "492px",
+      goalList: goals.map((g, i) => ({ hide: this.state.lead === i,
+        name: g.name, kind: g.kind, status: g.status, pct: pct(g),
+        money: g.monthly ? money(g.saved) + " of " + money(g.target) + " · " + money(g.monthly) + "/mo" : money(g.saved) + " of " + money(g.target) + " · not funded",
+        statusFg: statusInk[g.status],
+        barColor: barInk[g.status],
+        bg: this.state.lead === i ? "rgba(126,87,194,0.35)" : "rgba(28,28,31,0.92)",
+        bd: this.state.lead === i ? "#B39DDB" : "rgba(255,255,255,0.22)",
+        onPick: () => this.setState({ lead: i })
+      })).filter(g => !g.hide)
+    };
+  }
+}
+
+</script>
+</body>
+</html>
