@@ -1,62 +1,98 @@
-// Summary: Design tokens — colors, gradients, typography, spacing, radii, motion, and haptics for Prism.
+// Summary: Design tokens — colors, typography (Fraunces/Figtree/Encode Sans/Inter), spacing, motion from App Screens recreation.
 
 import SwiftUI
 
 enum PrismColors {
-    static let backgroundDeep = Color(red: 0.08, green: 0.02, blue: 0.16)
-    static let backgroundMid = Color(red: 0.14, green: 0.04, blue: 0.28)
-    static let violet = Color(red: 0.42, green: 0.10, blue: 0.72)
+    /// Canvas behind flipped backdrop art.
+    static let backgroundDeep = Color(red: 0.08, green: 0.07, blue: 0.09) // #141118-ish
+    static let backgroundMid = Color(red: 0.10, green: 0.09, blue: 0.13) // #1a1620
+    static let glassFill = Color(red: 28 / 255, green: 28 / 255, blue: 31 / 255).opacity(0.48)
+    static let glassStroke = Color.white.opacity(0.30)
+    static let glassStrokeSoft = Color.white.opacity(0.22)
+    static let tabBarFill = Color(red: 20 / 255, green: 17 / 255, blue: 24 / 255).opacity(0.72)
+    static let buttonDark = Color(red: 44 / 255, green: 44 / 255, blue: 44 / 255) // #2C2C2C
+    static let buttonInk = Color(red: 245 / 255, green: 245 / 255, blue: 245 / 255)
+
+    static let violet = Color(red: 126 / 255, green: 87 / 255, blue: 194 / 255) // #7E57C2
+    static let violetSoft = Color(red: 179 / 255, green: 157 / 255, blue: 219 / 255) // #B39DDB
+    static let lavender = Color(red: 217 / 255, green: 204 / 255, blue: 245 / 255)
+    static let statusGreen = Color(red: 64 / 255, green: 150 / 255, blue: 42 / 255) // #40962A
+    static let statusGreenSoft = Color(red: 156 / 255, green: 217 / 255, blue: 140 / 255) // #9CD98C
+    static let statusAmber = Color(red: 247 / 255, green: 148 / 255, blue: 32 / 255) // #F79420
+    static let statusAmberSoft = Color(red: 247 / 255, green: 180 / 255, blue: 99 / 255) // #F7B463
+
     static let magenta = Color(red: 0.90, green: 0.25, blue: 0.65)
     static let cyan = Color(red: 0.35, green: 0.85, blue: 0.95)
-    static let lavender = Color(red: 0.75, green: 0.65, blue: 0.95)
     static let warmLight = Color(red: 0.98, green: 0.88, blue: 0.70)
-    static let glassFill = Color.white.opacity(0.08)
-    static let glassStroke = Color.white.opacity(0.22)
+
     static let textPrimary = Color.white
     static let textSecondary = Color.white.opacity(0.72)
     static let textTertiary = Color.white.opacity(0.48)
+    static let textOnLight = Color(red: 44 / 255, green: 44 / 255, blue: 44 / 255)
     static let danger = Color(red: 0.95, green: 0.35, blue: 0.40)
-    static let successSoft = Color(red: 0.45, green: 0.85, blue: 0.70)
+    static let successSoft = statusGreenSoft
 
-    static let tagWant = Color(red: 0.55, green: 0.35, blue: 0.95)
+    // Legacy tag aliases → tone system
+    static let tagWant = violet
     static let tagNeed = Color(red: 0.30, green: 0.55, blue: 0.95)
     static let tagDream = Color(red: 0.90, green: 0.45, blue: 0.75)
     static let tagGift = Color(red: 0.25, green: 0.65, blue: 0.90)
     static let tagFashion = Color(red: 0.95, green: 0.30, blue: 0.55)
-    static let tagPriority = Color(red: 0.98, green: 0.78, blue: 0.25)
+    static let tagPriority = statusAmber
+}
+
+/// Tag / chip tones from recreation HTML `TONE`.
+enum PrismTone: String, CaseIterable {
+    case intent, intentOutline, priority, topic, done, off
+
+    var background: Color {
+        switch self {
+        case .intent: return PrismColors.violet
+        case .intentOutline: return .clear
+        case .priority: return PrismColors.statusAmber
+        case .topic: return Color.white.opacity(0.10)
+        case .done: return PrismColors.statusGreen
+        case .off: return Color.black.opacity(0.45)
+        }
+    }
+
+    var border: Color {
+        switch self {
+        case .intent: return PrismColors.violet
+        case .intentOutline: return PrismColors.violetSoft
+        case .priority: return PrismColors.statusAmber
+        case .topic: return Color.white.opacity(0.50)
+        case .done: return PrismColors.statusGreen
+        case .off: return Color.white.opacity(0.28)
+        }
+    }
+
+    var foreground: Color {
+        switch self {
+        case .intent, .done: return .white
+        case .intentOutline: return PrismColors.lavender
+        case .priority: return PrismColors.textOnLight
+        case .topic: return .white
+        case .off: return Color.white.opacity(0.90)
+        }
+    }
 }
 
 enum PrismGradients {
+    /// Prefer recreation backdrop art over this wash for in-app chrome.
     static let atmospheric = LinearGradient(
-        colors: [
-            PrismColors.backgroundDeep,
-            PrismColors.violet.opacity(0.55),
-            PrismColors.backgroundMid
-        ],
+        colors: [PrismColors.backgroundDeep, PrismColors.backgroundMid],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    static let prismShimmer = LinearGradient(
-        colors: [
-            PrismColors.magenta.opacity(0.35),
-            PrismColors.cyan.opacity(0.25),
-            PrismColors.lavender.opacity(0.30),
-            PrismColors.warmLight.opacity(0.15)
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
-
-    static let glassHighlight = LinearGradient(
-        colors: [Color.white.opacity(0.18), Color.white.opacity(0.02)],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
+    static let cardFade = LinearGradient(
+        colors: [Color.black.opacity(0), Color.black.opacity(0.85)],
+        startPoint: .init(x: 0.5, y: 0.47),
+        endPoint: .bottom
     )
 }
 
-/// Bundled brand fonts, loaded from the asset catalog (see scripts/fetch_fonts.sh).
-/// If a font has not been installed yet, typography falls back to the system fonts.
 enum PrismFonts {
     fileprivate struct Family {
         let postScriptName: String
@@ -64,6 +100,8 @@ enum PrismFonts {
 
     fileprivate static let fraunces: Family? = register(dataAsset: "FrauncesVariable")
     fileprivate static let inter: Family? = register(dataAsset: "InterVariable")
+    fileprivate static let figtree: Family? = register(dataAsset: "FigtreeVariable")
+    fileprivate static let encodeSans: Family? = register(dataAsset: "EncodeSansVariable")
 
     private static func register(dataAsset name: String) -> Family? {
         guard let asset = NSDataAsset(name: name),
@@ -71,7 +109,6 @@ enum PrismFonts {
               let cgFont = CGFont(provider),
               let psName = cgFont.postScriptName as String? else { return nil }
         var error: Unmanaged<CFError>?
-        // Ignore "already registered" errors; the font is usable either way.
         CTFontManagerRegisterGraphicsFont(cgFont, &error)
         return Family(postScriptName: psName)
     }
@@ -108,7 +145,7 @@ enum PrismFonts {
 }
 
 enum PrismTypography {
-    /// Titles and wordmark — Fraunces Light (falls back to the system serif).
+    /// Display / titles — Fraunces Light.
     static func display(_ size: CGFloat, weight: Font.Weight = .light) -> Font {
         if let family = PrismFonts.fraunces {
             return PrismFonts.font(family, size: size, variations: [
@@ -121,11 +158,32 @@ enum PrismTypography {
         return .system(size: size, weight: weight, design: .serif)
     }
 
-    static func title(_ size: CGFloat = 28) -> Font {
+    static func title(_ size: CGFloat = 32) -> Font {
         display(size, weight: .light)
     }
 
-    /// Body font — Inter (falls back to the system font).
+    /// Metrics / money — Figtree.
+    static func number(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        if let family = PrismFonts.figtree {
+            return PrismFonts.font(family, size: size, variations: [
+                "wght": PrismFonts.wght(weight)
+            ])
+        }
+        return .system(size: size, weight: weight, design: .rounded)
+    }
+
+    /// Tab / chrome labels — Encode Sans.
+    static func chrome(_ size: CGFloat = 9.5, weight: Font.Weight = .regular) -> Font {
+        if let family = PrismFonts.encodeSans {
+            return PrismFonts.font(family, size: size, variations: [
+                "wght": PrismFonts.wght(weight),
+                "wdth": 100
+            ])
+        }
+        return .system(size: size, weight: weight, design: .default)
+    }
+
+    /// Body — Inter.
     static func body(_ size: CGFloat = 16, weight: Font.Weight = .regular) -> Font {
         if let family = PrismFonts.inter {
             return PrismFonts.font(family, size: size, variations: [
@@ -139,6 +197,7 @@ enum PrismTypography {
     static func headline() -> Font { body(17, weight: .semibold) }
     static func caption() -> Font { body(12, weight: .medium) }
     static func micro() -> Font { body(10, weight: .semibold) }
+    static let mono = Font.system(size: 10, weight: .regular, design: .monospaced)
 }
 
 enum PrismSpacing {
@@ -154,8 +213,8 @@ enum PrismSpacing {
 enum PrismRadius {
     static let sm: CGFloat = 8
     static let md: CGFloat = 14
-    static let lg: CGFloat = 20
-    static let xl: CGFloat = 28
+    static let lg: CGFloat = 16
+    static let xl: CGFloat = 24
     static let pill: CGFloat = 999
 }
 
@@ -167,24 +226,16 @@ enum PrismMotion {
 }
 
 enum PrismHaptics {
-    static func decision() {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
-
-    static func save() {
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-    }
-
-    static func soft() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-    }
+    static func decision() { UIImpactFeedbackGenerator(style: .medium).impactOccurred() }
+    static func save() { UINotificationFeedbackGenerator().notificationOccurred(.success) }
+    static func soft() { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
 }
 
 enum PrismBackdrop {
-    /// Figma uses frost over sharp art, not a heavy Gaussian on the image.
-    static let blurRadius: CGFloat = 0
-    /// Keep very light so cyan/magenta streaks remain readable on device.
-    static let scrimOpacity: Double = 0.08
+    static let blurRadius: CGFloat = 80
+    static let imageBlurRadius: CGFloat = 14
+    static let materialOpacity: Double = 0.22
+    static let scrimOpacity: Double = 0.12
 }
 
 enum PrismMaterials {

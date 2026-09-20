@@ -248,6 +248,65 @@ final class GoalPlanningTests: XCTestCase {
         XCTAssertEqual(required, 325, accuracy: 1)
     }
 
+    func testBufferRaisesEffectiveTargetAndPace() {
+        let calendar = Calendar(identifier: .gregorian)
+        let created = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+        let target = calendar.date(from: DateComponents(year: 2027, month: 1, day: 1))!
+        var goal = PrismGoal(
+            id: UUID(),
+            userID: UUID(),
+            sourceAspirationID: nil,
+            title: "Laptop",
+            goalDescription: nil,
+            type: .purchase,
+            motivation: .practicalNeed,
+            customMotivation: nil,
+            targetAmount: 1_199,
+            currencyCode: "USD",
+            amountSaved: 150,
+            targetDate: target,
+            contributionFrequency: .monthly,
+            priority: .active,
+            includesBuffer: false,
+            trackStatus: .onTrack,
+            createdAt: created,
+            updatedAt: created,
+            completedAt: nil,
+            pausedAt: nil
+        )
+        let service = GoalPlanningService()
+        XCTAssertEqual(service.effectiveTarget(for: goal), 1_199)
+        let without = service.pace(for: goal, now: created, calendar: calendar)
+
+        goal.includesBuffer = true
+        let effective = NSDecimalNumber(decimal: service.effectiveTarget(for: goal) ?? 0).doubleValue
+        XCTAssertEqual(effective, 1294.92, accuracy: 0.01)
+        let withBuffer = service.pace(for: goal, now: created, calendar: calendar)
+        XCTAssertGreaterThan(
+            NSDecimalNumber(decimal: withBuffer.requiredPerPeriod ?? 0).doubleValue,
+            NSDecimalNumber(decimal: without.requiredPerPeriod ?? 0).doubleValue
+        )
+    }
+
+    func testProjectedCostExcludesAlternativesAndInspiration() {
+        let userID = UUID()
+        let goalID = UUID()
+        let now = Date()
+        let components: [GoalComponent] = [
+            GoalComponent(id: UUID(), userID: userID, goalID: goalID, name: "Air", estimatedCost: 1199, currencyCode: "USD", isOptional: false, role: .essential, sortOrder: 0, createdAt: now),
+            GoalComponent(id: UUID(), userID: userID, goalID: goalID, name: "Refurb", estimatedCost: 1019, currencyCode: "USD", isOptional: false, role: .alternative, sortOrder: 1, createdAt: now),
+            GoalComponent(id: UUID(), userID: userID, goalID: goalID, name: "Student", estimatedCost: nil, currencyCode: nil, isOptional: false, role: .inspiration, sortOrder: 2, createdAt: now),
+            GoalComponent(id: UUID(), userID: userID, goalID: goalID, name: "Case", estimatedCost: 45, currencyCode: "USD", isOptional: true, role: .optional, sortOrder: 3, createdAt: now),
+            GoalComponent(id: UUID(), userID: userID, goalID: goalID, name: "Care", estimatedCost: 95, currencyCode: "USD", isOptional: true, role: .optional, sortOrder: 4, createdAt: now)
+        ]
+        let projected = components
+            .filter(\.countsTowardProjectedCost)
+            .compactMap(\.estimatedCost)
+            .reduce(Decimal(0), +)
+        XCTAssertEqual(projected, 1339)
+        XCTAssertEqual(projected - 1199, 140)
+    }
+
     func testTradeoffCopy() {
         let goal = PrismGoal(
             id: UUID(), userID: UUID(), sourceAspirationID: nil, title: "Japan",

@@ -27,10 +27,14 @@ struct SettingsView: View {
                     Section {
                         HStack {
                             Spacer()
-                            PrismBrandMark(size: 22)
+                            PrismLogoMark()
                             Spacer()
                         }
                         .listRowBackground(Color.clear)
+                        Text("Settings")
+                            .font(PrismTypography.title(32))
+                            .frame(maxWidth: .infinity)
+                            .listRowBackground(Color.clear)
                         if environment.profile?.isDemoMode == true {
                             Text("Local / demo mode — data is not synced to the cloud.")
                                 .font(PrismTypography.caption())
@@ -231,6 +235,8 @@ struct SettingsView: View {
     private func wipe() async {
         try? await container.profileRepository.deleteAllLocalData()
         await container.notificationScheduler.cancelWeeklyRecap()
+        UserDefaults.standard.removeObject(forKey: "prism.demo.recreationSeeded.v1")
+        UserDefaults.standard.removeObject(forKey: "prism.demo.goalsSeeded.v1")
         environment.profile = nil
         statusMessage = "Local data deleted."
     }

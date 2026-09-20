@@ -1,4 +1,18 @@
+## IA update (2026-09-19 — App Screens recreation)
+
+Source of truth: `Prism App Screens Recreation/`. Full vision: [PRODUCT_VISION.md](PRODUCT_VISION.md).
+
+- **Tabs:** Home · Collections · Goals · Money Story (Settings and Review are no longer tabs).
+- **Review entry:** from Collections swipe-sort CTA and Review buttons — collection-scoped Buy Options + Discarded rows (not the old tab deck alone).
+- **Capture:** “Paste anything” staged sheet; Instagram / Share Extension still opens Capture via `prism://share`.
+- **Home:** saves archive only (goals moved to Goals tab). Paused/finished goals live under Goals, not Home.
+- **Regret check-in card:** surfaces inside the Review *flow* (and can remain reachable from Collections → Review), not a dedicated tab.
+- **AI DESCRIPTION:** local mock on item detail for MVP; real generation is Future (see PRODUCT_VISION).
+
+---
+
 # Handoff: reflection features (goal outcomes, regret check-in, weekly recap, share card, redirect nudge, goal from collection)
+
 
 Audience: teammates and their AI coding agents who will build, test, and extend this work.
 Branch: `mmn_dev` (uncommitted working-tree changes at time of writing). A copy of the full diff is in `docs/handoff/features.patch`.

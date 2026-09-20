@@ -18,11 +18,12 @@ struct AspirationMediaView: View {
                 .fill(PrismColors.violet.opacity(0.3))
 
             if let image = localImage ?? previewImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: height)
+                Color.clear
+                    .overlay {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                    }
                     .clipped()
             } else if isLoading {
                 ProgressView()
@@ -46,8 +47,10 @@ struct AspirationMediaView: View {
             )
             .allowsHitTesting(false)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: height)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .task(id: item.id) {
             await loadMedia()
         }

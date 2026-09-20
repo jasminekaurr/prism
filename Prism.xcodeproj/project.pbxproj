@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01D303131D1E794FD38641AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 922FFDD29F4C0B910EA2AF20 /* Assets.xcassets */; };
+		08CB6E8910240847D6C61EE5 /* CollectionSortDeckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7A75906E4DFF41DC6E0E69 /* CollectionSortDeckView.swift */; };
 		0D8E38B16D7AD339E3780C30 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F819625379C8FED237C8E9 /* OnboardingFlowView.swift */; };
 		15F666C5282F2482CC4864C0 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946A1954BA1622BDCF2017EA /* Enums.swift */; };
 		19A528789A40CC32308DDDB3 /* MoneyStoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5871341863E783BC0F0A9BA9 /* MoneyStoryService.swift */; };
@@ -28,6 +29,7 @@
 		58DAA1CC56ADC9838619715B /* DecisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668E6A56E0FEB5176CDFE4F4 /* DecisionService.swift */; };
 		59B853C3D1C3FE97550F5412 /* GoalPlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94952FC4F297F9DFC7E03251 /* GoalPlanningService.swift */; };
 		632379F6DA3D0E11711871E1 /* PrismApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0FE572AD856E190D4583B1 /* PrismApp.swift */; };
+		63D13D15AC388DC1B89BCB76 /* MockAIDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0EB2880F67925D4B7B1940 /* MockAIDescription.swift */; };
 		64F06D95F14F25D8F84E9F08 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546BC6EFDFE09A52DCBF0816 /* ShareViewController.swift */; };
 		70045AC2D4271A320D22A9F6 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC40857258D606DE72FCD97 /* Analytics.swift */; };
 		7220A01D75DA160B6F7A2385 /* PrismUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A1F701F292E7C3239343E /* PrismUtilities.swift */; };
@@ -47,6 +49,7 @@
 		B68ECCAB9FED26B7CD14A36A /* GoalSetupFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13DED36F539BC7B569CBD15 /* GoalSetupFlowView.swift */; };
 		BA2F1F9F83519AD975DCD957 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77344BC18D1248D4E201C3 /* DataExporter.swift */; };
 		BE6064DF2E6E273D3DBA4349 /* SavedItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */; };
+		B2C3D4E5F60718293A4B5C6D /* FeelingMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */; };
 		C313E818935949AABB8D727E /* ReflectionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381F0B79FE050ECE0F23A78F /* ReflectionEditorView.swift */; };
 		CFCC9FD4AE25523FFCF0347A /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBF52F3FA1A816060503D43 /* SignInView.swift */; };
 		D27CECCE9F72AB4DF0109319 /* PrismTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1797E9AA267F682A3541AAB9 /* PrismTokens.swift */; };
@@ -105,6 +108,7 @@
 		22F819625379C8FED237C8E9 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowView.swift; sourceTree = "<group>"; };
 		274C4CE0E1369B298A457A3E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		29E29151A6DA70AE0C4E7AE2 /* ShareInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareInbox.swift; sourceTree = "<group>"; };
+		2C0EB2880F67925D4B7B1940 /* MockAIDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIDescription.swift; sourceTree = "<group>"; };
 		381F0B79FE050ECE0F23A78F /* ReflectionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionEditorView.swift; sourceTree = "<group>"; };
 		3B26B1DC733D2E211912F087 /* ReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViews.swift; sourceTree = "<group>"; };
 		3C77344BC18D1248D4E201C3 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExporter.swift; sourceTree = "<group>"; };
@@ -123,6 +127,7 @@
 		83186F0D9749E32A0734027C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		87B438803C6E4BEA5508B407 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedItemDetailView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeelingMoodPickerView.swift; sourceTree = "<group>"; };
 		8DA7DB413F62C150F2C14E81 /* LinkPreviewFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewFetcher.swift; sourceTree = "<group>"; };
 		922FFDD29F4C0B910EA2AF20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		946A1954BA1622BDCF2017EA /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
@@ -143,6 +148,7 @@
 		BFE7222E6F7FE1B4127FAACE /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
 		C13D1DCB58DA7A8B2C7B3803 /* Prism.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Prism.entitlements; sourceTree = "<group>"; };
 		C8A7C680F6BB8194312B1A74 /* MoneyStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyStoryView.swift; sourceTree = "<group>"; };
+		CA7A75906E4DFF41DC6E0E69 /* CollectionSortDeckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSortDeckView.swift; sourceTree = "<group>"; };
 		D13DED36F539BC7B569CBD15 /* GoalSetupFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalSetupFlowView.swift; sourceTree = "<group>"; };
 		D23CB1EF073B6B9C2D1B4070 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		DAE8314A57B4215EF823E151 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -184,6 +190,7 @@
 		16862A7B3EBC5EB5A4190724 /* Collections */ = {
 			isa = PBXGroup;
 			children = (
+				CA7A75906E4DFF41DC6E0E69 /* CollectionSortDeckView.swift */,
 				BFE7222E6F7FE1B4127FAACE /* CollectionsView.swift */,
 			);
 			path = Collections;
@@ -384,6 +391,7 @@
 			isa = PBXGroup;
 			children = (
 				B80BBF9FFC901A4565B47840 /* AspirationMediaView.swift */,
+				A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */,
 				8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */,
 			);
 			path = Saves;
@@ -432,6 +440,7 @@
 				668E6A56E0FEB5176CDFE4F4 /* DecisionService.swift */,
 				5A81A8666DB944298F5B12D8 /* DemoDataSeeder.swift */,
 				94952FC4F297F9DFC7E03251 /* GoalPlanningService.swift */,
+				2C0EB2880F67925D4B7B1940 /* MockAIDescription.swift */,
 				5871341863E783BC0F0A9BA9 /* MoneyStoryService.swift */,
 			);
 			path = Services;
@@ -628,6 +637,7 @@
 				22AA83F22606F0429DE5F117 /* AppRouter.swift in Sources */,
 				8A39A226113E91FD9DF649E3 /* AspirationMediaView.swift in Sources */,
 				D9DE10812D089A76681516DE /* CaptureFlowView.swift in Sources */,
+				08CB6E8910240847D6C61EE5 /* CollectionSortDeckView.swift in Sources */,
 				42EA900B3F6CB7F9881F7C7C /* CollectionsView.swift in Sources */,
 				BA2F1F9F83519AD975DCD957 /* DataExporter.swift in Sources */,
 				58DAA1CC56ADC9838619715B /* DecisionService.swift in Sources */,
@@ -643,6 +653,7 @@
 				43C7E49704A1A4B9EFF5CC39 /* HomeView.swift in Sources */,
 				99FB59BEB9CC638F7A162B0B /* LinkPreviewFetcher.swift in Sources */,
 				8AE8693F7F3D50AD1A6D8031 /* LocalStore.swift in Sources */,
+				63D13D15AC388DC1B89BCB76 /* MockAIDescription.swift in Sources */,
 				19A528789A40CC32308DDDB3 /* MoneyStoryService.swift in Sources */,
 				9CAF762D8EFD95EC86469C7F /* MoneyStoryView.swift in Sources */,
 				93119062237C529DC598225E /* NotificationScheduler.swift in Sources */,
@@ -656,6 +667,7 @@
 				1E3515A0B1AA6284FB4ED624 /* RepositoryProtocols.swift in Sources */,
 				D37AE8871DBD4416AC2A5DAD /* ReviewViews.swift in Sources */,
 				BE6064DF2E6E273D3DBA4349 /* SavedItemDetailView.swift in Sources */,
+				B2C3D4E5F60718293A4B5C6D /* FeelingMoodPickerView.swift in Sources */,
 				21A4F84DB758AAAFEBC28950 /* Security.swift in Sources */,
 				9D07CC72D94E0F084FAC3126 /* SettingsView.swift in Sources */,
 				2B0B5FE5C2064077DF5D00E6 /* ShareInbox.swift in Sources */,
@@ -954,6 +966,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -996,6 +1009,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1011,6 +1025,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Staging;

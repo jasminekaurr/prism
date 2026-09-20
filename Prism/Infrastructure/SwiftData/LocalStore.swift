@@ -375,6 +375,30 @@ extension LocalStore: GoalRepository {
         try saveContext()
     }
 
+    func deleteGoal(id: UUID) async throws {
+        let milestones = FetchDescriptor<SDGoalMilestone>(predicate: #Predicate { $0.goalID == id })
+        for row in try modelContext.fetch(milestones) {
+            modelContext.delete(row)
+        }
+        let components = FetchDescriptor<SDGoalComponent>(predicate: #Predicate { $0.goalID == id })
+        for row in try modelContext.fetch(components) {
+            modelContext.delete(row)
+        }
+        let contributions = FetchDescriptor<SDGoalContribution>(predicate: #Predicate { $0.goalID == id })
+        for row in try modelContext.fetch(contributions) {
+            modelContext.delete(row)
+        }
+        let links = FetchDescriptor<SDGoalAspirationLink>(predicate: #Predicate { $0.goalID == id })
+        for row in try modelContext.fetch(links) {
+            modelContext.delete(row)
+        }
+        let goals = FetchDescriptor<SDGoal>(predicate: #Predicate { $0.id == id })
+        for row in try modelContext.fetch(goals) {
+            modelContext.delete(row)
+        }
+        try saveContext()
+    }
+
     func fetchMilestones(goalID: UUID) async throws -> [GoalMilestone] {
         let descriptor = FetchDescriptor<SDGoalMilestone>(
             predicate: #Predicate { $0.goalID == goalID },

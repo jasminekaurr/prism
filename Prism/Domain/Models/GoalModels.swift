@@ -47,8 +47,42 @@ struct GoalComponent: Identifiable, Codable, Equatable, Sendable {
     var estimatedCost: Decimal?
     var currencyCode: String?
     var isOptional: Bool
+    /// How this line sits in the plan (essential / optional / alternative / inspiration).
+    var role: AspirationLinkRole
     var sortOrder: Int
     var createdAt: Date
+
+    /// Costs that count toward “projected cost of this plan” (excludes alternatives & inspiration).
+    var countsTowardProjectedCost: Bool {
+        switch role {
+        case .essential, .optional, .booked: return true
+        case .alternative, .inspiration, .decidedAgainst: return false
+        }
+    }
+
+    init(
+        id: UUID,
+        userID: UUID,
+        goalID: UUID,
+        name: String,
+        estimatedCost: Decimal?,
+        currencyCode: String?,
+        isOptional: Bool,
+        role: AspirationLinkRole? = nil,
+        sortOrder: Int,
+        createdAt: Date
+    ) {
+        self.id = id
+        self.userID = userID
+        self.goalID = goalID
+        self.name = name
+        self.estimatedCost = estimatedCost
+        self.currencyCode = currencyCode
+        self.isOptional = isOptional
+        self.role = role ?? (isOptional ? .optional : .essential)
+        self.sortOrder = sortOrder
+        self.createdAt = createdAt
+    }
 }
 
 struct GoalContribution: Identifiable, Codable, Equatable, Sendable {

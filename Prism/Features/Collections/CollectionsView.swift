@@ -1,4 +1,4 @@
-// Summary: Collections list and creation flow with preset suggestions.
+// Summary: Collections list with cover glimpses; create flow with presets.
 
 import SwiftUI
 
@@ -8,15 +8,31 @@ struct CollectionsView: View {
     @EnvironmentObject private var container: DependencyContainer
     @State private var collections: [PrismCollection] = []
     @State private var itemCounts: [UUID: Int] = [:]
+    @State private var previewItems: [UUID: [SavedItem]] = [:]
 
     var body: some View {
         NavigationStack {
             ZStack {
                 PrismAtmosphericBackground()
-                VStack {
-                    PrismBrandMark().padding(.top, PrismSpacing.sm)
-                    Text("Collections")
-                        .font(PrismTypography.title())
+                VStack(spacing: 0) {
+                    HStack {
+                        Spacer()
+                        PrismLogoMark()
+                        Spacer()
+                    }
+                    .padding(.top, PrismSpacing.sm)
+
+                    HStack(alignment: .center) {
+                        Text("Collections")
+                            .font(PrismTypography.title(32))
+                        Spacer()
+                        PrismHeaderAction(title: "New", accessibilityID: "collections.create") {
+                            router.sheet = .createCollection
+                        }
+                    }
+                    .padding(.horizontal, PrismSpacing.md)
+                    .padding(.bottom, PrismSpacing.sm)
+
                     if collections.isEmpty {
                         EmptyStateView(
                             title: "Start a collection",
@@ -25,47 +41,25 @@ struct CollectionsView: View {
                             action: { router.sheet = .createCollection }
                         )
                         .accessibilityIdentifier("collections.empty")
+                        Spacer()
                     } else {
                         ScrollView {
                             LazyVStack(spacing: PrismSpacing.sm) {
                                 ForEach(collections) { collection in
-                                    GlassCard {
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(collection.name)
-                                                    .font(PrismTypography.headline())
-                                                Text("\(itemCounts[collection.id, default: 0]) items")
-                                                    .font(PrismTypography.caption())
-                                                    .foregroundStyle(PrismColors.textSecondary)
-                                                if let description = collection.description {
-                                                    Text(description)
-                                                        .font(PrismTypography.body())
-                                                        .foregroundStyle(PrismColors.textSecondary)
-                                                        .lineLimit(2)
-                                                }
-                                            }
-                                            Spacer()
-                                            if itemCounts[collection.id, default: 0] > 0 {
-                                                Button("Make a goal") {
-                                                    router.sheet = .goalFromCollection(collection.id)
-                                                }
-                                                .font(PrismTypography.caption())
-                                                .buttonStyle(.bordered)
-                                                .accessibilityIdentifier("collections.makeGoal.\(collection.id.uuidString)")
-                                            }
-                                        }
+                                    Button {
+                                        router.sheet = .review(collection.id)
+                                    } label: {
+                                        collectionCard(collection)
                                     }
+                                    .buttonStyle(.plain)
                                     .accessibilityIdentifier("collections.item.\(collection.id.uuidString)")
                                 }
                             }
-                            .padding()
+                            .padding(.horizontal, PrismSpacing.md)
+                            .padding(.bottom, 110)
                         }
+                        .prismTransparentBackground()
                     }
-                    PrismPrimaryButton(title: "New collection") {
-                        router.sheet = .createCollection
-                    }
-                    .padding(.bottom)
-                    .accessibilityIdentifier("collections.create")
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -76,17 +70,74 @@ struct CollectionsView: View {
         }
     }
 
+    private func collectionCard(_ collection: PrismCollection) -> some View {
+        let count = itemCounts[collection.id, default: 0]
+        let previews = previewItems[collection.id] ?? []
+        return GlassCard {
+            HStack(alignment: .top, spacing: 12) {
+                collectionGlimpse(previews)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(collection.name)
+                        .font(PrismTypography.headline())
+                        .foregroundStyle(.white)
+                    Text("\(count) item\(count == 1 ? "" : "s")")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textSecondary)
+                    if let description = collection.description {
+                        Text(description)
+                            .font(PrismTypography.body(14))
+                            .foregroundStyle(PrismColors.textSecondary)
+                            .lineLimit(2)
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.35))
+                    .padding(.top, 4)
+            }
+        }
+    }
+
+    private func collectionGlimpse(_ items: [SavedItem]) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+                .frame(width: 72, height: 72)
+
+            if items.isEmpty {
+                Image(systemName: "square.stack")
+                    .foregroundStyle(Color.white.opacity(0.35))
+            } else {
+                ForEach(Array(items.prefix(3).enumerated()), id: \.element.id) { index, item in
+                    AspirationMediaView(item: item, height: 56, cornerRadius: 12)
+                        .frame(width: 56, height: 56)
+                        .clipped()
+                        .rotationEffect(.degrees(Double(index - 1) * 6))
+                        .offset(x: CGFloat(index) * 6 - 6, y: CGFloat(index) * 2 - 2)
+                        .zIndex(Double(index))
+                }
+            }
+        }
+        .frame(width: 72, height: 72)
+        .clipped()
+    }
+
     private func reload() async {
         guard let userID = environment.profile?.id else { return }
         collections = (try? await container.collectionRepository.fetchAll(userID: userID)) ?? []
         let items = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
         var counts: [UUID: Int] = [:]
+        var previews: [UUID: [SavedItem]] = [:]
         for item in items {
-            if let cid = item.collectionID {
-                counts[cid, default: 0] += 1
-            }
+            guard let cid = item.collectionID else { continue }
+            counts[cid, default: 0] += 1
+            var list = previews[cid] ?? []
+            if list.count < 3 { list.append(item) }
+            previews[cid] = list
         }
         itemCounts = counts
+        previewItems = previews
     }
 }
 

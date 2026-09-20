@@ -1,36 +1,42 @@
-// Summary: Reusable glass surfaces, Figma backdrop, chrome, item cards, and primary buttons.
+// Summary: Reusable chrome from App Screens recreation — backdrop, glass, chips, save cards, tab bar, buttons.
 
 import SwiftUI
 
-// MARK: - Backdrop (Figma: large offset art + light frost)
+// MARK: - Backdrop (flipped bg.jpg + soft blur + glass-friendly scrim)
 
 struct PrismAtmosphericBackground: View {
     var body: some View {
         GeometryReader { geo in
-            let w = max(geo.size.width, 1)
-            let h = max(geo.size.height, 1)
+            // Use screen size as a floor so the keyboard shrinking the
+            // GeometryReader cannot re-scale the art (feels like a page zoom).
+            let screen = UIScreen.main.bounds
+            let w = max(geo.size.width, screen.width, 1)
+            let h = max(geo.size.height, screen.height, 1)
             ZStack {
-                PrismColors.backgroundDeep
-                // Refraction-only art (never BrandSplash — that includes logo/tagline).
-                // Figma rotates this plate 180° so blooms sit behind the feed.
+                PrismColors.backgroundMid
                 Image("PrismBackground")
                     .resizable()
                     .scaledToFill()
-                    .frame(width: w * 2.05, height: h * 1.35)
-                    .rotationEffect(.degrees(180))
-                    .position(x: w * 0.38, y: h * 0.52)
+                    .frame(width: w * 1.35, height: h * 1.2)
+                    .scaleEffect(x: -1, y: -1)
+                    .blur(radius: PrismBackdrop.imageBlurRadius)
+                    .position(x: w * 0.45, y: h * 0.48)
+                // Soft frosted veil so glass cards read against the art.
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .opacity(PrismBackdrop.materialOpacity)
                 Color.black.opacity(PrismBackdrop.scrimOpacity)
             }
-            .frame(width: w, height: h)
+            .frame(width: geo.size.width, height: geo.size.height)
             .clipped()
         }
+        .background(PrismClearHostingBackground())
         .ignoresSafeArea()
         .accessibilityHidden(true)
-        .background(PrismClearHostingBackground())
     }
 }
 
-/// Forces UIKit hosting / tab child controllers to a clear background so SwiftUI layers show through.
 private struct PrismClearHostingBackground: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -51,34 +57,12 @@ private struct PrismClearHostingBackground: UIViewRepresentable {
     }
 }
 
-/// Clears system chrome so the root atmospheric background shows through.
-struct PrismClearChrome: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(.hidden, for: .tabBar)
-            .background(Color.clear)
-    }
-}
-
-extension View {
-    func prismClearChrome() -> some View {
-        modifier(PrismClearChrome())
-    }
-
-    /// Transparent hosting for NavigationStack / Tab content on iOS 17+.
-    func prismTransparentBackground() -> some View {
-        self
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
-    }
-}
-
 // MARK: - Glass
 
 struct GlassCard<Content: View>: View {
     var padding: CGFloat = PrismSpacing.md
     var cornerRadius: CGFloat = PrismRadius.lg
+    var stroke: Color = PrismColors.glassStroke
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -86,40 +70,132 @@ struct GlassCard<Content: View>: View {
             .padding(padding)
             .background {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(Color.white.opacity(0.10))
-                    .background {
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .overlay {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .fill(.ultraThinMaterial.opacity(0.25))
+                            .fill(PrismColors.glassFill)
                     }
                     .overlay {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(PrismColors.glassStroke, lineWidth: 1)
+                            .stroke(stroke, lineWidth: 1)
                     }
             }
     }
 }
+
+// MARK: - Chips / tags
 
 struct TagPill: View {
     let text: String
-    var color: Color = PrismColors.tagWant
+    var tone: PrismTone = .intent
+    var color: Color? = nil
     var filled: Bool = true
+    var onRemove: (() -> Void)? = nil
 
     var body: some View {
-        Text(text)
-            .font(PrismTypography.caption())
-            .foregroundStyle(filled ? Color.white : PrismColors.textPrimary)
-            .padding(.horizontal, PrismSpacing.sm)
-            .padding(.vertical, PrismSpacing.xxs + 2)
-            .background {
-                Capsule()
-                    .fill(filled ? color : Color.clear)
-                    .overlay {
-                        Capsule().stroke(filled ? Color.clear : PrismColors.glassStroke, lineWidth: 1)
-                    }
+        HStack(spacing: 6) {
+            Text(text)
+                .font(PrismTypography.caption())
+            if let onRemove {
+                Button(action: onRemove) {
+                    Text("✕").font(.system(size: 11)).opacity(0.75)
+                }
+                .buttonStyle(.plain)
             }
-            .accessibilityLabel(text)
+        }
+        .foregroundStyle(filled ? (color != nil ? Color.white : tone.foreground) : PrismColors.textPrimary)
+        .padding(.horizontal, 12)
+        .frame(height: 28)
+        .background {
+            Capsule()
+                .fill(filled ? (color ?? tone.background) : Color.clear)
+                .overlay {
+                    Capsule().stroke(filled ? (color ?? tone.border) : PrismColors.glassStroke, lineWidth: 1)
+                }
+        }
+        .accessibilityLabel(text)
     }
 }
+
+struct FilterChip: View {
+    let title: String
+    var selected: Bool
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(PrismTypography.body(12.5))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 13)
+                .frame(height: 32)
+                .background {
+                    Capsule()
+                        .fill(selected ? Color.white.opacity(0.22) : Color.white.opacity(0.06))
+                        .overlay {
+                            Capsule().stroke(selected ? Color.white : Color.white.opacity(0.3), lineWidth: 1)
+                        }
+                }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Sliding context switcher — distinct from TagPill chips.
+struct PrismSegmentedControl<Option: Hashable>: View {
+    let options: [Option]
+    @Binding var selection: Option
+    var title: (Option) -> String
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(options, id: \.self) { option in
+                Button {
+                    PrismHaptics.soft()
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                        selection = option
+                    }
+                } label: {
+                    Text(title(option))
+                        .font(PrismTypography.body(12.5, weight: .medium))
+                        .foregroundStyle(selection == option ? .white : Color.white.opacity(0.55))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 9)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background {
+            GeometryReader { geo in
+                let count = max(options.count, 1)
+                let slot = geo.size.width / CGFloat(count)
+                let index = CGFloat(options.firstIndex(of: selection) ?? 0)
+                Capsule()
+                    .fill(Color.white.opacity(0.22))
+                    .overlay {
+                        Capsule().stroke(Color.white.opacity(0.55), lineWidth: 1)
+                    }
+                    .frame(width: max(slot - 2, 0), height: max(geo.size.height - 6, 0))
+                    .offset(x: index * slot + 1, y: 3)
+                    .animation(.spring(response: 0.32, dampingFraction: 0.82), value: selection)
+            }
+        }
+        .background {
+            Capsule()
+                .fill(Color.white.opacity(0.08))
+                .overlay {
+                    Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                }
+        }
+    }
+}
+
+// MARK: - Buttons
 
 struct PrismPrimaryButton: View {
     let title: String
@@ -129,18 +205,45 @@ struct PrismPrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(PrismTypography.headline())
-                .foregroundStyle(PrismColors.textPrimary)
-                .frame(minHeight: 44)
-                .padding(.horizontal, PrismSpacing.lg)
+                .font(PrismTypography.body(16, weight: .medium))
+                .foregroundStyle(PrismColors.buttonInk)
+                .frame(minHeight: 40)
+                .padding(.horizontal, PrismSpacing.md)
                 .background {
-                    RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous)
-                        .fill(Color.black.opacity(0.85))
-                        .shadow(color: isDestructive ? PrismColors.danger.opacity(0.35) : PrismColors.violet.opacity(0.55), radius: 12, y: 2)
+                    RoundedRectangle(cornerRadius: PrismRadius.sm, style: .continuous)
+                        .fill(PrismColors.buttonDark)
                 }
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("button.\(title.lowercased().replacingOccurrences(of: " ", with: "_"))")
+    }
+}
+
+// MARK: - Brand
+
+struct PrismLogoMark: View {
+    var width: CGFloat = 34
+    var height: CGFloat = 24
+
+    var body: some View {
+        Canvas { ctx, size in
+            let w = size.width
+            let h = size.height
+            var left = Path()
+            left.move(to: CGPoint(x: w * 0.49, y: 0))
+            left.addLine(to: CGPoint(x: 0, y: h * 0.75))
+            left.addLine(to: CGPoint(x: w * 0.32, y: h))
+            left.closeSubpath()
+            ctx.fill(left, with: .color(Color.white.opacity(0.55)))
+            var right = Path()
+            right.move(to: CGPoint(x: w, y: h * 0.89))
+            right.addLine(to: CGPoint(x: w * 0.49, y: 0))
+            right.addLine(to: CGPoint(x: w * 0.31, y: h))
+            right.closeSubpath()
+            ctx.fill(right, with: .color(Color.white.opacity(0.35)))
+        }
+        .frame(width: width, height: height)
+        .accessibilityHidden(true)
     }
 }
 
@@ -152,63 +255,6 @@ struct PrismBrandMark: View {
             .font(PrismTypography.display(size))
             .foregroundStyle(PrismColors.textPrimary)
             .accessibilityAddTraits(.isHeader)
-    }
-}
-
-/// Figma-style top band: frosted strip + centered wordmark.
-struct PrismTopBar: View {
-    var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color(red: 69 / 255, green: 29 / 255, blue: 114 / 255).opacity(0.05))
-                .background(.ultraThinMaterial.opacity(0.35))
-            PrismBrandMark(size: 17)
-                .padding(.top, 22)
-        }
-        .frame(height: 56)
-        .frame(maxWidth: .infinity)
-    }
-}
-
-/// Figma home search pill + profile button.
-struct PrismSearchChrome: View {
-    @Binding var search: String
-    var onProfile: () -> Void
-    var searchIdentifier: String = "home.search"
-
-    var body: some View {
-        HStack(spacing: PrismSpacing.xs) {
-            HStack(spacing: 4) {
-                Image(systemName: "line.3.horizontal")
-                    .foregroundStyle(Color(white: 0.2))
-                TextField("Search", text: $search)
-                    .font(PrismTypography.body(18))
-                    .foregroundStyle(Color(white: 0.2))
-                    .textInputAutocapitalization(.never)
-                    .accessibilityIdentifier(searchIdentifier)
-                Image(systemName: "square.grid.2x2")
-                    .foregroundStyle(Color(white: 0.2))
-            }
-            .padding(.horizontal, PrismSpacing.md)
-            .padding(.vertical, PrismSpacing.sm)
-            .background {
-                Capsule()
-                    .fill(Color.white.opacity(0.5))
-            }
-            .frame(maxWidth: .infinity)
-
-            Button(action: onProfile) {
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 28))
-                    .foregroundStyle(Color(white: 0.25))
-                    .frame(width: 48, height: 48)
-                    .background(Circle().fill(Color(white: 0.95).opacity(0.5)))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Profile")
-            .accessibilityIdentifier("home.profile")
-        }
-        .padding(.horizontal, PrismSpacing.md)
     }
 }
 
@@ -245,127 +291,220 @@ struct EmptyStateView: View {
     }
 }
 
-// MARK: - Figma Item Card
+// MARK: - Search + top chrome
 
-struct AspirationItemCard: View {
-    let item: SavedItem
-    var collectionName: String?
-    var maxTags: Int = 3
+struct PrismSearchChrome: View {
+    @Binding var search: String
+    var placeholder: String = "Search your saves"
+    var onProfile: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(PrismColors.textOnLight)
+                TextField(placeholder, text: $search)
+                    .font(PrismTypography.body(17))
+                    .foregroundStyle(PrismColors.textOnLight)
+            }
+            .padding(.horizontal, 16)
+            .frame(height: 48)
+            .background(Capsule().fill(Color.white.opacity(0.5)))
+
+            Button(action: onProfile) {
+                Image(systemName: "person.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color(red: 0.05, green: 0.12, blue: 0.17))
+                    .frame(width: 48, height: 48)
+                    .background(Circle().fill(Color(red: 0.95, green: 0.95, blue: 0.95).opacity(0.5)))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Settings")
+            .accessibilityIdentifier("home.profile")
+        }
+        .padding(.horizontal, PrismSpacing.md)
+    }
+}
+
+struct PrismTopBar: View {
+    var body: some View {
+        HStack {
+            Spacer()
+            PrismLogoMark()
+            Spacer()
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+    }
+}
+
+/// Consistent top-trailing text action (New, See all, etc.).
+struct PrismHeaderAction: View {
+    let title: String
+    var accessibilityID: String? = nil
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(PrismTypography.caption())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .frame(height: 32)
+                .background {
+                    Capsule()
+                        .fill(Color.white.opacity(0.08))
+                        .overlay {
+                            Capsule().stroke(Color.white.opacity(0.4), lineWidth: 1)
+                        }
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityID ?? "header.action.\(title)")
+    }
+}
+
+// MARK: - Save card (178×251)
+
+struct PrismSaveCard: View {
+    let image: Image?
+    let uiImage: UIImage?
+    var tags: [(String, PrismTone)]
+    var showPlay: Bool = false
+    var moreLabel: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            ZStack {
-                AspirationMediaView(item: item, height: 162, cornerRadius: 16)
-                // Source / play affordances
-                VStack {
-                    HStack {
-                        if item.sourceDomain != nil {
-                            Image(systemName: "camera.fill")
-                                .font(.system(size: 12))
-                                .foregroundStyle(.white)
-                                .padding(6)
+            ZStack(alignment: .center) {
+                Group {
+                    if let uiImage {
+                        Color.clear.overlay {
+                            Image(uiImage: uiImage).resizable().scaledToFill()
                         }
-                        Spacer()
-                    }
-                    Spacer()
-                    if looksLikeVideo {
-                        Image(systemName: "play.circle.fill")
-                            .font(.system(size: 36))
-                            .foregroundStyle(.white.opacity(0.95))
-                            .shadow(radius: 4)
+                    } else if let image {
+                        Color.clear.overlay {
+                            image.resizable().scaledToFill()
+                        }
+                    } else {
+                        Color.white.opacity(0.08)
                     }
                 }
-                .padding(8)
-            }
-            .frame(height: 162)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .frame(width: 162, height: 162)
+                .clipped()
+                .overlay(PrismGradients.cardFade)
 
-            tagRow
+                if showPlay {
+                    PlayBadge(size: 36)
+                }
+            }
+            .frame(width: 162, height: 162)
+            .clipShape(RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous))
+
+            FlowTagRow(tags: tags, moreLabel: moreLabel)
+                .frame(width: 162, alignment: .leading)
         }
         .padding(8)
+        .frame(width: 178, height: 251, alignment: .top)
         .background {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.white.opacity(0.10))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(PrismColors.glassStroke, lineWidth: 1)
-                }
-        }
-    }
-
-    private var looksLikeVideo: Bool {
-        guard let url = item.sourceURL?.absoluteString.lowercased() else { return false }
-        return url.contains("tiktok") || url.contains("reel") || url.contains("youtube") || url.contains("vimeo")
-    }
-
-    private var tagRow: some View {
-        let tags = displayTags
-        let visible = Array(tags.prefix(maxTags))
-        let overflow = tags.count - visible.count
-        return HStack(alignment: .center, spacing: 8) {
-            FlexibleTagWrap(tags: visible)
-            if overflow > 0 {
-                Text("+\(overflow)")
-                    .font(PrismTypography.body(14))
-                    .foregroundStyle(.white)
-            }
-        }
-    }
-
-    private var displayTags: [(String, Color)] {
-        var result: [(String, Color)] = []
-        result.append((item.intent.displayName, intentColor(item.intent)))
-        if let name = collectionName, !name.isEmpty {
-            result.append((name, PrismColors.tagFashion))
-        }
-        if let cost = item.costSignificance {
-            result.append((priorityLabel(cost), priorityColor(cost)))
-        }
-        if let priority = item.priority, priority != .undecided {
-            result.append((priority.displayName, PrismColors.lavender))
-        }
-        return result
-    }
-
-    private func intentColor(_ intent: SaveIntent) -> Color {
-        switch intent {
-        case .want: return PrismColors.tagWant
-        case .need: return PrismColors.tagNeed
-        case .dream: return PrismColors.tagDream
-        case .gift: return PrismColors.tagGift
-        }
-    }
-
-    private func priorityLabel(_ cost: CostSignificance) -> String {
-        switch cost {
-        case .small: return "Low Priority"
-        case .considered: return "Medium Priority"
-        case .major: return "High Priority"
-        case .unknown: return "Priority?"
-        }
-    }
-
-    private func priorityColor(_ cost: CostSignificance) -> Color {
-        switch cost {
-        case .small: return PrismColors.tagPriority
-        case .considered: return Color.orange
-        case .major: return PrismColors.danger
-        case .unknown: return PrismColors.textTertiary
+            RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous)
+                .fill(PrismColors.glassFill)
         }
     }
 }
 
-/// Simple wrapping HStack for a few tags (avoids complex layout dependency).
-private struct FlexibleTagWrap: View {
-    let tags: [(String, Color)]
+struct PlayBadge: View {
+    var size: CGFloat = 36
     var body: some View {
-        WrappingHStack(spacing: 8) {
-            ForEach(Array(tags.enumerated()), id: \.offset) { _, tag in
-                TagPill(text: tag.0, color: tag.1)
+        ZStack {
+            Circle().fill(Color.black.opacity(0.5)).frame(width: size, height: size)
+            Circle().stroke(Color.white, lineWidth: 1.5).frame(width: size * 0.83, height: size * 0.83)
+            Image(systemName: "play.fill")
+                .font(.system(size: size * 0.28))
+                .foregroundStyle(.white)
+                .offset(x: 1)
+        }
+    }
+}
+
+struct FlowTagRow: View {
+    var tags: [(String, PrismTone)]
+    var moreLabel: String? = nil
+
+    var body: some View {
+        // Simple wrapping via LazyVGrid-like HStack wrap approximation
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                ForEach(Array(tags.prefix(3).enumerated()), id: \.offset) { _, pair in
+                    TagPill(text: pair.0, tone: pair.1)
+                        .scaleEffect(0.85, anchor: .leading)
+                }
+                if let moreLabel {
+                    Text(moreLabel).font(PrismTypography.body(14)).foregroundStyle(.white)
+                }
             }
         }
     }
 }
 
-/// Back-compat alias used by older call sites.
-typealias SavedItemCard = AspirationItemCard
+// MARK: - Custom tab bar
+
+struct PrismTabBar: View {
+    @Binding var selection: AppRouter.Tab
+
+    private let items: [(AppRouter.Tab, String, String)] = [
+        (.home, "house", "Home"),
+        (.collections, "square.stack.3d.up", "Collections"),
+        (.goals, "scope", "Goals"),
+        (.moneyStory, "chart.pie", "Money Story")
+    ]
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(items, id: \.0) { tab, icon, label in
+                Button {
+                    selection = tab
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: icon)
+                            .font(.system(size: 18, weight: .regular))
+                        Text(label)
+                            .font(PrismTypography.chrome(9.5))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 64)
+                    .opacity(selection == tab ? 1 : 0.5)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("tab.\(tab)")
+            }
+        }
+        .padding(.horizontal, 4)
+        .background {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(PrismColors.tabBarFill)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color.white.opacity(0.22), lineWidth: 1)
+                }
+                .background(.ultraThinMaterial.opacity(0.4), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+        .padding(.horizontal, PrismSpacing.md)
+        .padding(.bottom, 8)
+    }
+}
+
+// MARK: - Helpers
+
+extension View {
+    func prismTransparentBackground() -> some View {
+        self.scrollContentBackground(.hidden)
+            .background(Color.clear)
+    }
+
+    func prismClearChrome() -> some View {
+        self.toolbarBackground(.hidden, for: .navigationBar)
+    }
+}

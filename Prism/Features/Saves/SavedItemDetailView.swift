@@ -1,4 +1,4 @@
-// Summary: Saved item detail styled to Figma — media hero, tags, why / feelings glass panels.
+// Summary: Item detail — Bought?, AI description, editable tags + collection, feeling mood, goal CTA.
 
 import SwiftUI
 
@@ -8,14 +8,18 @@ struct SavedItemDetailView: View {
     @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var container: DependencyContainer
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
 
     @State private var item: SavedItem?
     @State private var feelings: [Feeling] = []
     @State private var tags: [Tag] = []
-    @State private var pocketPreview: String?
+    @State private var collections: [PrismCollection] = []
+    @State private var selectedCollectionID: UUID?
+    @State private var newTagText = ""
+    @State private var moodValence: MoodValence?
+    @State private var showMoodPicker = false
+    @State private var whyText: String = ""
     @State private var goalTradeoff: String?
-    @State private var collectionName: String?
+    @State private var isSaving = false
 
     var body: some View {
         NavigationStack {
@@ -23,109 +27,49 @@ struct SavedItemDetailView: View {
                 PrismAtmosphericBackground()
                 if let item {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: PrismSpacing.md) {
-                            PrismTopBar()
-
-                            HStack {
-                                Spacer()
-                                Button("Edit") {
-                                    router.sheet = .reflection(item.id)
-                                }
-                                .font(PrismTypography.caption())
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 6)
-                                .background(Capsule().fill(Color.black.opacity(0.45)))
-                                .accessibilityIdentifier("detail.edit")
-                            }
-                            .padding(.horizontal, PrismSpacing.md)
-
+                        VStack(alignment: .leading, spacing: PrismSpacing.lg) {
+                            topChrome(item)
                             Text(item.title)
-                                .font(PrismTypography.title(24))
+                                .font(PrismTypography.display(24, weight: .regular))
                                 .frame(maxWidth: .infinity)
                                 .multilineTextAlignment(.center)
                                 .accessibilityIdentifier("detail.title")
 
-                            ZStack(alignment: .topLeading) {
-                                AspirationMediaView(item: item, height: 360, cornerRadius: 20)
-                                    .padding(.horizontal, 40)
-                                if item.sourceDomain != nil {
-                                    Image(systemName: "camera.fill")
+                            mediaBlock(item)
+
+                            sectionBlock(label: "AI DESCRIPTION") {
+                                Text(MockAIDescription.text(for: item))
+                                    .font(PrismTypography.body(14))
+                                    .foregroundStyle(.white)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+
+                            sectionBlock(label: "COLLECTION") {
+                                collectionEditor
+                            }
+
+                            sectionBlock(label: "TAGS") {
+                                tagEditor(intentLabel: item.intent.displayName)
+                            }
+
+                            HStack(alignment: .top, spacing: PrismSpacing.md) {
+                                sectionBlock(label: "WHY DO I WANT THIS?") {
+                                    TextField("Add a reflection…", text: $whyText, axis: .vertical)
+                                        .font(PrismTypography.body(14))
                                         .foregroundStyle(.white)
-                                        .padding(10)
-                                        .padding(.leading, 52)
-                                        .padding(.top, 12)
+                                        .frame(minHeight: 120, alignment: .topLeading)
                                 }
-                                if looksLikeVideo(item) {
-                                    Image(systemName: "play.circle.fill")
-                                        .font(.system(size: 56))
-                                        .foregroundStyle(.white.opacity(0.95))
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                }
-                            }
-                            .accessibilityIdentifier("detail.media")
+                                .frame(maxWidth: .infinity)
 
-                            if let notes = item.notes, !notes.isEmpty {
-                                GlassCard {
-                                    SectionMicroLabel(text: "Notes")
-                                    Text(notes)
-                                        .font(PrismTypography.body())
-                                }
-                                .padding(.horizontal, PrismSpacing.md)
-                            }
-
-                            VStack(alignment: .leading, spacing: PrismSpacing.sm) {
-                                SectionMicroLabel(text: "Tags")
-                                WrappingHStack(spacing: 8) {
-                                    TagPill(text: item.intent.displayName, color: PrismColors.tagWant)
-                                    if let cost = item.costSignificance {
-                                        TagPill(text: cost.displayName, color: PrismColors.tagPriority)
-                                    }
-                                    TagPill(text: item.status.displayName, color: PrismColors.lavender, filled: false)
-                                    ForEach(tags) { tag in
-                                        TagPill(text: tag.name, color: PrismColors.tagFashion)
+                                sectionBlock(label: "FEELING ATTACHED") {
+                                    FeelingMoodCardPreview(
+                                        valence: moodValence,
+                                        feelings: feelings
+                                    ) {
+                                        showMoodPicker = true
                                     }
                                 }
-                            }
-                            .padding(.horizontal, PrismSpacing.md)
-
-                            HStack(alignment: .top, spacing: PrismSpacing.sm) {
-                                GlassCard {
-                                    SectionMicroLabel(text: "Why do I want this?")
-                                    Text(item.reflection?.isEmpty == false ? (item.reflection ?? "") : "Add a short reflection anytime.")
-                                        .font(PrismTypography.body())
-                                        .foregroundStyle(item.reflection?.isEmpty == false ? PrismColors.textPrimary : PrismColors.textTertiary)
-                                        .frame(minHeight: 100, alignment: .topLeading)
-                                }
-                                GlassCard {
-                                    SectionMicroLabel(text: "Feeling attached")
-                                    if feelings.isEmpty {
-                                        Text("—")
-                                            .foregroundStyle(PrismColors.textTertiary)
-                                    } else {
-                                        VStack(spacing: 4) {
-                                            Image(systemName: "heart.fill")
-                                                .font(.system(size: 28))
-                                                .foregroundStyle(PrismColors.magenta)
-                                            ForEach(feelings.prefix(3)) { feeling in
-                                                Text(feeling.name)
-                                                    .font(PrismTypography.caption())
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                    }
-                                }
-                                .frame(width: 120)
-                            }
-                            .padding(.horizontal, PrismSpacing.md)
-
-                            if let pocketPreview {
-                                GlassCard {
-                                    Text(pocketPreview)
-                                        .font(PrismTypography.body())
-                                        .foregroundStyle(PrismColors.textSecondary)
-                                }
-                                .padding(.horizontal, PrismSpacing.md)
+                                .frame(width: 132)
                             }
 
                             if let goalTradeoff {
@@ -135,88 +79,201 @@ struct SavedItemDetailView: View {
                                         .font(PrismTypography.body())
                                         .foregroundStyle(PrismColors.textSecondary)
                                 }
-                                .padding(.horizontal, PrismSpacing.md)
                             }
 
-                            if let estimate = item.estimatedPrice {
-                                Text("Estimated \(CurrencyFormatting.string(from: estimate, currencyCode: item.estimatedCurrencyCode ?? "USD"))")
-                                    .font(PrismTypography.caption())
-                                    .foregroundStyle(PrismColors.textSecondary)
-                                    .padding(.horizontal, PrismSpacing.md)
-                            }
-
-                            if let url = item.sourceURL {
-                                Button("Open source") { openURL(url) }
-                                    .frame(minHeight: 44)
-                                    .padding(.horizontal, PrismSpacing.md)
-                            }
+                            worthSavingBlock(item)
 
                             HStack {
-                                PrismPrimaryButton(title: "Make this a goal") {
-                                    router.sheet = .goalSetup(item.id)
+                                Spacer()
+                                PrismPrimaryButton(title: "Delete") {
+                                    Task { await softDelete() }
                                 }
-                                .accessibilityIdentifier("detail.makeGoal")
+                                PrismPrimaryButton(title: "Save") {
+                                    Task { await saveEdits() }
+                                }
                             }
-                            .padding(.horizontal, PrismSpacing.md)
-
-                            HStack {
-                                PrismPrimaryButton(title: "Reflect") {
-                                    router.sheet = .reflection(item.id)
-                                }
-                                if item.status == .considering || item.status == .readyForReview {
-                                    PrismPrimaryButton(title: "Review") {
-                                        dismiss()
-                                        router.selectedTab = .review
-                                    }
-                                }
-                                Button("Done") { dismiss() }
-                                    .font(PrismTypography.headline())
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(Capsule().fill(Color.black.opacity(0.55)))
-                                    .accessibilityIdentifier("detail.done")
-                            }
-                            .padding(.horizontal, PrismSpacing.md)
-                            .padding(.bottom, PrismSpacing.xl)
                         }
+                        .padding(.horizontal, PrismSpacing.lg)
+                        .padding(.bottom, 40)
                     }
                     .prismTransparentBackground()
                 } else {
                     ProgressView()
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
         }
         .task { await load() }
+        .sheet(isPresented: $showMoodPicker) {
+            FeelingMoodPickerView(
+                itemID: itemID,
+                initialValence: moodValence ?? .neutral,
+                initialFeelings: feelings
+            ) { valence, chosen in
+                moodValence = valence
+                feelings = chosen
+                Task { await persistFeelings(chosen) }
+            }
+        }
+    }
+
+    private var collectionEditor: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if collections.isEmpty {
+                Text("No collections yet. Create one from the Collections tab.")
+                    .font(PrismTypography.caption())
+                    .foregroundStyle(PrismColors.textSecondary)
+            } else {
+                Picker("Collection", selection: $selectedCollectionID) {
+                    Text("None").tag(Optional<UUID>.none)
+                    ForEach(collections) { c in
+                        Text(c.name).tag(Optional(c.id))
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(.white)
+                .accessibilityIdentifier("detail.collection")
+            }
+            if selectedCollectionID != nil {
+                Button("Remove from collection") {
+                    selectedCollectionID = nil
+                    PrismHaptics.soft()
+                }
+                .font(PrismTypography.caption())
+                .foregroundStyle(PrismColors.lavender)
+                .accessibilityIdentifier("detail.collection.remove")
+            }
+        }
+    }
+
+    private func tagEditor(intentLabel: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            FlexibleView(data: tags.map(\.name), spacing: 8) { name in
+                TagPill(text: name, tone: .topic, onRemove: {
+                    tags.removeAll { $0.name.caseInsensitiveCompare(name) == .orderedSame }
+                    PrismHaptics.soft()
+                })
+            }
+            TagPill(text: intentLabel, tone: .intent)
+
+            HStack(spacing: 8) {
+                TextField("Add a tag", text: $newTagText)
+                    .textInputAutocapitalization(.words)
+                    .padding(10)
+                    .background {
+                        RoundedRectangle(cornerRadius: PrismRadius.md)
+                            .stroke(PrismColors.glassStroke)
+                    }
+                    .accessibilityIdentifier("detail.tagField")
+                Button("Add") { addTag() }
+                    .font(PrismTypography.caption())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .frame(height: 36)
+                    .background {
+                        Capsule().stroke(Color.white.opacity(0.4), lineWidth: 1)
+                    }
+                    .disabled(newTagText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("detail.tagAdd")
+            }
+        }
+    }
+
+    private func addTag() {
+        let name = newTagText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        guard let userID = environment.profile?.id else { return }
+        if tags.contains(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
+            newTagText = ""
+            return
+        }
+        tags.append(Tag(id: UUID(), userID: userID, name: name, createdAt: .now))
+        newTagText = ""
+        PrismHaptics.soft()
+    }
+
+    private func topChrome(_ item: SavedItem) -> some View {
+        HStack {
+            PrismLogoMark()
+            Spacer()
+            Button {
+                Task { await toggleBought() }
+            } label: {
+                Text(item.status == .purchased ? "Bought" : "Bought?")
+                    .font(PrismTypography.body(12))
+                    .foregroundStyle(PrismColors.textOnLight)
+                    .frame(width: 63, height: 28)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(red: 0.95, green: 0.93, blue: 0.98).opacity(item.status == .purchased ? 1 : 0.5))
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    private func mediaBlock(_ item: SavedItem) -> some View {
+        ZStack {
+            AspirationMediaView(item: item, height: 466)
+                .frame(maxWidth: 274)
+                .frame(height: 466)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            if looksLikeVideo(item) {
+                PlayBadge(size: 73)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityIdentifier("detail.media")
+    }
+
+    private func sectionBlock<Content: View>(label: String, @ViewBuilder content: @escaping () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(PrismTypography.micro())
+                .foregroundStyle(.white)
+            GlassCard(padding: 14, cornerRadius: PrismRadius.lg, content: content)
+        }
+    }
+
+    private func worthSavingBlock(_ item: SavedItem) -> some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 11) {
+                Text("Worth saving for?")
+                    .font(PrismTypography.title(24))
+                Text("Carry this save into a goal — name, cover, type, and estimate come with you.")
+                    .font(PrismTypography.body(14))
+                    .foregroundStyle(PrismColors.textSecondary)
+                PrismPrimaryButton(title: "Start a goal") {
+                    router.sheet = .goalSetup(item.id)
+                }
+                .accessibilityIdentifier("detail.makeGoal")
+            }
+        }
     }
 
     private func looksLikeVideo(_ item: SavedItem) -> Bool {
-        guard let url = item.sourceURL?.absoluteString.lowercased() else { return false }
-        return url.contains("tiktok") || url.contains("reel") || url.contains("youtube") || url.contains("vimeo")
+        let url = item.sourceURL?.absoluteString.lowercased() ?? ""
+        return url.contains("reel") || url.contains("tiktok") || url.contains("/video")
     }
 
     private func load() async {
         item = try? await container.savedItemRepository.fetch(id: itemID)
         feelings = (try? await container.feelingRepository.feelings(for: itemID)) ?? []
         tags = (try? await container.tagRepository.tags(for: itemID)) ?? []
-        if let item, let profile = environment.profile {
-            if let cid = item.collectionID {
-                let cols = (try? await container.collectionRepository.fetchAll(userID: profile.id)) ?? []
-                collectionName = cols.first { $0.id == cid }?.name
-            }
-            let previewSnap = SpendingPocketSnapshot(
-                isActive: profile.spendingPocket.isEnabled && profile.spendingPocket.monthlyAmount != nil,
-                monthlyAmount: profile.spendingPocket.monthlyAmount,
-                currencyCode: profile.spendingPocket.currencyCode,
-                confirmedSpentThisMonth: 0,
-                remaining: nil,
-                isPaused: profile.spendingPocket.isPaused
-            )
-            pocketPreview = previewSnap.previewCopy(itemTitle: item.title, estimatedPrice: item.estimatedPrice)
-
+        whyText = item?.reflection ?? ""
+        moodValence = MoodValenceStore.load(itemID: itemID)
+        selectedCollectionID = item?.collectionID
+        if let profile = environment.profile {
+            collections = (try? await container.collectionRepository.fetchAll(userID: profile.id)) ?? []
             let goals = (try? await container.goalRepository.fetchAll(userID: profile.id)) ?? []
-            if let primary = goals.first(where: { $0.priority == .primary && $0.trackStatus != .completed })
+            if let item,
+               let primary = goals.first(where: { $0.priority == .primary && $0.trackStatus != .completed })
                 ?? goals.first(where: { $0.priority == .active && $0.trackStatus != .completed }) {
                 let pace = container.goalPlanningService.pace(for: primary)
                 goalTradeoff = container.goalPlanningService.tradeoffCopy(
@@ -228,13 +285,63 @@ struct SavedItemDetailView: View {
             }
         }
     }
+
+    private func persistFeelings(_ chosen: [Feeling]) async {
+        guard let profile = environment.profile else { return }
+        try? await container.feelingRepository.setFeelings(chosen, for: itemID, userID: profile.id)
+        feelings = chosen
+    }
+
+    private func toggleBought() async {
+        guard var item else { return }
+        if item.status == .purchased {
+            item.status = .considering
+            item.decidedAt = nil
+        } else {
+            item.status = .purchased
+            item.decidedAt = .now
+        }
+        item.updatedAt = .now
+        try? await container.savedItemRepository.upsert(item)
+        self.item = item
+        PrismHaptics.decision()
+    }
+
+    private func saveEdits() async {
+        guard var item else { return }
+        isSaving = true
+        defer { isSaving = false }
+        item.reflection = whyText.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        item.collectionID = selectedCollectionID
+        item.updatedAt = .now
+        try? await container.savedItemRepository.upsert(item)
+        if let profile = environment.profile {
+            try? await container.feelingRepository.setFeelings(feelings, for: itemID, userID: profile.id)
+            try? await container.tagRepository.setTags(tags, for: itemID, userID: profile.id)
+        }
+        PrismHaptics.save()
+        dismiss()
+    }
+
+    private func softDelete() async {
+        try? await container.savedItemRepository.softDeleteItem(id: itemID)
+        PrismHaptics.decision()
+        dismiss()
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        let t = trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
+    }
 }
 
 struct FlowTags: View {
     let names: [String]
     var body: some View {
         FlexibleView(data: names, spacing: 8) { name in
-            TagPill(text: name, color: PrismColors.tagFashion)
+            TagPill(text: name, tone: .topic)
         }
     }
 }

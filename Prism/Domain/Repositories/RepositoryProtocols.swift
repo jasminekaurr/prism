@@ -63,6 +63,7 @@ protocol GoalRepository: Sendable {
     func fetchAll(userID: UUID) async throws -> [PrismGoal]
     func fetch(id: UUID) async throws -> PrismGoal?
     func upsert(_ goal: PrismGoal) async throws
+    func deleteGoal(id: UUID) async throws
     func fetchMilestones(goalID: UUID) async throws -> [GoalMilestone]
     func upsertMilestone(_ milestone: GoalMilestone) async throws
     func fetchComponents(goalID: UUID) async throws -> [GoalComponent]

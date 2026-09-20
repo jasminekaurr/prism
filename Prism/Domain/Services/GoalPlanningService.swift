@@ -68,12 +68,19 @@ struct GoalPlanningService: Sendable {
     }
 
     func remaining(for goal: PrismGoal) -> Decimal? {
-        guard let target = goal.targetAmount else { return nil }
+        guard let target = effectiveTarget(for: goal) else { return nil }
         return target - goal.amountSaved
     }
 
+    /// Base target with optional 8% buffer applied when `includesBuffer` is on.
+    func effectiveTarget(for goal: PrismGoal) -> Decimal? {
+        guard let target = goal.targetAmount else { return nil }
+        guard goal.includesBuffer else { return target }
+        return (target * Decimal(108)) / Decimal(100)
+    }
+
     func percentFunded(for goal: PrismGoal) -> Double? {
-        guard let target = goal.targetAmount, target > 0 else { return nil }
+        guard let target = effectiveTarget(for: goal), target > 0 else { return nil }
         let ratio = NSDecimalNumber(decimal: goal.amountSaved).doubleValue
             / NSDecimalNumber(decimal: target).doubleValue
         return min(max(ratio * 100, 0), 100)

@@ -1,4 +1,4 @@
-// Summary: Figma Home — aspiration masonry with All / Collections; profile opens Settings.
+// Summary: Home — saves grid with search + filters; profile → Settings (recreation screen 02).
 
 import SwiftUI
 
@@ -10,19 +10,19 @@ struct HomeView: View {
     @State private var items: [SavedItem] = []
     @State private var collections: [PrismCollection] = []
     @State private var search = ""
-    @State private var segment: HomeSegment = .all
-    @State private var showStatusFilter = false
-    @State private var statusFilter: ItemStatus?
+    @State private var filter: HomeFilter = .all
+
+    private enum HomeFilter: String, CaseIterable {
+        case all = "All"
+        case highPriority = "High priority"
+        case undecided = "Undecided"
+        case videos = "Videos"
+    }
 
     private let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
     ]
-
-    private enum HomeSegment: String, CaseIterable {
-        case all = "All"
-        case collections = "Collections"
-    }
 
     var body: some View {
         NavigationStack {
@@ -31,17 +31,39 @@ struct HomeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: PrismSpacing.md) {
                         PrismTopBar()
+                            .padding(.horizontal, PrismSpacing.md)
+
                         PrismSearchChrome(search: $search) {
-                            router.selectedTab = .settings
+                            router.sheet = .settings
                         }
-                        segmentRow
-                        if segment == .all {
-                            allFeed
+
+                        filterRow
+
+                        if filteredItems.isEmpty {
+                            Text("Save something that caught your eye. Reflect later — or make it a goal when you’re ready.")
+                                .font(PrismTypography.body())
+                                .foregroundStyle(PrismColors.textSecondary)
+                                .padding(.horizontal, PrismSpacing.md)
+                                .padding(.top, PrismSpacing.lg)
+                                .accessibilityIdentifier("home.empty")
                         } else {
-                            CollectionsEmbeddedView(collections: collections, itemCounts: itemCounts)
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                ForEach(filteredItems) { item in
+                                    Button {
+                                        router.sheet = .itemDetail(item.id)
+                                    } label: {
+                                        homeCard(for: item)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .frame(maxWidth: .infinity, alignment: .top)
+                                    .accessibilityIdentifier("home.item.\(item.id.uuidString)")
+                                }
+                            }
+                            .padding(.horizontal, PrismSpacing.md)
+                            .accessibilityIdentifier("home.grid")
                         }
                     }
-                    .padding(.bottom, 88)
+                    .padding(.bottom, 110)
                 }
                 .prismTransparentBackground()
 
@@ -49,24 +71,17 @@ struct HomeView: View {
                     router.presentCapture()
                 } label: {
                     Image(systemName: "plus")
-                        .font(PrismTypography.title(22))
+                        .font(.system(size: 22, weight: .medium))
                         .foregroundStyle(.white)
                         .frame(width: 56, height: 56)
-                        .background(Circle().fill(Color.black.opacity(0.85)).shadow(color: PrismColors.violet.opacity(0.5), radius: 12))
+                        .background(Circle().fill(PrismColors.buttonDark))
                 }
-                .padding(PrismSpacing.lg)
+                .padding(.trailing, PrismSpacing.lg)
+                .padding(.bottom, 88)
                 .accessibilityIdentifier("home.add")
-                .accessibilityLabel("Add aspiration")
+                .accessibilityLabel("Paste anything")
             }
-            .prismClearChrome()
             .toolbar(.hidden, for: .navigationBar)
-            .confirmationDialog("Filter by status", isPresented: $showStatusFilter, titleVisibility: .visible) {
-                Button("All statuses") { statusFilter = nil }
-                ForEach([ItemStatus.considering, .readyForReview, .purchased, .letGo], id: \.self) { status in
-                    Button(status.displayName) { statusFilter = status }
-                }
-                Button("Cancel", role: .cancel) {}
-            }
         }
         .task { await reload() }
         .onChange(of: router.sheet) { _, new in
@@ -74,106 +89,48 @@ struct HomeView: View {
         }
     }
 
-    private var segmentRow: some View {
-        HStack(spacing: PrismSpacing.sm) {
-            ForEach(HomeSegment.allCases, id: \.self) { seg in
-                Button {
-                    withAnimation(.easeInOut(duration: PrismMotion.quick)) { segment = seg }
-                } label: {
-                    VStack(spacing: 4) {
-                        Text(seg.rawValue)
-                            .font(PrismTypography.body(16, weight: segment == seg ? .semibold : .regular))
-                            .foregroundStyle(.white)
-                        Rectangle()
-                            .fill(segment == seg ? Color.white : Color.clear)
-                            .frame(height: 1)
-                            .frame(width: seg == .all ? 30 : 90)
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier(seg == .all ? "home.segment.all" : "home.segment.collections")
-            }
-            Spacer()
-            Button {
-                showStatusFilter = true
-            } label: {
-                Image(systemName: "line.3.horizontal.decrease")
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-            }
-
-            if !pausedOrFinishedGoals.isEmpty {
-                Text("Paused & finished")
-                    .font(PrismTypography.headline())
-                    .foregroundStyle(PrismColors.textSecondary)
-                    .padding(.horizontal, PrismSpacing.md)
-                    .padding(.top, PrismSpacing.xs)
-                ForEach(pausedOrFinishedGoals) { goal in
-                    Button {
-                        router.sheet = .goalDetail(goal.id)
-                    } label: {
-                        GoalCardView(goal: goal, pace: container.goalPlanningService.pace(for: goal), isPrimary: false)
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, PrismSpacing.md)
-                    .accessibilityIdentifier("home.finishedGoal.\(goal.id.uuidString)")
-                }
-            }
-        }
-        .padding(.horizontal, PrismSpacing.md)
+    private var filterRow: some View {
+        PrismSegmentedControl(options: HomeFilter.allCases, selection: $filter) { $0.rawValue }
+            .padding(.horizontal, PrismSpacing.md)
     }
 
-    private var allFeed: some View {
-        Group {
-            if filteredItems.isEmpty {
-                Text("Save something that caught your eye. Reflect later — or make it a goal when you’re ready.")
-                    .font(PrismTypography.body())
-                    .foregroundStyle(PrismColors.textSecondary)
-                    .padding(.horizontal, PrismSpacing.md)
-                    .accessibilityIdentifier("home.empty")
-            } else {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(filteredItems) { item in
-                        Button {
-                            router.sheet = .itemDetail(item.id)
-                        } label: {
-                            AspirationItemCard(item: item, collectionName: collectionName(for: item))
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier("home.item.\(item.id.uuidString)")
-                    }
-                }
-                .padding(.horizontal, 10)
-                .accessibilityIdentifier("home.grid")
-            }
-        }
+    @ViewBuilder
+    private func homeCard(for item: SavedItem) -> some View {
+        SavedItemCard(item: item, collectionName: nil, showPlay: looksLikeVideo(item), tags: cardTags(for: item))
     }
 
-    private var itemCounts: [UUID: Int] {
-        var counts: [UUID: Int] = [:]
-        for item in items {
-            if let cid = item.collectionID {
-                counts[cid, default: 0] += 1
-            }
+    private func cardTags(for item: SavedItem) -> [(String, PrismTone)] {
+        var result: [(String, PrismTone)] = [(item.intent.displayName, .intent)]
+        if let priority = item.priority, priority != .undecided {
+            result.append((priority.displayName, .priority))
         }
-        return counts
+        if let cost = item.costSignificance {
+            result.append((cost.shortLabel, .topic))
+        }
+        return result
     }
 
-    private var pausedOrFinishedGoals: [PrismGoal] {
-        goals.filter { $0.trackStatus == .paused || $0.trackStatus == .completed }
+    private func looksLikeVideo(_ item: SavedItem) -> Bool {
+        let url = item.sourceURL?.absoluteString.lowercased() ?? ""
+        return url.contains("reel") || url.contains("tiktok") || url.contains("/video")
     }
 
     private var filteredItems: [SavedItem] {
         items.filter { item in
-            if let statusFilter, item.status != statusFilter { return false }
+            switch filter {
+            case .all: break
+            case .highPriority:
+                if item.priority != .mustHave { return false }
+            case .undecided:
+                if item.priority != .undecided && item.priority != nil { return false }
+            case .videos:
+                if !looksLikeVideo(item) { return false }
+            }
             if search.isEmpty { return true }
             return item.title.localizedCaseInsensitiveContains(search)
                 || (item.notes?.localizedCaseInsensitiveContains(search) ?? false)
         }
-    }
-
-    private func collectionName(for item: SavedItem) -> String? {
-        collections.first { $0.id == item.collectionID }?.name
+        .sorted { $0.createdAt > $1.createdAt }
     }
 
     private func reload() async {
@@ -186,45 +143,133 @@ struct HomeView: View {
     }
 }
 
-/// Collections list embedded under Home’s Collections segment.
-struct CollectionsEmbeddedView: View {
-    @EnvironmentObject private var router: AppRouter
-    let collections: [PrismCollection]
-    let itemCounts: [UUID: Int]
+struct SavedItemCard: View {
+    let item: SavedItem
+    var collectionName: String?
+    var showPlay: Bool = false
+    var tags: [(String, PrismTone)] = []
 
     var body: some View {
-        VStack(spacing: PrismSpacing.sm) {
-            if collections.isEmpty {
-                EmptyStateView(
-                    title: "Start a collection",
-                    message: "Group the things you’re considering — fashion, gifts, a first apartment, or a dream.",
-                    actionTitle: "Create",
-                    action: { router.sheet = .createCollection }
-                )
-                .accessibilityIdentifier("collections.empty")
-            } else {
-                ForEach(collections) { collection in
-                    GlassCard {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(collection.name)
-                                    .font(PrismTypography.headline())
-                                Text("\(itemCounts[collection.id, default: 0]) items")
-                                    .font(PrismTypography.caption())
-                                    .foregroundStyle(PrismColors.textSecondary)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .padding(.horizontal, PrismSpacing.md)
-                    .accessibilityIdentifier("collections.item.\(collection.id.uuidString)")
+        VStack(alignment: .leading, spacing: 8) {
+            ZStack {
+                AspirationMediaView(item: item, height: 162)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 162)
+                    .clipped()
+                    .overlay(PrismGradients.cardFade)
+                    .clipShape(RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous))
+                if showPlay {
+                    PlayBadge(size: 36)
                 }
             }
-            PrismPrimaryButton(title: "New collection") {
-                router.sheet = .createCollection
+            .frame(maxWidth: .infinity)
+            .frame(height: 162)
+            .clipped()
+
+            HStack(spacing: 6) {
+                ForEach(Array(resolvedTags.prefix(2).enumerated()), id: \.offset) { _, pair in
+                    TagPill(text: pair.0, tone: pair.1)
+                }
+                Spacer(minLength: 0)
             }
-            .accessibilityIdentifier("collections.create")
-            .padding(.horizontal, PrismSpacing.md)
+            .frame(height: 28, alignment: .leading)
+            .clipped()
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .background {
+            RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous)
+                .fill(PrismColors.glassFill)
+                .overlay {
+                    RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous)
+                        .stroke(PrismColors.glassStroke, lineWidth: 1)
+                }
+        }
+    }
+
+    private var resolvedTags: [(String, PrismTone)] {
+        if !tags.isEmpty { return tags }
+        var result: [(String, PrismTone)] = [(item.intent.displayName, .intent)]
+        if let cost = item.costSignificance {
+            result.append((cost.shortLabel, .priority))
+        }
+        return result
+    }
+}
+
+/// Shared goal card used on Goals hub (and elsewhere).
+struct GoalCardView: View {
+    let goal: PrismGoal
+    let pace: GoalPaceSnapshot
+    var isPrimary: Bool
+
+    var body: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: PrismSpacing.sm) {
+                HStack {
+                    Text(isPrimary ? "PRIMARY GOAL" : goal.priority.displayName.uppercased())
+                        .font(PrismTypography.mono)
+                        .foregroundStyle(Color.white.opacity(0.7))
+                    Spacer()
+                    statusChip
+                }
+                Text(goal.title)
+                    .font(PrismTypography.title(27))
+                if let target = GoalPlanningService().effectiveTarget(for: goal) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(CurrencyFormatting.string(from: goal.amountSaved, currencyCode: goal.currencyCode))
+                            .font(PrismTypography.number(26))
+                        Text("of \(CurrencyFormatting.string(from: target, currencyCode: goal.currencyCode))")
+                            .font(PrismTypography.body(14))
+                            .foregroundStyle(PrismColors.textSecondary)
+                        Spacer()
+                        if let pct = pace.percentFunded {
+                            Text("\(Int(pct))%")
+                                .font(PrismTypography.number(14))
+                                .foregroundStyle(PrismColors.textSecondary)
+                        }
+                    }
+                    ProgressView(value: (pace.percentFunded ?? 0) / 100)
+                        .tint(barColor)
+                }
+                if let required = pace.requiredPerPeriod, goal.trackStatus != .paused {
+                    Text("\(CurrencyFormatting.string(from: required, currencyCode: goal.currencyCode)) / \(pace.periodLabel)")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textSecondary)
+                }
+            }
+        }
+    }
+
+    private var statusChip: some View {
+        Text(pace.trackStatus.displayName)
+            .font(PrismTypography.caption())
+            .foregroundStyle(statusForeground)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(statusBackground))
+    }
+
+    private var statusBackground: Color {
+        switch pace.trackStatus {
+        case .ahead, .onTrack: return PrismColors.statusGreen
+        case .aLittleBehind, .needsAdjustment: return PrismColors.statusAmber
+        default: return Color.white.opacity(0.18)
+        }
+    }
+
+    private var statusForeground: Color {
+        switch pace.trackStatus {
+        case .aLittleBehind, .needsAdjustment: return PrismColors.textOnLight
+        default: return .white
+        }
+    }
+
+    private var barColor: Color {
+        switch pace.trackStatus {
+        case .ahead, .onTrack: return PrismColors.statusGreen
+        case .aLittleBehind, .needsAdjustment: return PrismColors.statusAmber
+        default: return Color.white.opacity(0.45)
         }
     }
 }

@@ -69,86 +69,191 @@ make this the onboarding 1st page + splash screen + use the logo as the favicon 
 
 **Errors encountered:** None (xcodebuild succeeded).
 
-### Prompt 5 — 2026-09-19
-I don't see the bg image in the background. maybe the blur is too high, experiment with it. this is what i want to see:
-[attached screenshot + PrismAtmosphericBackground selection]
+### Prompt 10 — 2026-09-19
+Recreate Prism UI from App Screens folder — implement the plan (1A IA, 2A full recreation, mock AI description).
 
-**TL;DR:** Lowered backdrop blur from 80→12 and dropped opaque blur so PrismBackground light streaks read instead of a flat purple wash.
+**TL;DR:** Rebuilt IA to 4 tabs (Home/Collections/Goals/Money Story), design tokens + Figtree/Encode Sans, recreation backdrop, and recreated screens 01–16 (skip 06) with swipe sort, Review flow, Paste anything Capture, Goals hub, mock AI descriptions; updated PRODUCT_VISION / MVP_SCOPE / HANDOFF.
+
+**Files changed:** docs/PRODUCT_VISION.md, MVP_SCOPE.md, HANDOFF_FEATURES.md; PrismTokens/PrismComponents; AppRouter/AppEnvironment; HomeView, GoalsHubView, CollectionSortDeckView, ReviewViews, SavedItemDetailView, CaptureFlowView, MoneyStoryView, GoalSetup/Detail, Onboarding; DemoDataSeeder + Demo* assets; MockAIDescription; fonts Figtree/EncodeSans.
+
+**Key decisions:** Recreation folder is IA truth; Review/Settings off-tab; AI description local mock only; custom PrismTabBar instead of system TabView chrome.
+
+**Errors encountered:** Duplicate PrismLogoMark; missing DemoDataSeeder/assets (recreated); FlowTags missing; sectionBlock escaping capture — fixed; BUILD SUCCEEDED.
+
+### Prompt 11 — 2026-09-19
+1. the bg for the whole app is missing - we had fixed this problem before introducing the new IA etc
+2. The money story page has a lot more than what is currently built - build those also - keep the UI with dummy data rn and build documentation on what needs to be done to build it properly later
+
+**TL;DR:** Restored visible atmospheric backdrop (removed full-screen blur frost that washed out art; light scrim only + transparent tab chrome). Rebuilt Money Story to full recreation screen-16 layout with demo data and documented real-data wiring.
 
 **Files changed:**
-- `Prism/Core/DesignSystem/PrismTokens.swift` — blurRadius 12, scrim 0.22
-- `Prism/Core/DesignSystem/PrismComponents.swift` — soft blur without opaque; slight overscan before blur
+- `Prism/Core/DesignSystem/PrismComponents.swift` — backdrop: oversized flipped PrismBackground + 5% scrim; removed UIVisualEffectView frost
+- `Prism/App/AppRouter.swift` — clear backgrounds on MainTabView
+- `Prism/Features/Collections/CollectionsView.swift` — prismTransparentBackground on list scroll
+- `Prism/Features/MoneyStory/MoneyStoryView.swift` — full screen-16 sections with MoneyStoryDemoContent
+- `docs/MONEY_STORY_REAL_DATA.md` — [NEW] checklist to wire aggregates later
+- `docs/MVP_SCOPE.md` — note demo narrative + doc link
 
-**Key decisions:** Reference still wants atmosphere (not sharp art); 12 keeps streaks visible under glass cards. Tune further if needed (try 6–20).
+**Key decisions:** Demo content mirrors HTML recreation placeholders; share card / pocket deferred until real counts; influence language stays non-causal.
+
+**Errors encountered:** None (xcodebuild succeeded).
+
+### Prompt 12 — 2026-09-19
+Once you go, firstly create a dummy goal following the image of the goal screenshot that I have attached. And once you are creating a goal, it should go into the five-step workflow. And it can start from, you can paste a URL of something that you want to save to words. Like maybe this can stay as it is. The first step, no, actually it's my, the screen is, this should be the first screen. The paste anything screen should be the first screen. Yeah, of the, define the goal, of the new goal. Workflow.
+
+**TL;DR:** Seeded MacBook/hub demo goals (Japan primary + New laptop with $1,339 projected plan) and made Paste anything step 1 of New Goal when starting fresh; Define → Why → Target → Plan follow.
+
+**Files changed:**
+- `Prism/Domain/Services/DemoDataSeeder.swift` — [NEW goals] Japan, New laptop (+components), Concert, Sofa, Kyoto; MacBook Air save
+- `Prism/Features/Goals/GoalSetupFlowView.swift` — Paste-first 5-step flow; mockup-aligned define/target/plan UI
+- `Prism/Features/Goals/GoalDetailView.swift` — role-tagged saves list; projected cost excludes alternatives
+- `Prism/Features/Goals/GoalsHubView.swift` — hub summary + “+ New goal from a save”
+- `Prism/Domain/Models/GoalModels.swift` — GoalComponent.role + countsTowardProjectedCost
+- `Prism/Infrastructure/SwiftData/SwiftDataModels.swift` — SDGoalComponent.roleRaw
+- `Prism/Features/Settings/SettingsView.swift` — clear demo seed keys on wipe
+- `PrismTests/PrismCoreTests.swift` — projected cost = $1,339 test
+- `scratchpad/goal-paste-first-workflow-v1.md` — [NEW] plan
+
+**Key decisions:** Fresh New Goal = Paste → Define → Why → Target → Plan (priority on plan). From save/collection skips Paste and keeps Rank as its own step. Projected cost = essential + optional only.
+
+**Errors encountered:** Simulator destination by name failed once (used device id); TEST SUCCEEDED for projected-cost unit test; BUILD SUCCEEDED.
+
+### Prompt 13 — 2026-09-19
+1. after pasting it zooms the entire page weirdly 
+2. after the splash/ onboarding, there should be a blur on the bg + glass effect on cards - refer to the images to fix that 
+3. remove where, date and estimated cause from define the goal screen 
+4. set target - toggling the buffer should change the final amount 
+5. allow deleting goals functionality 
+6. money story page should have the logo instead of "prism"
+7. on goals the logo should be on the center instead of left 
+
+**TL;DR:** Fixed paste keyboard zoom, restored frosted bg + glass cards, trimmed Define fields, buffer raises effective target/pace, hard-delete goals, and centered pyramid logos on Goals / Money Story.
+
+**Files changed:**
+- `Prism/Core/DesignSystem/PrismComponents.swift` — bg ignore-keyboard sizing + blur/material; GlassCard ultraThinMaterial
+- `Prism/Core/DesignSystem/PrismTokens.swift` — translucent glassFill; backdrop blur/material opacities
+- `Prism/Features/Goals/GoalSetupFlowView.swift` — paste zoom guards; remove Where/Date/Cost from Define; buffer plan total UI
+- `Prism/Domain/Services/GoalPlanningService.swift` — effectiveTarget (+8%) for remaining/pace
+- `Prism/Domain/Repositories/RepositoryProtocols.swift` + `LocalStore.swift` — deleteGoal cascade
+- `Prism/Features/Goals/GoalDetailView.swift` — Delete goal; show buffered target
+- `Prism/Features/Goals/GoalsHubView.swift` — centered logo; effective target in rows
+- `Prism/Features/MoneyStory/MoneyStoryView.swift` — PrismLogoMark instead of “Prism” text
+- `Prism/Features/Home/HomeView.swift` — GoalCardView uses effectiveTarget
+- `PrismTests/PrismCoreTests.swift` — buffer pace test
+- `scratchpad/ui-polish-goal-glass-v1.md` — [NEW] plan
+
+**Key decisions:** Keyboard zoom fixed by flooring GeometryReader to screen bounds; buffer keeps base target stored and applies 8% only in planning math/display.
+
+**Errors encountered:** None (BUILD SUCCEEDED).
+
+### Prompt 14 — 2026-09-19
+in the feelings attached card on the saved links pages - i want to replicate something like this from the apple journal feature - refer to the video@/Users/jasminekaur/Downloads/ScreenRecording_09-19-2026 22-05-02_1.MP4
+
+match the colors of the prism app
+
+**TL;DR:** Replaced 3-star Feeling Attached with an Apple Journal–style mood flow: glowing morphing orb + valence slider, then emotion chips — tinted with Prism violet/cyan/magenta/amber/green.
+
+**Files changed:**
+- `Prism/Features/Saves/FeelingMoodPickerView.swift` — [NEW] MoodValence, MoodOrbView, slider, 2-step sheet, emotion catalog
+- `Prism/Features/Saves/SavedItemDetailView.swift` — card preview opens picker; persists feelings + valence
+- `Prism.xcodeproj/project.pbxproj` — add FeelingMoodPickerView
+
+**Key decisions:** Compact card shows mini orb; full Journal UX in a sheet. Valence in UserDefaults (no schema migration); emotion chips via FeelingRepository. Palette maps unpleasant→magenta/violet, neutral→cyan, pleasant→amber/green.
+
+**Errors encountered:** None (xcodebuild succeeded).
+
+### Prompt 14 — 2026-09-19
+1. remove the random 6 saves and newest first on the homepage 
+2. fix padding on the home screen - that got spoilt 
+3. when i add something new, there is overlap in cards - all of them need to fit properly in the grid. this was implemented correctly before but then it got wrong 
+4. in the feelings attached card - keep 5 states - very pleasant, pleasnt, neutral, unpleasnt, very unpleasnant. make the shapes less angular and more rounded. the arrow to select kind of feelings only shows up on full screen - should show up with half page modal also 
+5. delete and save buttons should be in sentence case 
+6. new collection button is behind the navbar on the bottom - keep it on top right 
+7. make a goal button on collections card should be removed 
+8. show a glimpse of images in the collections 
+9. goals page should have an option to see other goals as well 
+
+**TL;DR:** Cleaned Home meta/padding/grid overlap; 5-state rounded mood picker with chevrons on medium sheet; Collections New top-right + image glimpses; Goals See all + other-goal detail.
+
+**Files changed:**
+- `Prism/Features/Home/HomeView.swift` — removed saves/newest meta; consistent padding; fixed-height tag row so grid cards don’t overlap
+- `Prism/Features/Saves/FeelingMoodPickerView.swift` — 5 valences; softer glyphs; chevrons layoutPriority for .medium
+- `Prism/Features/Saves/SavedItemDetailView.swift` — Delete / Save sentence case
+- `Prism/Features/Collections/CollectionsView.swift` — New top-right; removed Make a goal; stacked media glimpses
+- `Prism/Features/Goals/GoalsHubView.swift` — See all sheet; expandable other goals open detail
+- `scratchpad/home-collections-feelings-v1.md` — [NEW] plan
+
+**Key decisions:** Mood valence persistence migrated with a v2 flag so old 7-state values don’t collide with new raw ints.
+
+**Errors encountered:** LazyVGrid `alignment: .top` invalid (HorizontalAlignment) — removed; BUILD SUCCEEDED.
+
+### Prompt 15 — 2026-09-19
+Couldn't read values in CFPrefsPlistSource… (Domain: group.com.jasminekaur.prism…) Using kCFPreferencesAnyUser with a container is only allowed for System Containers…
+
+**TL;DR:** Guarded App Group UserDefaults behind containerURL checks so launch no longer hits CFPrefs when the group isn’t provisioned.
+
+**Files changed:**
+- `Prism/Infrastructure/Notifications/ShareInbox.swift` — sharedDefaults only if App Group container exists
+- `PrismShareExtension/ShareViewController.swift` — same guard before suite write
+
+**Key decisions:** Warning is harmless simulator/signing noise; real Share Extension still needs App Group in Developer portal + Signing & Capabilities.
 
 **Errors encountered:** None
 
-### Prompt 6 — 2026-09-19
-Figma UI match (all 6 frames) — implement the plan
+### Prompt 16 — 2026-09-19
+1. collections - remove sort and review buttons - make the card clickable 
+2. make see all, new etc buttons on top right on screens consistent UI wise 
+3. when pasting links with non square preview images, crop the preview image. 
 
-**TL;DR:** Matched app UI to original Figma frames: Figma backdrop recipe (visible art + frost), Home aspiration feed, Goals tab, restyled detail/review/Money Story; Collections under Home segment.
-
-**Files changed:**
-- `Prism/Core/DesignSystem/PrismComponents.swift` — Figma backdrop, chrome, AspirationItemCard
-- `Prism/Core/DesignSystem/PrismTokens.swift` — backdrop scrim
-- `Prism/Resources/Assets.xcassets/PrismBackground.imageset/` — Figma refraction art
-- `Prism/App/AppRouter.swift`, `AppEnvironment.swift` — Home/Goals/Review/Story/Settings tabs
-- `Prism/Features/Home/HomeView.swift` — Figma feed
-- `Prism/Features/Goals/GoalsHubView.swift` — [NEW] goals hub
-- `Prism/Features/Review/ReviewViews.swift`, `SavedItemDetailView.swift`, `MoneyStoryView.swift`, `AspirationMediaView.swift`, `SettingsView.swift`
-- `PrismUITests` — Collections via Home segment
-- `scratchpad/figma-ui-match-v1.md`
-
-**Key decisions:** Product metrics on Money Story (no credit/category spend); Goals tab for goals-first IA; frost overlay not heavy image blur so bg shows.
-
-**Errors encountered:** WrappingHStack redeclaration (removed duplicate); GoalsHubView missing until xcodegen; sips cwd trap in /tmp (used absolute paths).
-
-### Prompt 7 — 2026-09-19
-No image named PrismBackground found in asset catalog…
-
-**TL;DR:** Root cause was Assets.xcassets never in the app Resources build phase (no Assets.car). Fixed via XcodeGen `buildPhase: resources` sources + user PrismBackground image; verified Assets.car contains PrismBackground.
+**TL;DR:** Collection cards open Review on tap (Sort/Review buttons removed); shared PrismHeaderAction for New/See all; link previews center-crop via overlay+clip.
 
 **Files changed:**
-- `project.yml` — resources via sources buildPhase; team ID
-- `Prism.xcodeproj/project.pbxproj` — regenerated with Resources phase
-- `PrismBackground.imageset` — user-provided background JPEG
-- `scripts/ensure-resources.py` — [NEW] safety patch if xcodegen drops resources
+- `Prism/Features/Collections/CollectionsView.swift` — clickable cards → review; New via PrismHeaderAction
+- `Prism/Features/Goals/GoalsHubView.swift` — See all via PrismHeaderAction
+- `Prism/Core/DesignSystem/PrismComponents.swift` — [NEW] PrismHeaderAction; PrismSaveCard crop fix
+- `Prism/Features/Capture/CaptureFlowView.swift` — paste preview center-crop
+- `Prism/Features/Saves/AspirationMediaView.swift` — overlay scaledToFill crop
 
-**Key decisions:** Prefer XcodeGen sources+buildPhase over broken top-level resources; keep ensure-resources as fallback.
+**Key decisions:** Card tap opens Review hub as the collection destination.
 
-**Errors encountered:** Manual pbxproj patch briefly corrupted project (regenerated).
+**Errors encountered:** (build result below)
 
-### Prompt 8 — 2026-09-19
-BrandSplash/PrismBackground missing in app; splash works but not inside app
+### Prompt 17 — 2026-09-19
+1. make tabs and tags look different - for tabs make it more like a context switcher where selected state slides between the options 
+2. the animation from the feelings card has completely been removed now - make it back to the first version with more rounded angles instead of sharp ones
+3. you should be able to save individual posts to collections and also remove or change them 
+4. you should be able to modify individual saves like add more tags 
+5. in the new goal set up i don't want the form to scroll so adjust the page such that it fits in, you can make some option shorter to make it fit in a straight line or something 
+6. when you're creating a goal, pasting a link is not working properly 
+7. allow the user to create a new collection when saving new inspiration 
 
-**TL;DR:** In-app tabs used Color.clear over an opaque TabView host and heavy frost hid the art. Local PrismAtmosphericBackground on each tab, lighter scrim, BrandSplash fallback, same JPEG for PrismBackground.
-
-**Files changed:** PrismComponents, PrismTokens, Home/Goals/Review/MoneyStory/Settings, PrismBackground imageset
-
-**Key decisions:** Do not rely on root bg through TabView; no need to resend Figma (all 6 frames already used).
-
-**Errors encountered:** None
-
-### Prompt 9 — 2026-09-19
-1. brother what have you done. the vision is there, but this needs to be fixed.
-2. When i open share a link from insta in the app, the app should open and automatically open the save something option.
-3. make a dummy database with some examples - you can use the same images I have in figma for this purpose and then anything we add on top can add value
-
-**TL;DR:** Fixed inverted in-app branding by using refraction-only PrismBackground (never BrandSplash) for atmospheric UI; Instagram/share now stores payload + opens prism://share which presents Capture prefilled; seeded demo collections/items from Figma Demo* images on demo start / empty Home.
+**TL;DR:** Sliding PrismSegmentedControl for tabs; restored pulsing/morphing rounded mood orbs; detail can change collection + add/remove tags; goal setup fits without scroll + real link paste/preview; capture can create a collection inline.
 
 **Files changed:**
-- `Prism/Core/DesignSystem/PrismComponents.swift` — atmospheric bg uses PrismBackground only + 180° Figma plate
-- `Prism/App/AppEnvironment.swift` — presentCapture draft fields on AppRouter
-- `Prism/App/AppRouter.swift` — consume App Group share + onOpenURL → Capture
-- `Prism/Features/Capture/CaptureFlowView.swift` — apply share draft URL/title/image
-- `PrismShareExtension/ShareViewController.swift` — store payload, open prism://share
-- `Prism/Infrastructure/Notifications/ShareInbox.swift` — extract URL from shared text
-- `Prism/Domain/Services/DemoDataSeeder.swift` — [NEW] Figma sample aspirations + media
-- `Prism/Features/Onboarding/OnboardingFlowView.swift` — seed after Explore locally
-- `Prism/Features/Home/HomeView.swift` — seed if demo empty; + opens presentCapture
-- `Prism/Prism.entitlements` / `PrismShareExtension/...entitlements` — App Group
-- `project.yml` + `Prism/Info.plist` — entitlements + prism URL scheme
+- `Prism/Core/DesignSystem/PrismComponents.swift` — PrismSegmentedControl
+- `Prism/Features/Home/HomeView.swift` / `MoneyStoryView.swift` — use segmented tabs
+- `Prism/Features/Saves/FeelingMoodPickerView.swift` — pulse/morph animation restored, rounded petals
+- `Prism/Features/Saves/SavedItemDetailView.swift` — collection picker + editable tags
+- `Prism/Features/Capture/CaptureFlowView.swift` — inline new collection; segmented type
+- `Prism/Features/Goals/GoalSetupFlowView.swift` — no ScrollView; LinkPreview paste; compact steps
 
-**Key decisions:** BrandSplash stays splash/onboarding only (logo baked in); Share Extension uses responder-chain openURL because extensionContext.open is unavailable for share extensions; first demo item is readyForReview so Review isn’t empty.
+**Key decisions:** Tag pills stay capsules; tabs use sliding pill track. Goal paste uses LPMetadata like Capture.
 
-**Errors encountered:** xcodebuild OS=latest failed to resolve iPhone 16; rebuilt with OS=18.4 successfully.
+**Errors encountered:** None (BUILD SUCCEEDED).
+
+### Prompt 18 — 2026-09-19
+Called -[UIContextMenuInteraction updateVisibleMenuWithBlock:] while no context menu is visible. This won't do anything.
+Called -[UIContextMenuInteraction updateVisibleMenuWithBlock:] while no context menu is visible. This won't do anything.
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+The variant selector cell index number could not be found.
+The variant selector cell index number could not be found.
+The variant selector cell index number could not be found.
+
+**TL;DR:** Diagnosed as benign UIKit/keyboard framework console noise (context menu refresh, emoji search RTI session, key variant selector). No Prism code change — not a crash and not a paste failure.
+
+**Files changed:**
+- None
+
+**Key decisions:** Do not chase Simulator-only UIKit logs unless paste/UI actually misbehaves.
+
+**Errors encountered:** None (informational only).

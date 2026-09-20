@@ -12,8 +12,19 @@ enum MainAppShareInbox {
         var imageData: Data?
     }
 
+    /// True when the App Group container is actually available (capability + provisioning).
+    static var isAppGroupAvailable: Bool {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil
+    }
+
+    /// Suite defaults only when the group container exists — avoids CFPrefs console spam.
+    static var sharedDefaults: UserDefaults? {
+        guard isAppGroupAvailable else { return nil }
+        return UserDefaults(suiteName: appGroupID)
+    }
+
     static func consumePending() -> Payload? {
-        guard let defaults = UserDefaults(suiteName: appGroupID),
+        guard let defaults = sharedDefaults,
               let data = defaults.data(forKey: "pendingShare"),
               let payload = try? JSONDecoder().decode(Payload.self, from: data) else {
             return nil

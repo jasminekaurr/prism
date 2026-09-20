@@ -27,6 +27,13 @@ struct RootView: View {
             }
             await container.notificationScheduler.reconcilePending()
             await environment.refreshWeeklyRecap()
+            await importPendingShareIfNeeded()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            Task { await importPendingShareIfNeeded() }
+        }
+        .onOpenURL { url in
+            Task { await handleOpenURL(url) }
         }
         .sheet(item: $router.sheet) { sheet in
             sheetContent(sheet)
@@ -46,12 +53,10 @@ struct RootView: View {
     }
 
     private func handleOpenURL(_ url: URL) async {
-        // prism://share — open capture after Share Extension stored the payload.
         if url.host == "share" || url.path.contains("share") {
             await importPendingShareIfNeeded()
             return
         }
-        // Direct link open: prism://capture?url=...
         if url.host == "capture" || url.path.contains("capture") {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
             let sharedURL = components?.queryItems?.first(where: { $0.name == "url" })?.value
@@ -92,6 +97,12 @@ struct RootView: View {
             AddProgressView(goalID: id)
         case .goalFromCollection(let id):
             GoalFromCollectionLoader(collectionID: id)
+        case .settings:
+            SettingsView()
+        case .collectionSort(let id):
+            CollectionSortDeckView(collectionID: id)
+        case .review(let id):
+            ReviewHubView(collectionID: id)
         }
     }
 }
@@ -157,45 +168,26 @@ struct MainTabView: View {
     @EnvironmentObject private var router: AppRouter
 
     var body: some View {
-        TabView(selection: $router.selectedTab) {
-            HomeView()
-                .tabItem { Label("Home", systemImage: "square.grid.2x2") }
-                .tag(AppRouter.Tab.home)
-                .accessibilityIdentifier("tab.home")
+        ZStack(alignment: .bottom) {
+            Group {
+                switch router.selectedTab {
+                case .home:
+                    HomeView()
+                case .collections:
+                    CollectionsView()
+                case .goals:
+                    GoalsHubView()
+                case .moneyStory:
+                    MoneyStoryView()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.clear)
 
-            GoalsHubView()
-                .tabItem { Label("Goals", systemImage: "flag") }
-                .tag(AppRouter.Tab.goals)
-                .accessibilityIdentifier("tab.goals")
-
-            ReviewHubView()
-                .tabItem { Label("Review", systemImage: "sparkles") }
-                .tag(AppRouter.Tab.review)
-                .accessibilityIdentifier("tab.review")
-
-            MoneyStoryView()
-                .tabItem { Label("Story", systemImage: "chart.bar") }
-                .tag(AppRouter.Tab.moneyStory)
-                .accessibilityIdentifier("tab.moneyStory")
-
-            SettingsView()
-                .tabItem { Label("Settings", systemImage: "person.crop.circle") }
-                .tag(AppRouter.Tab.settings)
-                .accessibilityIdentifier("tab.settings")
+            PrismTabBar(selection: $router.selectedTab)
         }
-        .toolbarBackground(.hidden, for: .tabBar)
-        .onAppear {
-            // Let the root atmospheric background show through tab content.
-            let appearance = UITabBarAppearance()
-            appearance.configureWithTransparentBackground()
-            UITabBar.appearance().standardAppearance = appearance
-            UITabBar.appearance().scrollEdgeAppearance = appearance
-
-            let nav = UINavigationBarAppearance()
-            nav.configureWithTransparentBackground()
-            UINavigationBar.appearance().standardAppearance = nav
-            UINavigationBar.appearance().scrollEdgeAppearance = nav
-        }
+        .background(Color.clear)
+        .ignoresSafeArea(.keyboard)
     }
 }
 

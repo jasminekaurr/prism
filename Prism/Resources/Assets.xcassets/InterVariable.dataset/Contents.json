@@ -1,0 +1,13 @@
+{
+  "data" : [
+    {
+      "filename" : "Inter.ttf",
+      "idiom" : "universal",
+      "universal-type-identifier" : "public.truetype-ttf-data"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

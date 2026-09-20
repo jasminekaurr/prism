@@ -1,4 +1,1 @@
-{
-  "images" : [ { "filename" : "DemoClogs.jpg", "idiom" : "universal" } ],
-  "info" : { "author" : "xcode", "version" : 1 }
-}
+{ "images" : [ { "filename" : "DemoClogs.jpg", "idiom" : "universal" } ], "info" : { "author" : "xcode", "version" : 1 } }

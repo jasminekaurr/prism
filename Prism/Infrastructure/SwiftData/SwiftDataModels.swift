@@ -550,6 +550,7 @@ final class SDGoalComponent {
     var estimatedCost: Decimal?
     var currencyCode: String?
     var isOptional: Bool
+    var roleRaw: String?
     var sortOrder: Int
     var createdAt: Date
 
@@ -561,15 +562,20 @@ final class SDGoalComponent {
         self.estimatedCost = c.estimatedCost
         self.currencyCode = c.currencyCode
         self.isOptional = c.isOptional
+        self.roleRaw = c.role.rawValue
         self.sortOrder = c.sortOrder
         self.createdAt = c.createdAt
     }
 
     func toDomain() -> GoalComponent {
-        GoalComponent(
+        let resolvedRole = roleRaw.flatMap(AspirationLinkRole.init(rawValue:))
+            ?? (isOptional ? .optional : .essential)
+        return GoalComponent(
             id: id, userID: userID, goalID: goalID, name: name,
             estimatedCost: estimatedCost, currencyCode: currencyCode,
-            isOptional: isOptional, sortOrder: sortOrder, createdAt: createdAt
+            isOptional: isOptional,
+            role: resolvedRole,
+            sortOrder: sortOrder, createdAt: createdAt
         )
     }
 }

@@ -23,13 +23,18 @@ struct CaptureFlowView: View {
     @State private var errorText: String?
     @State private var isSaving = false
     @State private var previewTask: Task<Void, Never>?
+    @State private var linkType: Int = 0
     @State private var appliedShareDraft = false
+    @State private var showNewCollection = false
+    @State private var newCollectionName = ""
+
+    private let linkTypes = ["Product", "Trip", "Event", "Inspiration"]
 
     private var canSave: Bool {
-        guard !isSaving, selectedCollectionID != nil else { return false }
+        guard !isSaving else { return false }
         let hasTitle = !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let hasLink = URLHelpers.normalizedURL(from: urlText) != nil
-        return hasTitle || hasLink
+        return (hasTitle || hasLink) && selectedCollectionID != nil
     }
 
     var body: some View {
@@ -38,28 +43,97 @@ struct CaptureFlowView: View {
                 PrismAtmosphericBackground()
                 ScrollView {
                     VStack(alignment: .leading, spacing: PrismSpacing.md) {
-                        Text("Save something")
-                            .font(PrismTypography.title())
+                        Text("SHARED TO PRISM")
+                            .font(PrismTypography.micro())
+                            .tracking(0.8)
+                            .foregroundStyle(Color.white.opacity(0.7))
+                        Text("Paste anything")
+                            .font(PrismTypography.title(32))
                             .accessibilityIdentifier("capture.title")
+
+                        GlassCard {
+                            HStack(spacing: 10) {
+                                Image(systemName: "link")
+                                Text(urlText.isEmpty ? "paste a link, or share to Prism" : urlText)
+                                    .font(PrismTypography.mono)
+                                    .foregroundStyle(urlText.isEmpty ? Color.white.opacity(0.5) : .white)
+                                    .lineLimit(1)
+                                Spacer()
+                                Button(isLoadingPreview ? "Reading…" : (urlText.isEmpty ? "Paste" : "Clear")) {
+                                    if urlText.isEmpty {
+                                        if let clip = UIPasteboard.general.string {
+                                            urlText = clip
+                                            schedulePreviewFetch(for: clip, immediate: true)
+                                        }
+                                    } else {
+                                        urlText = ""
+                                        imageData = nil
+                                        previewFromLink = false
+                                        title = ""
+                                    }
+                                }
+                                .font(PrismTypography.caption())
+                                .foregroundStyle(.white)
+                            }
+                        }
 
                         linkPreviewSection
 
+                        HStack(spacing: 8) {
+                            PrismSegmentedControl(
+                                options: Array(linkTypes.indices),
+                                selection: $linkType
+                            ) { linkTypes[$0] }
+                        }
+
                         SectionMicroLabel(text: "Collection")
-                        if collections.isEmpty {
-                            Text("Create a collection first from the Collections tab.")
+                        if collections.isEmpty && !showNewCollection {
+                            Text("Create a collection to file this save.")
                                 .foregroundStyle(PrismColors.textSecondary)
-                            Button("Create a collection") {
-                                dismiss()
+                            Button("New collection") {
+                                showNewCollection = true
                             }
                             .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.lavender)
+                            .accessibilityIdentifier("capture.newCollection")
                         } else {
-                            Picker("Collection", selection: $selectedCollectionID) {
-                                ForEach(collections) { c in
-                                    Text(c.name).tag(Optional(c.id))
+                            HStack {
+                                if !collections.isEmpty {
+                                    Picker("Collection", selection: $selectedCollectionID) {
+                                        ForEach(collections) { c in
+                                            Text(c.name).tag(Optional(c.id))
+                                        }
+                                    }
+                                    .pickerStyle(.menu)
+                                    .accessibilityIdentifier("capture.collection")
+                                }
+                                Spacer()
+                                Button(showNewCollection ? "Cancel" : "New") {
+                                    showNewCollection.toggle()
+                                    if !showNewCollection { newCollectionName = "" }
+                                }
+                                .font(PrismTypography.caption())
+                                .foregroundStyle(.white)
+                                .accessibilityIdentifier("capture.newCollection")
+                            }
+                            if showNewCollection {
+                                HStack(spacing: 8) {
+                                    TextField("Collection name", text: $newCollectionName)
+                                        .padding(10)
+                                        .background {
+                                            RoundedRectangle(cornerRadius: PrismRadius.md)
+                                                .stroke(PrismColors.glassStroke)
+                                        }
+                                        .accessibilityIdentifier("capture.newCollectionName")
+                                    Button("Create") {
+                                        Task { await createCollectionInline() }
+                                    }
+                                    .font(PrismTypography.caption())
+                                    .foregroundStyle(.white)
+                                    .disabled(newCollectionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                                    .accessibilityIdentifier("capture.createCollection")
                                 }
                             }
-                            .pickerStyle(.menu)
-                            .accessibilityIdentifier("capture.collection")
                         }
 
                         SectionMicroLabel(text: "What kind of desire is this?")
@@ -146,8 +220,8 @@ struct CaptureFlowView: View {
                                 .padding(.horizontal, PrismSpacing.lg)
                                 .background {
                                     RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous)
-                                        .fill(Color.black.opacity(canSave ? 0.85 : 0.35))
-                                        .shadow(color: PrismColors.violet.opacity(canSave ? 0.55 : 0), radius: 12, y: 2)
+                                        .fill(PrismColors.buttonDark.opacity(canSave ? 1 : 0.45))
+                                        .shadow(color: Color.black.opacity(canSave ? 0.35 : 0), radius: 12, y: 2)
                                 }
                         }
                         .buttonStyle(.plain)
@@ -212,11 +286,14 @@ struct CaptureFlowView: View {
         } else if let imageData, let uiImage = UIImage(data: imageData) {
             GlassCard(padding: PrismSpacing.xs) {
                 VStack(alignment: .leading, spacing: PrismSpacing.xs) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
+                    Color.clear
                         .frame(maxWidth: .infinity)
                         .frame(height: 220)
+                        .overlay {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                        }
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: PrismRadius.md, style: .continuous))
                         .accessibilityIdentifier("capture.preview.image")
@@ -313,8 +390,32 @@ struct CaptureFlowView: View {
             selectedCollectionID = collections.first?.id
         }
         if collections.isEmpty {
-            errorText = "Create a collection first, then come back to save."
+            showNewCollection = true
+            errorText = nil
         }
+    }
+
+    private func createCollectionInline() async {
+        guard let userID = environment.profile?.id else { return }
+        let name = newCollectionName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        let collection = PrismCollection(
+            id: UUID(),
+            userID: userID,
+            name: name,
+            description: nil,
+            coverMediaID: nil,
+            colorTheme: nil,
+            createdAt: .now,
+            updatedAt: .now,
+            archivedAt: nil
+        )
+        try? await container.collectionRepository.upsert(collection)
+        collections.insert(collection, at: 0)
+        selectedCollectionID = collection.id
+        newCollectionName = ""
+        showNewCollection = false
+        PrismHaptics.save()
     }
 
     private func save() async {

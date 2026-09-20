@@ -16,6 +16,7 @@ struct GoalDetailView: View {
     @State private var showCompletion = false
     @State private var completionPrompted = false
     @State private var confirmAbandon = false
+    @State private var confirmDelete = false
 
     var body: some View {
         NavigationStack {
@@ -24,7 +25,10 @@ struct GoalDetailView: View {
                 if let goal, let pace {
                     ScrollView {
                         VStack(alignment: .leading, spacing: PrismSpacing.md) {
-                            Text(goal.title).font(PrismTypography.title())
+                            Text(goal.title).font(PrismTypography.title(32))
+                            Text(goalSubtitle(goal))
+                                .font(PrismTypography.body(14))
+                                .foregroundStyle(Color.white.opacity(0.7))
                             HStack {
                                 TagPill(text: goal.priority.displayName, color: PrismColors.tagWant)
                                 TagPill(text: pace.trackStatus.displayName, color: PrismColors.lavender, filled: false)
@@ -67,17 +71,15 @@ struct GoalDetailView: View {
                             }
 
                             if !components.isEmpty {
-                                Text("Plan components").font(PrismTypography.headline())
+                                projectedCostCard(goal: goal)
+
+                                Text("Saves in this goal")
+                                    .font(PrismTypography.title(28))
+                                Text("tap to reclassify · \(components.count) saves")
+                                    .font(PrismTypography.mono)
+                                    .foregroundStyle(Color.white.opacity(0.45))
                                 ForEach(components) { c in
-                                    HStack {
-                                        Text(c.name)
-                                        Spacer()
-                                        if let cost = c.estimatedCost {
-                                            Text("Est. \(CurrencyFormatting.string(from: cost, currencyCode: c.currencyCode ?? goal.currencyCode))")
-                                                .foregroundStyle(PrismColors.textSecondary)
-                                        }
-                                    }
-                                    .font(PrismTypography.caption())
+                                    componentRow(c, currency: goal.currencyCode)
                                 }
                                 Text("Component costs are your own estimates, not confirmed prices.")
                                     .font(PrismTypography.caption())
@@ -129,6 +131,99 @@ struct GoalDetailView: View {
         } message: {
             Text("It stays in your history. Nothing is deleted.")
         }
+        .confirmationDialog("Delete this goal?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete permanently", role: .destructive) {
+                Task { await deleteGoal() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes the goal and its progress from this device. It can’t be undone.")
+        }
+    }
+
+    private func componentRow(_ c: GoalComponent, currency: String) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.08))
+                .frame(width: 44, height: 44)
+                .overlay {
+                    Text("save")
+                        .font(PrismTypography.mono)
+                        .foregroundStyle(Color.white.opacity(0.35))
+                }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(c.name)
+                    .font(PrismTypography.body(15, weight: .medium))
+                TagPill(text: c.role.displayName, color: roleColor(c.role), filled: c.role == .essential || c.role == .alternative)
+            }
+            Spacer()
+            Text(c.estimatedCost.map { CurrencyFormatting.string(from: $0, currencyCode: c.currencyCode ?? currency) } ?? "—")
+                .font(PrismTypography.body(14))
+                .foregroundStyle(PrismColors.textSecondary)
+        }
+        .padding(12)
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(PrismColors.glassFill)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                }
+        }
+    }
+
+    private func roleColor(_ role: AspirationLinkRole) -> Color {
+        switch role {
+        case .essential: return PrismColors.tagWant
+        case .alternative: return PrismColors.statusAmber
+        case .inspiration: return Color.white.opacity(0.25)
+        case .optional: return Color.white.opacity(0.2)
+        case .booked: return PrismColors.statusGreen
+        case .decidedAgainst: return PrismColors.danger
+        }
+    }
+
+    private func projectedCostCard(goal: PrismGoal) -> some View {
+        let projected = components
+            .filter(\.countsTowardProjectedCost)
+            .compactMap(\.estimatedCost)
+            .reduce(Decimal(0), +)
+        let target = goal.targetAmount ?? projected
+        let over = projected - target
+        let targetDouble = NSDecimalNumber(decimal: target).doubleValue
+        let projectedDouble = NSDecimalNumber(decimal: projected).doubleValue
+        let ratio = targetDouble > 0 ? min(1, projectedDouble / targetDouble) : 0
+        return GlassCard {
+            VStack(alignment: .leading, spacing: 9) {
+                HStack {
+                    Text("Projected cost of this plan")
+                        .font(PrismTypography.chrome(13))
+                        .foregroundStyle(Color.white.opacity(0.7))
+                    Spacer()
+                    Text(over > 0
+                         ? "\(CurrencyFormatting.string(from: over, currencyCode: goal.currencyCode)) over target"
+                         : "\(CurrencyFormatting.string(from: -over, currencyCode: goal.currencyCode)) under target")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(over > 0 ? PrismColors.statusAmberSoft : PrismColors.statusGreenSoft)
+                }
+                Text(CurrencyFormatting.string(from: projected, currencyCode: goal.currencyCode))
+                    .font(PrismTypography.number(32))
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.white.opacity(0.2)).frame(height: 6)
+                        Capsule()
+                            .fill(over > 0 ? PrismColors.statusAmber : PrismColors.statusGreen)
+                            .frame(width: geo.size.width * ratio, height: 6)
+                    }
+                }
+                .frame(height: 6)
+                if over > 0 {
+                    Text("Switching to an alternative or trimming optionals brings this back under target.")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textSecondary)
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -139,6 +234,9 @@ struct GoalDetailView: View {
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("goalDetail.reflect")
             }
+            Button("Delete goal", role: .destructive) { confirmDelete = true }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("goalDetail.delete")
         } else if goal.trackStatus != .abandoned {
             HStack {
                 Button("Mark complete") { Task { await complete() } }
@@ -155,7 +253,25 @@ struct GoalDetailView: View {
             }
             .buttonStyle(.bordered)
             .font(PrismTypography.caption())
+
+            Button("Delete goal", role: .destructive) { confirmDelete = true }
+                .font(PrismTypography.caption())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("goalDetail.delete")
+        } else {
+            Button("Delete goal", role: .destructive) { confirmDelete = true }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("goalDetail.delete")
         }
+    }
+
+    private func goalSubtitle(_ goal: PrismGoal) -> String {
+        let priority = "\(goal.priority.displayName) goal"
+        if let date = goal.targetDate {
+            let month = date.formatted(.dateTime.month(.abbreviated).year())
+            return "\(priority) · \(month)"
+        }
+        return priority
     }
 
     private func complete() async {
@@ -184,12 +300,27 @@ struct GoalDetailView: View {
         await load()
     }
 
+    private func deleteGoal() async {
+        do {
+            try await container.goalRepository.deleteGoal(id: goalID)
+            PrismHaptics.save()
+            dismiss()
+        } catch {
+            container.crashReporter.record(error: error, context: "goal.delete")
+        }
+    }
+
     private func progressBlock(goal: PrismGoal, pace: GoalPaceSnapshot) -> some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 8) {
-                if let target = goal.targetAmount {
+                if let target = container.goalPlanningService.effectiveTarget(for: goal) {
                     Text("\(CurrencyFormatting.string(from: goal.amountSaved, currencyCode: goal.currencyCode)) of \(CurrencyFormatting.string(from: target, currencyCode: goal.currencyCode))")
                         .font(PrismTypography.title(22))
+                    if goal.includesBuffer, let base = goal.targetAmount {
+                        Text("Includes 8% buffer on \(CurrencyFormatting.string(from: base, currencyCode: goal.currencyCode))")
+                            .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.textSecondary)
+                    }
                     ProgressView(value: (pace.percentFunded ?? 0) / 100)
                         .tint(PrismColors.lavender)
                 }

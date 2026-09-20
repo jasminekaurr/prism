@@ -30,7 +30,7 @@ struct OnboardingFlowView: View {
             VStack(spacing: PrismSpacing.lg) {
                 if isBrandPage {
                     Spacer(minLength: 0)
-                    // Wordmark lives in BrandSplash art; keep an accessible label for UITests.
+                    // Accessible label; wordmark is drawn in the hero art.
                     Text("Prism")
                         .font(PrismTypography.display(1))
                         .foregroundStyle(.clear)
@@ -104,23 +104,22 @@ struct OnboardingFlowView: View {
     }
 
     private var brandHeroBackground: some View {
-        Image("BrandSplash")
-            .resizable()
-            .scaledToFill()
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .clipped()
-            .ignoresSafeArea()
-            .accessibilityHidden(true)
-            .overlay(alignment: .bottom) {
-                LinearGradient(
-                    colors: [Color.clear, Color.black.opacity(0.45)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 180)
-                .ignoresSafeArea(edges: .bottom)
-                .allowsHitTesting(false)
+        ZStack {
+            Image("PrismBackground")
+                .resizable()
+                .scaledToFill()
+                .scaleEffect(x: -1, y: -1)
+                .ignoresSafeArea()
+            VStack(spacing: PrismSpacing.md) {
+                Spacer()
+                PrismLogoMark(width: 180, height: 128)
+                Text("Turn impulse into inspiration")
+                    .font(PrismTypography.body(16, weight: .light))
+                    .foregroundStyle(.white)
+                Spacer()
             }
+        }
+        .accessibilityHidden(true)
     }
 
     private var pageDots: some View {
@@ -151,14 +150,5 @@ struct OnboardingFlowView: View {
             errorText = "Could not start local mode. Please try again."
             container.crashReporter.record(error: error, context: "onboarding.demo")
         }
-    }
-}
-
-struct PrismLogoMark: View {
-    var body: some View {
-        Image("PrismMark")
-            .resizable()
-            .scaledToFit()
-            .accessibilityHidden(true)
     }
 }

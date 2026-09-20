@@ -75,7 +75,7 @@ final class AppEnvironment: ObservableObject {
 @MainActor
 final class AppRouter: ObservableObject {
     enum Tab: Hashable {
-        case home, goals, review, moneyStory, settings
+        case home, collections, goals, moneyStory
     }
 
     enum Sheet: Identifiable, Equatable {
@@ -91,6 +91,9 @@ final class AppRouter: ObservableObject {
         case goalDetail(UUID)
         case addProgress(UUID)
         case goalFromCollection(UUID)
+        case settings
+        case collectionSort(UUID)
+        case review(UUID?)
 
         var id: String {
             switch self {
@@ -106,6 +109,9 @@ final class AppRouter: ObservableObject {
             case .goalDetail(let id): return "goalDetail-\(id)"
             case .addProgress(let id): return "progress-\(id)"
             case .goalFromCollection(let id): return "goalFromCollection-\(id)"
+            case .settings: return "settings"
+            case .collectionSort(let id): return "sort-\(id)"
+            case .review(let id): return "review-\(id?.uuidString ?? "all")"
             }
         }
     }
@@ -113,7 +119,6 @@ final class AppRouter: ObservableObject {
     @Published var selectedTab: Tab = .home
     @Published var sheet: Sheet?
     @Published var showOnboarding: Bool = false
-    /// Prefilled when a Share Extension / URL import arrives.
     @Published var captureURLText: String = ""
     @Published var captureTitleHint: String = ""
     @Published var captureImageData: Data?

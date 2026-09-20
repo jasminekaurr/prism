@@ -103,8 +103,10 @@ enum ShareInbox {
     static let appGroupID = "group.com.jasminekaur.prism"
 
     static func store(_ payload: SharePayload) {
-        guard let defaults = UserDefaults(suiteName: appGroupID) else {
-            // App Group may be unavailable until provisioning is configured.
+        // Skip suite access when the App Group container isn't provisioned —
+        // UserDefaults(suiteName:) otherwise logs CFPrefs "kCFPreferencesAnyUser" noise.
+        guard FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil,
+              let defaults = UserDefaults(suiteName: appGroupID) else {
             return
         }
         if let data = try? JSONEncoder().encode(payload) {

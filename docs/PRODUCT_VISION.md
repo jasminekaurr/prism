@@ -1,7 +1,7 @@
-# Prism Product Vision — Goals Era (v1)
+# Prism Product Vision — Recreation IA (v2)
 
 Date: 2026-09-19  
-Status: Active product direction (supersedes impulse-only framing)
+Status: Active product direction (source of truth: `Prism App Screens Recreation/`)
 
 ## Positioning
 
@@ -9,53 +9,65 @@ Status: Active product direction (supersedes impulse-only framing)
 
 Consumer lines:
 
+- Turn impulse into inspiration.
 - Save what inspires you. Work toward what matters.
-- From “I want this” to “I’m making it happen.”
 
 Core loop:
 
-> **Save → Reflect → Prioritize → Set a goal → Make progress → Decide intentionally → Learn**
+> **Save → Sort into collections → Reflect → Review (buy or let go) → Set a goal → Make progress → Learn (Money Story)**
 
-Prism still never connects banks, calculates affordability from income, or dictates choices. Users declare targets, contributions, and priorities. Prism surfaces pace, trade-offs, and patterns.
+Prism never connects banks, calculates affordability from income, or dictates choices. Users declare targets, contributions, and priorities. Prism surfaces pace, trade-offs, and patterns.
+
+## Information architecture
+
+**Tab bar (4):** Home · Collections · Goals · Money Story
+
+| Surface | Role |
+| --- | --- |
+| **Home** | Archive of everything saved — search, filters, masonry cards |
+| **Collections** | Group and sort saves; swipe keep/delete into a collection |
+| **Goals** | Primary + other goals; setup and progress live here |
+| **Money Story** | Weekly / Monthly / Over time narrative of decisions vs goals |
+| **Review** | Flow (not a tab) — Buy Options + Discarded for a collection, reached after sorting |
+| **Settings** | Off-tab, opened from the Home profile control |
+| **Paste anything** | Capture sheet (share extension or +) — link preview stages |
 
 ## Conceptual model
 
 | Concept | Meaning | Example |
 | --- | --- | --- |
-| Aspiration | Something that caught my attention | A TikTok about Japan |
-| Goal | Something I’ve decided to work toward | Visit Japan in April 2027 |
-| Plan | Components required to achieve it | Flights, hotels, food, activities |
-| Contribution | Money or progress added toward it | $250 saved this month / Chose dates |
-| Outcome | What ultimately happened | Completed, changed, paused, abandoned |
+| Aspiration / Save | Something that caught my attention | A reel about convertible sandals |
+| Collection | A place to group and sort saves | Summer Fashion |
+| Goal | Something I’ve decided to work toward | New laptop by March 2027 |
+| Plan | Contribution, milestones, buffer, non-money progress | $191 / month |
+| Contribution | Money or progress added toward a goal | $60 this week |
+| Outcome | What ultimately happened | Completed, paused, abandoned |
 
-Saved items remain **aspirations** until the user taps **Make this a goal**.
+Saves remain aspirations until the user starts a goal (“Worth saving for?”).
 
 ## User journey
 
 ```mermaid
 flowchart TD
-    A["Save inspiration"] --> B["Understand the aspiration"]
-    B --> C{"Does this matter enough?"}
-    C -->|Not yet| D["Keep in a collection"]
-    C -->|Yes| E["Turn it into a goal"]
-    E --> F["Set cost timing and priority"]
-    F --> G["Create milestones"]
-    G --> H["Contribute and track progress"]
-    H --> I{"On track?"}
-    I -->|Yes| J["Continue"]
-    I -->|No| K["Adjust goal or plan"]
-    J --> L["Complete and reflect"]
-    K --> H
+    A["Paste or share a link"] --> B["Home archive"]
+    B --> C["Collections · swipe sort"]
+    C --> D["Review · buy or discard"]
+    B --> E["Item detail · why / feeling"]
+    E --> F{"Worth saving for?"}
+    F -->|Yes| G["Goal setup 1 of 5"]
+    G --> H["Goals dashboard"]
+    H --> I["Money Story"]
+    D --> I
 ```
 
 ## Goal types (MVP support)
 
-- Purchase
-- Experience
-- Travel
+- Purchase / Tech one-time
+- Experience / Event
+- Travel / Trip
 - Project
-- Recurring (frequency progress)
-- Low / no-cost (milestone progress without money)
+- Recurring
+- Low / no-cost
 
 ## Goal priority states
 
@@ -66,30 +78,33 @@ flowchart TD
 | Flexible | Unlimited, not actively funded |
 | Someday | Unlimited |
 
-## Goal setup (required fields)
+## Goal setup (5 steps)
 
-1. What do you want to achieve?
-2. How much will it cost? (optional for low/no-cost)
-3. When do you want it?
-4. How much have you already saved / progressed?
-5. How important is it vs other goals?
-6. Why does this matter? (motivation)
-
-Prism computes remaining + required contribution pace from user-entered numbers only.
+1. Define the goal (name, type, cost, where, date — chips from the save)
+2. Why this matters (motivation list)
+3. Set the target (amount, frequency, buffer, pace preview)
+4. Where it ranks (priority + allocation preview)
+5. Your plan (contribution, milestones, buffer, non-money progress)
 
 ## Home
 
-Lead with the **primary goal** card (progress, remaining, pace, status, Add progress).  
-Secondary: active goals.  
-Below: aspiration feed (existing saves masonry).
+Masonry of saves with search and chips: **All · High priority · Undecided · Videos**.  
+Meta row: save count + “newest first”. Profile opens Settings. Plus / share opens Paste anything.
 
-## Goal-aware decisions
+## Collections + Review
 
-When reviewing a purchase aspiration, show trade-offs against the primary goal / monthly contribution — expose consequence, never dictate.
+- Swipe deck: right = keep in collection, left = delete.
+- After sorting: **Review** shows Buy Options and Discarded rows for that collection.
+
+## Item detail
+
+Portrait media, Bought?, **AI DESCRIPTION** (local mock for MVP), editable tags, “Why do I want this?”, feeling stars, Delete / Save.  
+Optional **Worth saving for?** carry-over into goal setup.
 
 ## Money Story
 
-Explain whether everyday choices reflect declared priorities (contributions, redirected estimates with disclaimer, planning milestones, aspiration vs funding patterns).
+Segmented **Weekly / Monthly / Over time** narrative: headline, metrics, goal progress, attention vs intention, influence by source, how you decided, feelings, trade-offs, next-step CTA.  
+Confirmed vs estimated remain labeled; let-go estimates are never “money saved.”
 
 ## Financial boundary (unchanged)
 
@@ -99,28 +114,14 @@ Explain whether everyday choices reflect declared priorities (contributions, red
 - Let-go estimates are never “money saved”
 - Spending pocket remains an optional comfort guardrail alongside goals
 
-## Implementation slices (this update)
+## AI description
 
-1. Domain + SwiftData for Goal / Milestone / Component / Contribution / aspiration link
-2. Make this a goal setup flow
-3. Home goal dashboard + Add progress
-4. Goal-aware review copy
-5. Money Story goal insights + docs
+**MVP:** local mock copy derived from title, domain, and notes (no network).  
+**Future:** real generation from link / media.
 
-### Deferred
+## Deferred / Future
 
-- Multi-goal monthly allocation editor (show read-only totals first)
-- Automatic plan cost recompute from linked saves (“$4,860 plan”)
-- Full component booking deadlines
+- Real AI description generation
+- Multi-goal monthly allocation editor (read-only preview ships in setup)
 - Cloud sync of goals
-
-## Update: reflection loop (learn + reflect)
-
-Added after the goals slice, to close the "Decide intentionally, Learn" end of the loop. Details and test steps: [HANDOFF_FEATURES.md](HANDOFF_FEATURES.md).
-
-- **Finish and reflect:** completing a goal (any type, including low/no-cost) asks one question, "Was it worth it?", and feeds Money Story.
-- **Redirect on let-go:** after letting go of a save, Prism offers to note it as progress on the focus goal. It records a behavioral note; money is added only if the user types an amount they actually moved. Estimates are never savings.
-- **Purchase check-in:** 30 days after a confirmed purchase, ask "still glad you bought it?" (opt-in notification; the in-app card always works).
-- **Weekly recap:** opt-in Sunday notification with a count only.
-- **Shareable story card:** counts and goal percentage only, never titles or prices.
-- **Goal from a collection (experimental):** a collection becomes one goal whose components are the user's own estimates. This pulls part of the deferred "automatic plan cost from linked saves" item into scope.
+- Missing recreation screen 06 (none in folder)
