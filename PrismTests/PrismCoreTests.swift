@@ -265,3 +265,170 @@ final class GoalPlanningTests: XCTestCase {
         XCTAssertTrue(copy!.contains("Japan"))
     }
 }
+
+// MARK: - Reflection features (regret check-in, goal lifecycle, weekly recap)
+
+private func makeTestItem(
+    status: ItemStatus = .considering,
+    createdAt: Date = .now,
+    checkInAt: Date? = nil,
+    answer: RegretAnswer? = nil
+) -> SavedItem {
+    SavedItem(
+        id: UUID(), userID: UUID(), collectionID: nil, title: "Item", notes: nil, reflection: nil,
+        sourceURL: nil, sourceDomain: nil, merchantName: nil, intent: .want, costSignificance: .small,
+        priority: nil, estimatedPrice: nil, estimatedCurrencyCode: nil,
+        confirmedPurchasePrice: nil, confirmedPurchaseCurrencyCode: nil,
+        status: status, primaryMediaID: nil, notificationsEnabled: false,
+        createdAt: createdAt, updatedAt: createdAt, reviewAt: nil, decidedAt: nil,
+        archivedAt: nil, deletedAt: nil,
+        regretCheckInAt: checkInAt, regretAnswer: answer, regretAnsweredAt: nil
+    )
+}
+
+private func makeTestGoal(
+    type: GoalType = .purchase,
+    priority: GoalPriorityLevel = .active,
+    status: GoalTrackStatus = .onTrack,
+    target: Decimal? = 1000
+) -> PrismGoal {
+    PrismGoal(
+        id: UUID(), userID: UUID(), sourceAspirationID: nil, title: "Goal", goalDescription: nil,
+        type: type, motivation: .joy, customMotivation: nil, targetAmount: target,
+        currencyCode: "USD", amountSaved: 0,
+        targetDate: Calendar.current.date(byAdding: .month, value: 6, to: .now),
+        contributionFrequency: .monthly, priority: priority, includesBuffer: false,
+        trackStatus: status, createdAt: .now, updatedAt: .now, completedAt: nil, pausedAt: nil
+    )
+}
+
+final class RegretCheckInTests: XCTestCase {
+    func testBuySchedulesCheckIn() throws {
+        let item = makeTestItem(status: .considering)
+        let now = Date(timeIntervalSince1970: 2_000_000)
+        let result = try DecisionService().applyBuy(
+            item: item, userID: item.userID, purchaseConfirmed: true,
+            confirmedPrice: 20, currencyCode: "USD", now: now,
+            checkInInterval: RegretCheckIn.defaultInterval
+        )
+        XCTAssertEqual(result.item.regretCheckInAt, now.addingTimeInterval(30 * 24 * 3600))
+        XCTAssertNil(result.item.regretAnswer)
+    }
+
+    func testBuyNotConfirmedDoesNotSchedule() throws {
+        let item = makeTestItem(status: .considering)
+        let result = try DecisionService().applyBuy(
+            item: item, userID: item.userID, purchaseConfirmed: false,
+            confirmedPrice: nil, currencyCode: nil
+        )
+        XCTAssertNil(result.item.regretCheckInAt)
+    }
+
+    func testUndoBuyClearsCheckIn() throws {
+        let item = makeTestItem(status: .considering)
+        let service = DecisionService()
+        let bought = try service.applyBuy(
+            item: item, userID: item.userID, purchaseConfirmed: true,
+            confirmedPrice: 20, currencyCode: "USD"
+        )
+        let undone = try service.undo(item: bought.item, lastEvent: bought.event, userID: item.userID)
+        XCTAssertNil(undone.item.regretCheckInAt)
+        XCTAssertNil(undone.item.regretAnswer)
+    }
+
+    func testDueFilter() {
+        let now = Date(timeIntervalSince1970: 3_000_000)
+        let due = makeTestItem(status: .purchased, checkInAt: now.addingTimeInterval(-60))
+        let future = makeTestItem(status: .purchased, checkInAt: now.addingTimeInterval(3600))
+        let answered = makeTestItem(status: .purchased, checkInAt: now.addingTimeInterval(-60), answer: .glad)
+        let notPurchased = makeTestItem(status: .letGo, checkInAt: now.addingTimeInterval(-60))
+        let result = RegretCheckIn.due(items: [due, future, answered, notPurchased], now: now)
+        XCTAssertEqual(result.map(\.id), [due.id])
+    }
+
+    func testMoneyStoryCountsAnswers() {
+        let glad = makeTestItem(status: .purchased, answer: .glad)
+        let regret = makeTestItem(status: .purchased, answer: .regret)
+        let unanswered = makeTestItem(status: .purchased)
+        let snap = MoneyStoryService().snapshot(items: [glad, regret, unanswered])
+        XCTAssertEqual(snap.regretGlad, 1)
+        XCTAssertEqual(snap.regretRegret, 1)
+        XCTAssertEqual(snap.regretAnswered, 2)
+    }
+
+    func testMockSchedulerRecordsRegretCalls() async {
+        let mock = MockNotificationScheduler()
+        let id = UUID()
+        await mock.scheduleRegretCheckIn(itemID: id, at: .now.addingTimeInterval(60))
+        await mock.cancelRegretCheckIn(itemID: id)
+        let scheduled = await mock.regretScheduled
+        let cancelled = await mock.regretCancelled
+        XCTAssertEqual(scheduled, [id])
+        XCTAssertEqual(cancelled, [id])
+    }
+}
+
+final class GoalLifecycleTests: XCTestCase {
+    func testLowCostGoalCanBeMarkedComplete() {
+        let goal = makeTestGoal(type: .lowCost, target: nil)
+        let done = GoalPlanningService().markComplete(goal)
+        XCTAssertEqual(done.trackStatus, .completed)
+        XCTAssertNotNil(done.completedAt)
+    }
+
+    func testFocusGoalPrefersPrimaryAndSkipsPausedOrDone() {
+        let primary = makeTestGoal(priority: .primary)
+        let active = makeTestGoal(priority: .active)
+        let pausedPrimary = makeTestGoal(priority: .primary, status: .paused)
+        let service = GoalPlanningService()
+        XCTAssertEqual(service.focusGoal(in: [active, primary])?.id, primary.id)
+        XCTAssertEqual(service.focusGoal(in: [pausedPrimary, active])?.id, active.id)
+        XCTAssertNil(service.focusGoal(in: [makeTestGoal(priority: .someday)]))
+        XCTAssertNil(service.focusGoal(in: [makeTestGoal(status: .completed)]))
+    }
+
+    func testRecordOutcomeTrimsNote() {
+        let goal = makeTestGoal()
+        let service = GoalPlanningService()
+        let withNote = service.recordOutcome(goal, rating: .worthIt, note: "  Loved it  ")
+        XCTAssertEqual(withNote.outcomeRating, .worthIt)
+        XCTAssertEqual(withNote.outcomeNote, "Loved it")
+        let blank = service.recordOutcome(goal, rating: .mixed, note: "   ")
+        XCTAssertNil(blank.outcomeNote)
+    }
+
+    func testPauseAndResume() {
+        let service = GoalPlanningService()
+        let paused = service.pause(makeTestGoal())
+        XCTAssertEqual(paused.trackStatus, .paused)
+        XCTAssertNotNil(paused.pausedAt)
+        let resumed = service.resume(paused)
+        XCTAssertNil(resumed.pausedAt)
+        XCTAssertNotEqual(resumed.trackStatus, .paused)
+    }
+}
+
+final class RecapPlannerTests: XCTestCase {
+    func testNextRecapIsFutureSundayAtSixPM() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let now = calendar.date(from: DateComponents(year: 2026, month: 9, day: 16, hour: 9))! // a Wednesday
+        let date = RecapPlanner.nextRecapDate(after: now, calendar: calendar)!
+        XCTAssertGreaterThan(date, now)
+        XCTAssertEqual(calendar.component(.weekday, from: date), 1)
+        XCTAssertEqual(calendar.component(.hour, from: date), 18)
+    }
+
+    func testPausedCountOnlyLastSevenDays() {
+        let now = Date(timeIntervalSince1970: 5_000_000)
+        let recent = makeTestItem(createdAt: now.addingTimeInterval(-2 * 24 * 3600))
+        let old = makeTestItem(createdAt: now.addingTimeInterval(-10 * 24 * 3600))
+        XCTAssertEqual(RecapPlanner.pausedCount(items: [recent, old], now: now), 1)
+    }
+
+    func testBodyNeverContainsItemDetails() {
+        XCTAssertTrue(RecapPlanner.body(pausedCount: 3).contains("3 impulses"))
+        XCTAssertTrue(RecapPlanner.body(pausedCount: 1).contains("1 impulse "))
+        XCTAssertFalse(RecapPlanner.body(pausedCount: 0).isEmpty)
+    }
+}

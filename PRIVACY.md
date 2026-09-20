@@ -14,7 +14,9 @@ Prism does **not** collect contacts, location, banking data, or browsing history
 
 ## Analytics (optional)
 
-Events only: `onboarding_completed`, `item_saved`, `review_completed`, `item_purchased_confirmed`, `item_let_go`, `notification_enabled`.
+Events only: `onboarding_completed`, `item_saved`, `review_completed`, `item_purchased_confirmed`, `item_let_go`, `notification_enabled`, `goal_created`, `goal_contribution_added`, `goal_completed`, `goal_outcome_recorded`, `regret_check_in_answered`, `weekly_recap_enabled`, `redirect_nudge_accepted`, `goal_from_collection_created`.
+
+Notifications (weekly recap, purchase check-in, cooling-off) never include item titles, goal titles, or prices. The weekly recap shows only a count. Shared Money Story images contain counts and a goal percentage only.
 
 Never: item title, reflection, URL, price, per-item feelings, media, merchant, PII.
 

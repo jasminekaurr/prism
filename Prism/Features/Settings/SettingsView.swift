@@ -12,6 +12,9 @@ struct SettingsView: View {
     @State private var pocketPaused = false
     @State private var coolingEnabled = true
     @State private var notificationsEnabled = false
+    @State private var weeklyRecapEnabled = false
+    @State private var regretCheckInsEnabled = false
+    @AppStorage(RegretCheckIn.demoDefaultsKey) private var shortRegretDemo = false
     @State private var exportURL: URL?
     @State private var showWipeConfirm = false
     @State private var statusMessage: String?
@@ -66,6 +69,21 @@ struct SettingsView: View {
                         }
                         Text("Reminders say an item is ready — not the item title.")
                             .font(PrismTypography.caption())
+                    }
+
+                    Section("Reflection nudges") {
+                        Toggle("Weekly recap", isOn: $weeklyRecapEnabled)
+                            .accessibilityIdentifier("settings.weeklyRecap")
+                        Toggle("Purchase check-ins", isOn: $regretCheckInsEnabled)
+                            .accessibilityIdentifier("settings.regretCheckIns")
+                        Button("Save nudges") { Task { await saveNudges() } }
+                            .accessibilityIdentifier("settings.nudges.save")
+                        Text("Off by default. Notifications never include item names or prices. The recap shows only a count.")
+                            .font(.caption)
+                        #if DEBUG
+                        Toggle("Demo: check-in 1 minute after a purchase", isOn: $shortRegretDemo)
+                            .accessibilityIdentifier("settings.demo.shortRegret")
+                        #endif
                     }
 
                     Section("Privacy & security") {
@@ -134,7 +152,26 @@ struct SettingsView: View {
             }
             coolingEnabled = profile.defaultCoolingPeriods.enabled
             notificationsEnabled = profile.notificationPreferences.coolingOffRemindersEnabled
+            weeklyRecapEnabled = profile.notificationPreferences.isWeeklyRecapOn
+            regretCheckInsEnabled = profile.notificationPreferences.isRegretCheckInOn
         }
+    }
+
+    private func saveNudges() async {
+        guard var profile = environment.profile else { return }
+        if (weeklyRecapEnabled || regretCheckInsEnabled) && !profile.notificationPreferences.permissionAsked {
+            _ = await container.notificationScheduler.requestPermission()
+            profile.notificationPreferences.permissionAsked = true
+        }
+        profile.notificationPreferences.weeklyRecapEnabled = weeklyRecapEnabled
+        profile.notificationPreferences.regretCheckInsEnabled = regretCheckInsEnabled
+        try? await container.profileRepository.save(profile)
+        environment.profile = profile
+        if weeklyRecapEnabled {
+            container.analytics.track(.weeklyRecapEnabled)
+        }
+        await environment.refreshWeeklyRecap()
+        statusMessage = "Nudge preferences saved."
     }
 
     private func savePocket() async {
@@ -193,6 +230,7 @@ struct SettingsView: View {
 
     private func wipe() async {
         try? await container.profileRepository.deleteAllLocalData()
+        await container.notificationScheduler.cancelWeeklyRecap()
         environment.profile = nil
         statusMessage = "Local data deleted."
     }

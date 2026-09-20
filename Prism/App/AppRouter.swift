@@ -26,13 +26,7 @@ struct RootView: View {
                 router.showOnboarding = true
             }
             await container.notificationScheduler.reconcilePending()
-            await importPendingShareIfNeeded()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            Task { await importPendingShareIfNeeded() }
-        }
-        .onOpenURL { url in
-            Task { await handleOpenURL(url) }
+            await environment.refreshWeeklyRecap()
         }
         .sheet(item: $router.sheet) { sheet in
             sheetContent(sheet)
@@ -96,7 +90,42 @@ struct RootView: View {
             GoalDetailView(goalID: id)
         case .addProgress(let id):
             AddProgressView(goalID: id)
+        case .goalFromCollection(let id):
+            GoalFromCollectionLoader(collectionID: id)
         }
+    }
+}
+
+/// Loads a collection and its open aspirations before presenting goal setup.
+struct GoalFromCollectionLoader: View {
+    let collectionID: UUID
+    @EnvironmentObject private var environment: AppEnvironment
+    @EnvironmentObject private var container: DependencyContainer
+    @State private var collection: PrismCollection?
+    @State private var items: [SavedItem] = []
+    @State private var loaded = false
+
+    var body: some View {
+        Group {
+            if !loaded {
+                ProgressView()
+                    .task { await load() }
+            } else {
+                GoalSetupFlowView(sourceItem: nil, sourceCollection: collection, collectionItems: items)
+            }
+        }
+    }
+
+    private func load() async {
+        collection = try? await container.collectionRepository.fetch(id: collectionID)
+        if let userID = environment.profile?.id {
+            let all = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
+            items = all.filter {
+                $0.collectionID == collectionID
+                    && ($0.status == .considering || $0.status == .readyForReview)
+            }
+        }
+        loaded = true
     }
 }
 

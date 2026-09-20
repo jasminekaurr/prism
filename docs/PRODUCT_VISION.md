@@ -113,3 +113,14 @@ Explain whether everyday choices reflect declared priorities (contributions, red
 - Automatic plan cost recompute from linked saves (“$4,860 plan”)
 - Full component booking deadlines
 - Cloud sync of goals
+
+## Update: reflection loop (learn + reflect)
+
+Added after the goals slice, to close the "Decide intentionally, Learn" end of the loop. Details and test steps: [HANDOFF_FEATURES.md](HANDOFF_FEATURES.md).
+
+- **Finish and reflect:** completing a goal (any type, including low/no-cost) asks one question, "Was it worth it?", and feeds Money Story.
+- **Redirect on let-go:** after letting go of a save, Prism offers to note it as progress on the focus goal. It records a behavioral note; money is added only if the user types an amount they actually moved. Estimates are never savings.
+- **Purchase check-in:** 30 days after a confirmed purchase, ask "still glad you bought it?" (opt-in notification; the in-app card always works).
+- **Weekly recap:** opt-in Sunday notification with a count only.
+- **Shareable story card:** counts and goal percentage only, never titles or prices.
+- **Goal from a collection (experimental):** a collection becomes one goal whose components are the user's own estimates. This pulls part of the deferred "automatic plan cost from linked saves" item into scope.

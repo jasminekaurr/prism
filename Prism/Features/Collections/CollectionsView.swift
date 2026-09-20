@@ -45,6 +45,14 @@ struct CollectionsView: View {
                                                 }
                                             }
                                             Spacer()
+                                            if itemCounts[collection.id, default: 0] > 0 {
+                                                Button("Make a goal") {
+                                                    router.sheet = .goalFromCollection(collection.id)
+                                                }
+                                                .font(PrismTypography.caption())
+                                                .buttonStyle(.bordered)
+                                                .accessibilityIdentifier("collections.makeGoal.\(collection.id.uuidString)")
+                                            }
                                         }
                                     }
                                     .accessibilityIdentifier("collections.item.\(collection.id.uuidString)")

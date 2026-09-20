@@ -3,7 +3,7 @@
 
 name: Prism
 options:
-  bundleIdPrefix: com.prism
+  bundleIdPrefix: com.jasminekaur
   deploymentTarget:
     iOS: "17.0"
   developmentLanguage: en
@@ -88,6 +88,7 @@ targets:
         CODE_SIGN_ENTITLEMENTS: PrismShareExtension/PrismShareExtension.entitlements
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: "84UWSJTPV6"
+        SKIP_INSTALL: YES
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
 
   PrismTests:
