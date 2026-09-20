@@ -181,10 +181,10 @@ enum PrismHaptics {
 }
 
 enum PrismBackdrop {
-    /// Uniform Gaussian blur applied to the app-wide background so text stays readable.
-    static let blurRadius: CGFloat = 80
-    /// Slight darkening on top of the blurred art (0 to disable).
-    static let scrimOpacity: Double = 0.18
+    /// Figma uses frost over sharp art, not a heavy Gaussian on the image.
+    static let blurRadius: CGFloat = 0
+    /// Keep very light so cyan/magenta streaks remain readable on device.
+    static let scrimOpacity: Double = 0.08
 }
 
 enum PrismMaterials {

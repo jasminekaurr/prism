@@ -35,10 +35,14 @@ targets:
         excludes:
           - "**/.DS_Store"
           - "**/Resources/**"
-    resources:
+      # Force asset catalog + privacy + launch into Resources build phase (XcodeGen 2.46
+      # was omitting a PBXResourcesBuildPhase when only `resources:` was used).
       - path: Prism/Resources/Assets.xcassets
+        buildPhase: resources
       - path: Prism/Resources/PrivacyInfo.xcprivacy
+        buildPhase: resources
       - path: Prism/Resources/LaunchScreen.storyboard
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism
@@ -49,10 +53,18 @@ targets:
         INFOPLIST_KEY_NSCameraUsageDescription: Prism uses the camera so you can save items you want to revisit later.
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Prism uses your photo library so you can save images and screenshots of things you want to revisit.
         INFOPLIST_KEY_NSFaceIDUsageDescription: Prism can lock the app with Face ID to keep your reflections private.
+        CODE_SIGN_ENTITLEMENTS: Prism/Prism.entitlements
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: ""
+        DEVELOPMENT_TEAM: "84UWSJTPV6"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
+    info:
+      path: Prism/Info.plist
+      properties:
+        CFBundleURLTypes:
+          - CFBundleURLName: com.jasminekaur.prism
+            CFBundleURLSchemes:
+              - prism
     dependencies:
       - target: PrismShareExtension
         embed: true
@@ -73,9 +85,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.jasminekaur.prism.share
         PRODUCT_NAME: PrismShareExtension
         INFOPLIST_FILE: PrismShareExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PrismShareExtension/PrismShareExtension.entitlements
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: ""
-        SKIP_INSTALL: YES
+        DEVELOPMENT_TEAM: "84UWSJTPV6"
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
 
   PrismTests:

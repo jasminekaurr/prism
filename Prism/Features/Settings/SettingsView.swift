@@ -32,6 +32,7 @@ struct SettingsView: View {
                             Text("Local / demo mode — data is not synced to the cloud.")
                                 .font(PrismTypography.caption())
                                 .foregroundStyle(PrismColors.textSecondary)
+                                .listRowBackground(Color.clear)
                         }
                     }
 

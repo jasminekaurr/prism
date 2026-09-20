@@ -1,4 +1,4 @@
-// Summary: Review hub, swipe deck, and buy / keep considering / let go decision sheets with undo.
+// Summary: Review hub (Figma lists) and swipe deck with Buy / Keep considering / Let go.
 
 import SwiftUI
 
@@ -13,6 +13,7 @@ struct ReviewHubView: View {
     @State private var purchased: [SavedItem] = []
     @State private var showDeck = false
     @State private var undoBanner: String?
+    @State private var collections: [PrismCollection] = []
 
     var body: some View {
         NavigationStack {
@@ -20,11 +21,7 @@ struct ReviewHubView: View {
                 PrismAtmosphericBackground()
                 ScrollView {
                     VStack(alignment: .leading, spacing: PrismSpacing.lg) {
-                        HStack {
-                            Spacer()
-                            PrismBrandMark(size: 18)
-                            Spacer()
-                        }
+                        PrismTopBar()
                         Text("Review")
                             .font(PrismTypography.title())
                             .frame(maxWidth: .infinity)
@@ -41,9 +38,10 @@ struct ReviewHubView: View {
                                     .accessibilityIdentifier("review.undo")
                                 }
                             }
+                            .padding(.horizontal, PrismSpacing.md)
                         }
 
-                        if ready.isEmpty && considering.isEmpty {
+                        if ready.isEmpty && considering.isEmpty && purchased.isEmpty && letGo.isEmpty {
                             EmptyStateView(
                                 title: "Nothing to revisit yet",
                                 message: "When a cooling-off period ends, items will appear here. You can also open anything you’re still considering."
@@ -52,28 +50,31 @@ struct ReviewHubView: View {
                         }
 
                         if !ready.isEmpty {
-                            section(title: "Ready to revisit", items: ready)
+                            carousel(title: "Ready to revisit", items: ready)
                             PrismPrimaryButton(title: "Start review") {
                                 showDeck = true
                             }
+                            .padding(.horizontal, PrismSpacing.md)
                             .accessibilityIdentifier("review.start")
                         }
 
                         if !considering.isEmpty {
-                            section(title: "Still considering", items: considering)
+                            carousel(title: "Still considering", items: considering)
                         }
 
                         if !purchased.isEmpty {
-                            section(title: "Purchased", items: purchased)
+                            carousel(title: "Purchased", items: purchased)
                         }
 
                         if !letGo.isEmpty {
-                            section(title: "Let go", items: letGo)
+                            carousel(title: "Let go", items: letGo)
                         }
                     }
-                    .padding()
+                    .padding(.bottom, PrismSpacing.xl)
                 }
+                .prismTransparentBackground()
             }
+            .prismClearChrome()
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showDeck) {
                 ReviewDeckView(items: ready.isEmpty ? considering : ready) { message in
@@ -88,28 +89,36 @@ struct ReviewHubView: View {
         }
     }
 
-    private func section(title: String, items: [SavedItem]) -> some View {
+    private func carousel(title: String, items: [SavedItem]) -> some View {
         VStack(alignment: .leading, spacing: PrismSpacing.sm) {
-            Text(title).font(PrismTypography.headline())
+            Text(title)
+                .font(PrismTypography.headline())
+                .padding(.horizontal, PrismSpacing.md)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: PrismSpacing.sm) {
+                HStack(spacing: 16) {
                     ForEach(items) { item in
                         Button {
                             router.sheet = .itemDetail(item.id)
                         } label: {
-                            SavedItemCard(item: item, collectionName: nil)
+                            AspirationItemCard(item: item, collectionName: collectionName(for: item))
                                 .frame(width: 178)
                         }
                         .buttonStyle(.plain)
                     }
                 }
+                .padding(.horizontal, PrismSpacing.md)
             }
         }
+    }
+
+    private func collectionName(for item: SavedItem) -> String? {
+        collections.first { $0.id == item.collectionID }?.name
     }
 
     private func reload() async {
         guard let userID = environment.profile?.id else { return }
         let all = (try? await container.savedItemRepository.fetchAll(userID: userID)) ?? []
+        collections = (try? await container.collectionRepository.fetchAll(userID: userID)) ?? []
         let due = (try? await container.savedItemRepository.fetchReadyForReview(userID: userID, asOf: .now)) ?? []
         ready = due
         let dueIDs = Set(due.map(\.id))
@@ -148,6 +157,7 @@ struct ReviewDeckView: View {
 
     @State private var index = 0
     @State private var offset: CGSize = .zero
+    @State private var collections: [PrismCollection] = []
 
     var body: some View {
         NavigationStack {
@@ -157,58 +167,92 @@ struct ReviewDeckView: View {
                     EmptyStateView(title: "You’re caught up", message: "No items in this review queue.")
                 } else if index < items.count {
                     let item = items[index]
-                    VStack(spacing: PrismSpacing.lg) {
-                        Text(item.title).font(PrismTypography.title(22))
-                        SavedItemCard(item: item, collectionName: nil)
-                            .frame(maxWidth: 300)
-                            .offset(offset)
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { offset = $0.translation }
-                                    .onEnded { value in
-                                        if value.translation.width < -120 {
-                                            Task { await letGo(item) }
-                                        } else if value.translation.width > 120 {
-                                            router.sheet = .buyConfirmation(item.id)
-                                        } else {
-                                            withAnimation { offset = .zero }
-                                        }
-                                    }
-                            )
-
-                        HStack(spacing: PrismSpacing.xl) {
-                            Button {
-                                Task { await letGo(item) }
-                            } label: {
-                                Image(systemName: "trash")
-                                    .frame(width: 44, height: 44)
-                                    .background(Circle().stroke(PrismColors.glassStroke))
-                            }
-                            .accessibilityLabel("Let go")
-                            .accessibilityIdentifier("review.letGo")
-
-                            Button {
-                                router.sheet = .keepConsidering(item.id)
-                            } label: {
-                                Text("Keep considering")
-                                    .font(PrismTypography.caption())
-                                    .padding()
-                                    .background(Capsule().stroke(PrismColors.glassStroke))
-                            }
-                            .accessibilityIdentifier("review.keep")
-
-                            Button {
-                                router.sheet = .buyConfirmation(item.id)
-                            } label: {
-                                Image(systemName: "heart.fill")
-                                    .frame(width: 44, height: 44)
-                                    .background(Circle().fill(PrismColors.violet.opacity(0.6)))
-                            }
-                            .accessibilityLabel("Buy")
-                            .accessibilityIdentifier("review.buy")
+                    VStack(spacing: PrismSpacing.md) {
+                        PrismTopBar()
+                        if let name = collectionName(for: item) {
+                            Text(name.uppercased())
+                                .font(PrismTypography.micro())
+                                .tracking(1.2)
+                                .foregroundStyle(PrismColors.textTertiary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, PrismSpacing.md)
+                            Text(name)
+                                .font(PrismTypography.headline())
+                                .padding(.horizontal, PrismSpacing.md)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(10)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.white.opacity(0.12))
+                                }
+                                .padding(.horizontal, PrismSpacing.md)
                         }
+
+                        ZStack {
+                            // Stacked cards behind
+                            AspirationMediaView(item: item, height: 420, cornerRadius: 20)
+                                .frame(width: 260)
+                                .rotationEffect(.degrees(-6))
+                                .offset(x: -20, y: 8)
+                                .opacity(0.55)
+                            AspirationMediaView(item: item, height: 442, cornerRadius: 20)
+                                .frame(width: 274)
+                                .offset(offset)
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { offset = $0.translation }
+                                        .onEnded { value in
+                                            if value.translation.width < -120 {
+                                                Task { await letGo(item) }
+                                            } else if value.translation.width > 120 {
+                                                router.sheet = .buyConfirmation(item.id)
+                                            } else {
+                                                withAnimation { offset = .zero }
+                                            }
+                                        }
+                                )
+
+                            HStack {
+                                Button {
+                                    Task { await letGo(item) }
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .foregroundStyle(.white)
+                                        .frame(width: 36, height: 36)
+                                        .background(Circle().fill(Color.black.opacity(0.45)))
+                                }
+                                .accessibilityLabel("Let go")
+                                .accessibilityIdentifier("review.letGo")
+                                Spacer()
+                                Button {
+                                    router.sheet = .buyConfirmation(item.id)
+                                } label: {
+                                    Image(systemName: "heart.fill")
+                                        .foregroundStyle(.white)
+                                        .frame(width: 40, height: 40)
+                                        .background(Circle().fill(PrismColors.violet.opacity(0.75)))
+                                }
+                                .accessibilityLabel("Buy")
+                                .accessibilityIdentifier("review.buy")
+                            }
+                            .padding(.horizontal, PrismSpacing.lg)
+                        }
+                        .padding(.top, PrismSpacing.sm)
+
+                        Button {
+                            router.sheet = .keepConsidering(item.id)
+                        } label: {
+                            Text("Keep considering")
+                                .font(PrismTypography.headline())
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, PrismSpacing.lg)
+                                .padding(.vertical, 10)
+                                .background(Capsule().fill(Color.black.opacity(0.55)))
+                        }
+                        .accessibilityIdentifier("review.keep")
+
+                        Spacer(minLength: 0)
                     }
-                    .padding()
                 } else {
                     VStack {
                         Text("Decision made. Prism will add this to your story.")
@@ -224,15 +268,21 @@ struct ReviewDeckView: View {
                     Button("Close") { dismiss() }
                 }
             }
+            .task {
+                if let userID = environment.profile?.id {
+                    collections = (try? await container.collectionRepository.fetchAll(userID: userID)) ?? []
+                }
+            }
             .onChange(of: router.sheet) { _, new in
-                // After buy/keep sheets dismiss, advance
                 if new == nil {
-                    Task {
-                        await reloadAdvance()
-                    }
+                    Task { await reloadAdvance() }
                 }
             }
         }
+    }
+
+    private func collectionName(for item: SavedItem) -> String? {
+        collections.first { $0.id == item.collectionID }?.name
     }
 
     private func letGo(_ item: SavedItem) async {
@@ -254,7 +304,6 @@ struct ReviewDeckView: View {
 
     private func reloadAdvance() async {
         offset = .zero
-        // If current item was decided via sheet, move forward
         if index < items.count {
             let current = items[index]
             if let updated = try? await container.savedItemRepository.fetch(id: current.id),

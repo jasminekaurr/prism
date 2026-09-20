@@ -35,7 +35,11 @@ final class PrismUITests: XCTestCase {
         app.launch()
         completeOnboardingIfNeeded(app)
 
-        app.tabBars.buttons["Collections"].tap()
+        // Collections live under Home → Collections segment
+        let collectionsSegment = app.buttons["home.segment.collections"]
+        if collectionsSegment.waitForExistence(timeout: 5) {
+            collectionsSegment.tap()
+        }
         let create = app.buttons["collections.create"]
         if create.waitForExistence(timeout: 5) {
             create.tap()
@@ -47,7 +51,7 @@ final class PrismUITests: XCTestCase {
             }
         }
 
-        app.tabBars.buttons["Home"].tap()
+        app.buttons["home.segment.all"].tap()
         let add = app.buttons["home.add"]
         XCTAssertTrue(add.waitForExistence(timeout: 5))
         add.tap()

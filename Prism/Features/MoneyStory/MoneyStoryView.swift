@@ -1,4 +1,4 @@
-// Summary: Money Story dashboard — spending pocket, confirmed spend, patterns; never “money saved.”
+// Summary: Money Story — Figma glass snapshot + bar chart; product metrics (pocket, confirmed, let-go).
 
 import SwiftUI
 
@@ -27,11 +27,7 @@ struct MoneyStoryView: View {
                 PrismAtmosphericBackground()
                 ScrollView {
                     VStack(alignment: .leading, spacing: PrismSpacing.lg) {
-                        HStack {
-                            Spacer()
-                            PrismBrandMark(size: 18)
-                            Spacer()
-                        }
+                        PrismTopBar()
                         Text("Your Money Story")
                             .font(PrismTypography.title())
                             .frame(maxWidth: .infinity)
@@ -43,11 +39,17 @@ struct MoneyStoryView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+                        .padding(.horizontal, PrismSpacing.md)
                         .onChange(of: filter) { _, _ in
                             Task { await reload() }
                         }
 
+                        snapshotHero
+                            .padding(.horizontal, PrismSpacing.md)
+
                         pocketCard
+                            .padding(.horizontal, PrismSpacing.md)
+
                         if let primaryGoalLine {
                             GlassCard {
                                 SectionMicroLabel(text: "Priorities")
@@ -55,21 +57,25 @@ struct MoneyStoryView: View {
                                     .font(PrismTypography.body())
                                     .foregroundStyle(PrismColors.textSecondary)
                             }
+                            .padding(.horizontal, PrismSpacing.md)
                             .accessibilityIdentifier("moneyStory.goalInsight")
                         }
-                        snapshotCard
+
                         patternsCard
+                            .padding(.horizontal, PrismSpacing.md)
 
                         if !letGoItems.isEmpty {
                             VStack(alignment: .leading, spacing: PrismSpacing.sm) {
                                 Text("Let go").font(PrismTypography.headline())
+                                    .padding(.horizontal, PrismSpacing.md)
                                 ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack {
+                                    HStack(spacing: 16) {
                                         ForEach(letGoItems.prefix(10)) { item in
-                                            SavedItemCard(item: item, collectionName: nil)
+                                            AspirationItemCard(item: item, collectionName: nil)
                                                 .frame(width: 178)
                                         }
                                     }
+                                    .padding(.horizontal, PrismSpacing.md)
                                 }
                             }
                         }
@@ -82,12 +88,104 @@ struct MoneyStoryView: View {
                             .accessibilityIdentifier("moneyStory.empty")
                         }
                     }
-                    .padding()
+                    .padding(.bottom, PrismSpacing.xl)
                 }
+                .prismTransparentBackground()
             }
+            .prismClearChrome()
             .toolbar(.hidden, for: .navigationBar)
         }
         .task { await reload() }
+    }
+
+    /// Figma-style glass snapshot card with confirmed spend + simple bar chart (product metrics only).
+    private var snapshotHero: some View {
+        GlassCard(padding: PrismSpacing.md, cornerRadius: 20) {
+            VStack(alignment: .leading, spacing: PrismSpacing.md) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Confirmed spend")
+                            .font(PrismTypography.headline())
+                        Text(CurrencyFormatting.string(from: snapshot.confirmedAmountSpent, currencyCode: pocket.currencyCode))
+                            .font(PrismTypography.title(32))
+                            .accessibilityIdentifier("moneyStory.confirmedSpend")
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Paused")
+                            .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.textSecondary)
+                        Text("\(snapshot.impulsesPaused)")
+                            .font(PrismTypography.title(22))
+                    }
+                }
+
+                MoneyStoryBarChart(values: chartValues)
+                    .frame(height: 110)
+
+                HStack {
+                    metricChip("Bought", "\(snapshot.purchasesConfirmed)")
+                    metricChip("Let go", "\(snapshot.itemsLetGo)")
+                    metricChip("Considering", "\(snapshot.itemsStillConsidering)")
+                }
+
+                if snapshot.purchasesMissingPrice > 0 {
+                    Text("Based on \(snapshot.confirmedSpendSampleSize) of \(snapshot.purchasesConfirmed) purchases with a recorded price.")
+                        .font(PrismTypography.caption())
+                        .foregroundStyle(PrismColors.textTertiary)
+                }
+
+                if let estimated = snapshot.estimatedValueOfItemsLetGo {
+                    HStack {
+                        Text("Estimated value of items let go")
+                            .font(PrismTypography.caption())
+                            .foregroundStyle(PrismColors.textSecondary)
+                        Spacer()
+                        Text(CurrencyFormatting.string(from: estimated, currencyCode: pocket.currencyCode))
+                            .font(PrismTypography.caption())
+                        Button {
+                            router.sheet = .estimatedLetGoInfo
+                        } label: {
+                            Image(systemName: "info.circle")
+                        }
+                        .accessibilityLabel("About estimated let go value")
+                    }
+                }
+
+                if !insight.isEmpty {
+                    Text(insight)
+                        .font(PrismTypography.body())
+                        .foregroundStyle(PrismColors.textSecondary)
+                        .accessibilityIdentifier("moneyStory.insight")
+                }
+            }
+        }
+    }
+
+    private var chartValues: [CGFloat] {
+        // Relative bars from product counts (not bank category spend).
+        let raw: [CGFloat] = [
+            CGFloat(snapshot.impulsesPaused),
+            CGFloat(snapshot.itemsStillConsidering),
+            CGFloat(snapshot.purchasesConfirmed),
+            CGFloat(snapshot.itemsLetGo),
+            CGFloat(snapshot.confirmedSpendSampleSize),
+            CGFloat(max(snapshot.purchasesMissingPrice, 1)),
+            CGFloat(max(Int(truncating: snapshot.confirmedAmountSpent as NSDecimalNumber) % 17, 3))
+        ]
+        let peak = max(raw.max() ?? 1, 1)
+        return raw.map { max($0 / peak, 0.08) }
+    }
+
+    private func metricChip(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(PrismTypography.micro())
+                .foregroundStyle(PrismColors.textTertiary)
+            Text(value)
+                .font(PrismTypography.headline())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var pocketCard: some View {
@@ -122,51 +220,6 @@ struct MoneyStoryView: View {
         }
     }
 
-    private var snapshotCard: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: PrismSpacing.sm) {
-                Text("Snapshot").font(PrismTypography.headline())
-                metric("Purchases confirmed", "\(snapshot.purchasesConfirmed)")
-                metric(
-                    "Confirmed amount spent",
-                    CurrencyFormatting.string(from: snapshot.confirmedAmountSpent, currencyCode: pocket.currencyCode)
-                )
-                if snapshot.purchasesMissingPrice > 0 {
-                    Text("Based on \(snapshot.confirmedSpendSampleSize) of \(snapshot.purchasesConfirmed) purchases with a recorded price.")
-                        .font(PrismTypography.caption())
-                        .foregroundStyle(PrismColors.textTertiary)
-                }
-                metric("Items let go", "\(snapshot.itemsLetGo)")
-                metric("Still considering", "\(snapshot.itemsStillConsidering)")
-                metric("Impulses paused", "\(snapshot.impulsesPaused)")
-                if let avg = snapshot.averageHoursToDecision {
-                    metric("Avg. hours to decide", String(format: "%.0f", avg))
-                }
-                if let estimated = snapshot.estimatedValueOfItemsLetGo {
-                    HStack {
-                        metric(
-                            "Estimated value of items let go",
-                            CurrencyFormatting.string(from: estimated, currencyCode: pocket.currencyCode)
-                        )
-                        Button {
-                            router.sheet = .estimatedLetGoInfo
-                        } label: {
-                            Image(systemName: "info.circle")
-                        }
-                        .accessibilityLabel("About estimated let go value")
-                    }
-                }
-                if !insight.isEmpty {
-                    Text(insight)
-                        .font(PrismTypography.body())
-                        .foregroundStyle(PrismColors.textSecondary)
-                        .padding(.top, 4)
-                        .accessibilityIdentifier("moneyStory.insight")
-                }
-            }
-        }
-    }
-
     private var patternsCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 8) {
@@ -185,15 +238,6 @@ struct MoneyStoryView: View {
                 }
             }
         }
-    }
-
-    private func metric(_ title: String, _ value: String) -> some View {
-        HStack {
-            Text(title).foregroundStyle(PrismColors.textSecondary)
-            Spacer()
-            Text(value).font(PrismTypography.headline())
-        }
-        .font(PrismTypography.body())
     }
 
     private func reload() async {
@@ -240,6 +284,39 @@ struct MoneyStoryView: View {
             insight = "You’ve paused \(snapshot.impulsesPaused) impulses in this view. Patterns deepen as you add reflections and fund goals."
         } else {
             insight = ""
+        }
+    }
+}
+
+private struct MoneyStoryBarChart: View {
+    let values: [CGFloat]
+    private let labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(alignment: .bottom, spacing: 16) {
+                ForEach(Array(values.prefix(7).enumerated()), id: \.offset) { _, value in
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [PrismColors.cyan.opacity(0.9), PrismColors.magenta.opacity(0.7)],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
+                        )
+                        .frame(width: 32, height: max(14, 95 * value))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            HStack(spacing: 16) {
+                ForEach(labels, id: \.self) { label in
+                    Text(label)
+                        .font(PrismTypography.micro())
+                        .foregroundStyle(PrismColors.textTertiary)
+                        .frame(width: 32)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
     }
 }

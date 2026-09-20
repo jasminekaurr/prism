@@ -58,7 +58,7 @@ final class AppEnvironment: ObservableObject {
 @MainActor
 final class AppRouter: ObservableObject {
     enum Tab: Hashable {
-        case home, collections, review, moneyStory, settings
+        case home, goals, review, moneyStory, settings
     }
 
     enum Sheet: Identifiable, Equatable {
@@ -94,4 +94,22 @@ final class AppRouter: ObservableObject {
     @Published var selectedTab: Tab = .home
     @Published var sheet: Sheet?
     @Published var showOnboarding: Bool = false
+    /// Prefilled when a Share Extension / URL import arrives.
+    @Published var captureURLText: String = ""
+    @Published var captureTitleHint: String = ""
+    @Published var captureImageData: Data?
+
+    func presentCapture(url: String? = nil, title: String? = nil, imageData: Data? = nil) {
+        captureURLText = url ?? ""
+        captureTitleHint = title ?? ""
+        captureImageData = imageData
+        selectedTab = .home
+        sheet = .capture
+    }
+
+    func clearCaptureDraft() {
+        captureURLText = ""
+        captureTitleHint = ""
+        captureImageData = nil
+    }
 }
