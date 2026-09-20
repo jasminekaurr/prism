@@ -5,6 +5,7 @@ import PhotosUI
 
 struct CaptureFlowView: View {
     @EnvironmentObject private var environment: AppEnvironment
+    @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var container: DependencyContainer
     @Environment(\.dismiss) private var dismiss
 
@@ -22,6 +23,7 @@ struct CaptureFlowView: View {
     @State private var errorText: String?
     @State private var isSaving = false
     @State private var previewTask: Task<Void, Never>?
+    @State private var appliedShareDraft = false
 
     private var canSave: Bool {
         guard !isSaving, selectedCollectionID != nil else { return false }
@@ -165,8 +167,33 @@ struct CaptureFlowView: View {
                 }
             }
         }
-        .task { await loadCollections() }
-        .onDisappear { previewTask?.cancel() }
+        .task {
+            await loadCollections()
+            applyShareDraftIfNeeded()
+        }
+        .onDisappear {
+            previewTask?.cancel()
+            router.clearCaptureDraft()
+        }
+    }
+
+    private func applyShareDraftIfNeeded() {
+        guard !appliedShareDraft else { return }
+        appliedShareDraft = true
+        if let data = router.captureImageData {
+            imageData = data
+            previewFromLink = false
+        }
+        if !router.captureTitleHint.isEmpty, title.isEmpty {
+            title = router.captureTitleHint
+        }
+        if !router.captureURLText.isEmpty {
+            urlText = router.captureURLText
+            if imageData == nil {
+                previewFromLink = true
+                schedulePreviewFetch(for: router.captureURLText, immediate: true)
+            }
+        }
     }
 
     @ViewBuilder

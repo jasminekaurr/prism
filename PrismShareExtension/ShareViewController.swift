@@ -1,4 +1,4 @@
-// Summary: Share Extension entry — accepts URL/image/text into App Group for the main app to import.
+// Summary: Share Extension entry — accepts URL/image/text into App Group, then opens Prism capture.
 
 import UIKit
 import UniformTypeIdentifiers
@@ -33,6 +33,9 @@ class ShareViewController: UIViewController {
                         provider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { data, _ in
                             if let text = data as? String {
                                 payload.text = text
+                                if payload.urlString == nil {
+                                    payload.urlString = Self.firstURL(in: text)
+                                }
                             }
                             group.leave()
                         }
@@ -53,7 +56,38 @@ class ShareViewController: UIViewController {
 
         group.notify(queue: .main) {
             ShareInbox.store(payload)
-            self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+            self.openMainAppThenFinish()
+        }
+    }
+
+    private func openMainAppThenFinish() {
+        // Share extensions cannot use UIApplication.open; walk the responder chain.
+        if let url = URL(string: "prism://share") {
+            _ = openURLViaResponderChain(url)
+        }
+        extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+    }
+
+    @discardableResult
+    private func openURLViaResponderChain(_ url: URL) -> Bool {
+        var responder: UIResponder? = self
+        let openSel = sel_registerName("openURL:")
+        while let current = responder {
+            if current.responds(to: openSel) {
+                current.perform(openSel, with: url)
+                return true
+            }
+            responder = current.next
+        }
+        return false
+    }
+
+    private static func firstURL(in text: String) -> String? {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        return detector?.firstMatch(in: text, options: [], range: range).flatMap { match in
+            guard let range = Range(match.range, in: text) else { return nil }
+            return String(text[range])
         }
     }
 }

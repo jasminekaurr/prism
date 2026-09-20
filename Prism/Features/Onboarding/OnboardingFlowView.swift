@@ -145,6 +145,7 @@ struct OnboardingFlowView: View {
             profile.isDemoMode = true
             try await container.profileRepository.save(profile)
             environment.profile = profile
+            await DemoDataSeeder.seedIfNeeded(userID: profile.id, container: container)
             container.analytics.track(.onboardingCompleted)
         } catch {
             errorText = "Could not start local mode. Please try again."

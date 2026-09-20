@@ -5,6 +5,7 @@ import SwiftUI
 struct AspirationMediaView: View {
     let item: SavedItem
     var height: CGFloat = 280
+    var cornerRadius: CGFloat = PrismRadius.lg
     @EnvironmentObject private var container: DependencyContainer
 
     @State private var localImage: UIImage?
@@ -13,7 +14,7 @@ struct AspirationMediaView: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous)
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(PrismColors.violet.opacity(0.3))
 
             if let image = localImage ?? previewImage {
@@ -46,7 +47,7 @@ struct AspirationMediaView: View {
             .allowsHitTesting(false)
         }
         .frame(height: height)
-        .clipShape(RoundedRectangle(cornerRadius: PrismRadius.lg, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .task(id: item.id) {
             await loadMedia()
         }

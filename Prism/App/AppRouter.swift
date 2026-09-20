@@ -35,6 +35,30 @@ struct RootView: View {
         .font(PrismTypography.body())
     }
 
+    private func importPendingShareIfNeeded() async {
+        guard environment.profile?.onboardingCompleted == true else { return }
+        guard let payload = MainAppShareInbox.consumePending() else { return }
+        router.presentCapture(
+            url: payload.urlString,
+            title: payload.title ?? payload.text,
+            imageData: payload.imageData
+        )
+    }
+
+    private func handleOpenURL(_ url: URL) async {
+        // prism://share — open capture after Share Extension stored the payload.
+        if url.host == "share" || url.path.contains("share") {
+            await importPendingShareIfNeeded()
+            return
+        }
+        // Direct link open: prism://capture?url=...
+        if url.host == "capture" || url.path.contains("capture") {
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            let sharedURL = components?.queryItems?.first(where: { $0.name == "url" })?.value
+            router.presentCapture(url: sharedURL)
+        }
+    }
+
     @ViewBuilder
     private func sheetContent(_ sheet: AppRouter.Sheet) -> some View {
         switch sheet {
@@ -135,14 +159,14 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $router.selectedTab) {
             HomeView()
-                .tabItem { Label("Home", systemImage: "flag") }
+                .tabItem { Label("Home", systemImage: "square.grid.2x2") }
                 .tag(AppRouter.Tab.home)
                 .accessibilityIdentifier("tab.home")
 
-            CollectionsView()
-                .tabItem { Label("Collections", systemImage: "rectangle.stack") }
-                .tag(AppRouter.Tab.collections)
-                .accessibilityIdentifier("tab.collections")
+            GoalsHubView()
+                .tabItem { Label("Goals", systemImage: "flag") }
+                .tag(AppRouter.Tab.goals)
+                .accessibilityIdentifier("tab.goals")
 
             ReviewHubView()
                 .tabItem { Label("Review", systemImage: "sparkles") }
@@ -158,6 +182,19 @@ struct MainTabView: View {
                 .tabItem { Label("Settings", systemImage: "person.crop.circle") }
                 .tag(AppRouter.Tab.settings)
                 .accessibilityIdentifier("tab.settings")
+        }
+        .toolbarBackground(.hidden, for: .tabBar)
+        .onAppear {
+            // Let the root atmospheric background show through tab content.
+            let appearance = UITabBarAppearance()
+            appearance.configureWithTransparentBackground()
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+
+            let nav = UINavigationBarAppearance()
+            nav.configureWithTransparentBackground()
+            UINavigationBar.appearance().standardAppearance = nav
+            UINavigationBar.appearance().scrollEdgeAppearance = nav
         }
     }
 }

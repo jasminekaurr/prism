@@ -35,8 +35,8 @@ Optionally set how much you are comfortable spending on wants this month. Prism 
 Requirements: macOS with Xcode 16+, iOS 17 Simulator.
 
 ```bash
-# Generate the Xcode project
-xcodegen generate
+# Generate the Xcode project (ensures Assets.xcassets ships in the app bundle)
+xcodegen generate && python3 scripts/ensure-resources.py
 
 # Open
 open Prism.xcodeproj
