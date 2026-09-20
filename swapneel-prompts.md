@@ -257,3 +257,108 @@ The variant selector cell index number could not be found.
 **Key decisions:** Do not chase Simulator-only UIKit logs unless paste/UI actually misbehaves.
 
 **Errors encountered:** None (informational only).
+
+### Prompt 19 — 2026-09-20
+https://developer.apple.com/documentation/xcode/testing-a-release-build
+
+I want to make a beta testing link for my team in test flight. What do i need to do, give me exact steps
+
+**TL;DR:** Provided exact App Store Connect + Xcode Archive/upload + Internal Testing invite-link steps for Prism (`com.jasminekaur.prism`), tailored to this project's checklist. No code changes.
+
+**Files changed:**
+- None
+
+**Key decisions:** Recommend Internal Testing first (up to 100 App Store Connect users, no Beta App Review) for team; Public Link only if External Testing is needed.
+
+**Errors encountered:** None
+
+### Prompt 20 — 2026-09-20
+i read that i don't need a paid apple developer program for a couple of beta testers - how do i do that
+
+**TL;DR:** Clarified misconception: TestFlight/shareable beta link requires paid Apple Developer Program. Free Apple ID only supports Xcode sideload onto physical devices (≈7-day expiry). Documented exact free-install steps vs paid TestFlight.
+
+**Files changed:**
+- None
+
+**Key decisions:** Be explicit that Internal TestFlight still requires paid membership.
+
+**Errors encountered:** None
+
+### Prompt 21 — 2026-09-20
+can i send it to someone like a package - i don't have my team members near me
+
+**TL;DR:** Explained remote distribution options: free account cannot ship a workable install package; paid + TestFlight is the remote path; Ad Hoc IPA is the alternate paid package path; source+Xcode on each Mac is the only free remote-ish option.
+
+**Files changed:**
+- None
+
+**Key decisions:** None
+
+**Errors encountered:** None
+
+### Prompt 22 — 2026-09-20
+npx @momentic/wizard@latest
+
+what will this website help me do
+
+**TL;DR:** Explained Momentic is AI end-to-end testing (web/iOS/Android); the npx wizard only scaffolds CLI + config + sample tests. Not related to TestFlight packaging/distribution.
+
+**Files changed:**
+- None
+
+**Key decisions:** None
+
+**Errors encountered:** None
+
+### Prompt 23 — 2026-09-20
+update the README with this - keep the technical details correct with steps on how to access the app
+
+**TL;DR:** Replaced README with product/market narrative from the uploaded Prism README while correcting tech to SwiftUI/SwiftData iOS MVP and adding clear clone → xcodegen → Run → Explore locally access steps.
+
+**Files changed:**
+- `README.md` — product vision, ICP, TAM, business model; accurate iOS setup & walkthrough; updated limitations/docs links
+
+**Key decisions:** Kept uploaded problem/solution/market copy; removed incorrect Next.js technical approach; documented demo onboarding and 4-tab IA.
+
+**Errors encountered:** None
+
+### Prompt 23 — 2026-09-20
+We need to make the oboarding clean - buttons need to be spaced at the same spot on all pages with only a 3 page omboarding. the rest of the onboarding pages should have the bg as the hero
+
+Hero
+Tagline: Catch the impulse
+Button: Get started
+
+Save what inspires you
+Bring products, trips, restaurants, events, and experiences from any social platform into one place.
+CTA: Next
+
+2. Turn inspiration into goals
+Prism helps you understand what matters, estimate the cost, and create a realistic plan for making it happen.
+CTA: Next
+
+3. Spend with intention
+See how today’s choices affect your bigger goals—then buy, wait, find an alternative, or put that money toward what matters more.
+CTA: Save my first inspiration
+
+**TL;DR:** Rebuilt onboarding to hero + 3 pages with shared hero background, fixed bottom CTA slot, new copy, and final CTA opens Capture after local demo start.
+
+**Files changed:**
+- `Prism/Features/Onboarding/OnboardingFlowView.swift` — 3 content pages, new copy, hero bg everywhere, pinned CTA; final action seeds demo + `presentCapture()`
+- `scratchpad/onboarding-copy-v1.md` — [NEW] plan/copy table
+
+**Key decisions:** Removed Sign in with Apple and footer legal line from last page to keep one fixed CTA; final button keeps `onboarding.demo` a11y id for UITests.
+
+**Errors encountered:** Ambiguous simulator name — rebuilt with device id; BUILD SUCCEEDED.
+
+### Prompt 24 — 2026-09-20
+blur the bg in onboarding + the text is spilling the screen so add padding
+
+**TL;DR:** Blurred onboarding hero bg (same tokens as atmospheric) and increased horizontal/vertical padding so copy wraps inside the screen.
+
+**Files changed:**
+- `Prism/Features/Onboarding/OnboardingFlowView.swift` — blur + material/scrim on bg; xxl side padding; text wrap constraints
+
+**Key decisions:** Reused PrismBackdrop blur/material tokens for consistency with post-onboarding chrome.
+
+**Errors encountered:** None

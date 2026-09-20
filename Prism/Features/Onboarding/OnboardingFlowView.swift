@@ -1,124 +1,157 @@
-// Summary: Onboarding — brand hero first, then product intro pages, demo mode entry.
+// Summary: Onboarding — brand hero + 3 content pages, shared hero bg, fixed CTA slot.
 
 import SwiftUI
 
 struct OnboardingFlowView: View {
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var container: DependencyContainer
+    @EnvironmentObject private var router: AppRouter
     @State private var page = 0
     @State private var isWorking = false
     @State private var errorText: String?
 
     /// Content pages after the brand hero (page 0).
     private let pages: [(title: String, body: String)] = [
-        ("Save what inspires you.", "Collect products, experiences, and ideas from anywhere — without rushing to buy."),
-        ("Give the impulse space.", "Reflect lightly, pause with a cooling-off period you control, then revisit."),
-        ("Work toward what matters.", "When something is worth it, turn it into a goal — with a target, a date, and progress you define."),
-        ("Your boundary, your choice.", "Prism never connects to your bank or decides what you can afford. Spending pockets and goals use only numbers you enter.")
+        (
+            "Save what inspires you",
+            "Bring products, trips, restaurants, events, and experiences from any social platform into one place."
+        ),
+        (
+            "Turn inspiration into goals",
+            "Prism helps you understand what matters, estimate the cost, and create a realistic plan for making it happen."
+        ),
+        (
+            "Spend with intention",
+            "See how today’s choices affect your bigger goals—then buy, wait, find an alternative, or put that money toward what matters more."
+        )
     ]
 
     private var isBrandPage: Bool { page == 0 }
     private var isLastContentPage: Bool { page == pages.count }
     private var contentPageIndex: Int { page - 1 }
 
+    private var ctaTitle: String {
+        if isBrandPage { return "Get started" }
+        if isLastContentPage { return "Save my first inspiration" }
+        return "Next"
+    }
+
     var body: some View {
         ZStack {
-            if isBrandPage {
-                brandHeroBackground
+            heroBackground
+
+            VStack(spacing: 0) {
+                Group {
+                    if isBrandPage {
+                        brandContent
+                    } else {
+                        contentPage
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                ctaFooter
             }
-
-            VStack(spacing: PrismSpacing.lg) {
-                if isBrandPage {
-                    Spacer(minLength: 0)
-                    // Accessible label; wordmark is drawn in the hero art.
-                    Text("Prism")
-                        .font(PrismTypography.display(1))
-                        .foregroundStyle(.clear)
-                        .accessibilityIdentifier("onboarding.brand")
-                        .accessibilityLabel("Prism")
-                        .accessibilityAddTraits(.isHeader)
-                    Spacer(minLength: 0)
-                } else {
-                    Spacer()
-                    PrismLogoMark()
-                        .frame(height: 88)
-                    Text("Prism")
-                        .font(PrismTypography.display(44))
-                        .accessibilityIdentifier("onboarding.brand")
-
-                    VStack(spacing: PrismSpacing.sm) {
-                        Text(pages[contentPageIndex].title)
-                            .font(PrismTypography.title(26))
-                            .multilineTextAlignment(.center)
-                        Text(pages[contentPageIndex].body)
-                            .font(PrismTypography.body())
-                            .foregroundStyle(PrismColors.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal, PrismSpacing.xl)
-                    .frame(minHeight: 140)
-
-                    pageDots
-                }
-
-                if !isLastContentPage {
-                    PrismPrimaryButton(title: isBrandPage ? "Get started" : "Continue") {
-                        withAnimation(.easeInOut(duration: PrismMotion.standard)) { page += 1 }
-                    }
-                    .accessibilityIdentifier("onboarding.continue")
-                    .padding(.horizontal, isBrandPage ? PrismSpacing.xl : 0)
-                } else {
-                    VStack(spacing: PrismSpacing.sm) {
-                        PrismPrimaryButton(title: "Explore locally") {
-                            Task { await startDemo() }
-                        }
-                        .accessibilityIdentifier("onboarding.demo")
-
-                        Button("Sign in with Apple (coming soon)") {}
-                            .disabled(true)
-                            .font(PrismTypography.body())
-                            .foregroundStyle(PrismColors.textTertiary)
-                            .accessibilityIdentifier("onboarding.apple")
-
-                        Text("Local and demo data stays on this device until you create an account later.")
-                            .font(PrismTypography.caption())
-                            .foregroundStyle(PrismColors.textTertiary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal)
-                }
-
-                if let errorText {
-                    Text(errorText).foregroundStyle(PrismColors.danger)
-                }
-
-                if !isBrandPage {
-                    Spacer()
-                } else {
-                    Color.clear.frame(height: PrismSpacing.md)
-                }
-            }
-            .padding()
+            .padding(.horizontal, PrismSpacing.xxl)
+            .padding(.top, PrismSpacing.lg)
+            .padding(.bottom, PrismSpacing.xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .animation(.easeInOut(duration: PrismMotion.standard), value: page)
     }
 
-    private var brandHeroBackground: some View {
-        ZStack {
-            Image("PrismBackground")
-                .resizable()
-                .scaledToFill()
-                .scaleEffect(x: -1, y: -1)
-                .ignoresSafeArea()
-            VStack(spacing: PrismSpacing.md) {
-                Spacer()
-                PrismLogoMark(width: 180, height: 128)
-                Text("Turn impulse into inspiration")
-                    .font(PrismTypography.body(16, weight: .light))
-                    .foregroundStyle(.white)
-                Spacer()
-            }
+    private var brandContent: some View {
+        VStack(spacing: PrismSpacing.md) {
+            Spacer(minLength: 0)
+            PrismLogoMark(width: 180, height: 128)
+            Text("Prism")
+                .font(PrismTypography.display(1))
+                .foregroundStyle(.clear)
+                .accessibilityIdentifier("onboarding.brand")
+                .accessibilityLabel("Prism")
+                .accessibilityAddTraits(.isHeader)
+            Text("Catch the impulse")
+                .font(PrismTypography.body(16, weight: .light))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, PrismSpacing.md)
+            Spacer(minLength: 0)
         }
+    }
+
+    private var contentPage: some View {
+        VStack(spacing: PrismSpacing.lg) {
+            Spacer(minLength: 0)
+            PrismLogoMark()
+                .frame(height: 72)
+            Text("Prism")
+                .font(PrismTypography.display(36))
+                .accessibilityIdentifier("onboarding.brand")
+
+            VStack(spacing: PrismSpacing.sm) {
+                Text(pages[contentPageIndex].title)
+                    .font(PrismTypography.title(26))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(pages[contentPageIndex].body)
+                    .font(PrismTypography.body())
+                    .foregroundStyle(Color.white.opacity(0.72))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, PrismSpacing.md)
+
+            pageDots
+            Spacer(minLength: 0)
+        }
+    }
+
+    private var ctaFooter: some View {
+        VStack(spacing: PrismSpacing.sm) {
+            if let errorText {
+                Text(errorText)
+                    .font(PrismTypography.caption())
+                    .foregroundStyle(PrismColors.danger)
+                    .multilineTextAlignment(.center)
+            }
+
+            PrismPrimaryButton(title: ctaTitle) {
+                handleCTA()
+            }
+            .disabled(isWorking)
+            .opacity(isWorking ? 0.7 : 1)
+            .accessibilityIdentifier(isLastContentPage ? "onboarding.demo" : "onboarding.continue")
+            .frame(maxWidth: .infinity)
+        }
+        .frame(minHeight: 56)
+    }
+
+    private var heroBackground: some View {
+        GeometryReader { geo in
+            let screen = UIScreen.main.bounds
+            let w = max(geo.size.width, screen.width, 1)
+            let h = max(geo.size.height, screen.height, 1)
+            ZStack {
+                PrismColors.backgroundMid
+                Image("PrismBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: w * 1.35, height: h * 1.2)
+                    .scaleEffect(x: -1, y: -1)
+                    .blur(radius: PrismBackdrop.imageBlurRadius)
+                    .position(x: w * 0.45, y: h * 0.48)
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .opacity(PrismBackdrop.materialOpacity)
+                Color.black.opacity(PrismBackdrop.scrimOpacity + 0.08)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+            .clipped()
+        }
+        .ignoresSafeArea()
         .accessibilityHidden(true)
     }
 
@@ -134,7 +167,15 @@ struct OnboardingFlowView: View {
         .padding(.top, PrismSpacing.xs)
     }
 
-    private func startDemo() async {
+    private func handleCTA() {
+        if isLastContentPage {
+            Task { await startDemoAndCapture() }
+        } else {
+            withAnimation(.easeInOut(duration: PrismMotion.standard)) { page += 1 }
+        }
+    }
+
+    private func startDemoAndCapture() async {
         isWorking = true
         defer { isWorking = false }
         do {
@@ -146,8 +187,9 @@ struct OnboardingFlowView: View {
             environment.profile = profile
             await DemoDataSeeder.seedIfNeeded(userID: profile.id, container: container)
             container.analytics.track(.onboardingCompleted)
+            router.presentCapture()
         } catch {
-            errorText = "Could not start local mode. Please try again."
+            errorText = "Could not start. Please try again."
             container.crashReporter.record(error: error, context: "onboarding.demo")
         }
     }

@@ -45,11 +45,11 @@
 		9D07CC72D94E0F084FAC3126 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B438803C6E4BEA5508B407 /* SettingsView.swift */; };
 		9F85B70815746322FDDC3EAF /* GoalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29578EE8E1607F5816296D7 /* GoalModels.swift */; };
 		AFD9389B140BD97EBB54194E /* SwiftDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387C1183E2183BEDAAC522F /* SwiftDataModels.swift */; };
+		B2C3D4E5F60718293A4B5C6D /* FeelingMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */; };
 		B2E6667F3ACC8D21E7437CD1 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4200B95B05FDE1C371669C /* DependencyContainer.swift */; };
 		B68ECCAB9FED26B7CD14A36A /* GoalSetupFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13DED36F539BC7B569CBD15 /* GoalSetupFlowView.swift */; };
 		BA2F1F9F83519AD975DCD957 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77344BC18D1248D4E201C3 /* DataExporter.swift */; };
 		BE6064DF2E6E273D3DBA4349 /* SavedItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */; };
-		B2C3D4E5F60718293A4B5C6D /* FeelingMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */; };
 		C313E818935949AABB8D727E /* ReflectionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381F0B79FE050ECE0F23A78F /* ReflectionEditorView.swift */; };
 		CFCC9FD4AE25523FFCF0347A /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBF52F3FA1A816060503D43 /* SignInView.swift */; };
 		D27CECCE9F72AB4DF0109319 /* PrismTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1797E9AA267F682A3541AAB9 /* PrismTokens.swift */; };
@@ -124,10 +124,9 @@
 		6556236D2010CB2DF81F912A /* PrismShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrismShareExtension.entitlements; sourceTree = "<group>"; };
 		663A1F701F292E7C3239343E /* PrismUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrismUtilities.swift; sourceTree = "<group>"; };
 		668E6A56E0FEB5176CDFE4F4 /* DecisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionService.swift; sourceTree = "<group>"; };
-		83186F0D9749E32A0734027C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		83186F0D9749E32A0734027C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		87B438803C6E4BEA5508B407 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		8C34748638CE8DE1492F52D5 /* SavedItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedItemDetailView.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeelingMoodPickerView.swift; sourceTree = "<group>"; };
 		8DA7DB413F62C150F2C14E81 /* LinkPreviewFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewFetcher.swift; sourceTree = "<group>"; };
 		922FFDD29F4C0B910EA2AF20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		946A1954BA1622BDCF2017EA /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
@@ -139,6 +138,7 @@
 		9F0477CDC9412077CFF6A416 /* PrismShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PrismShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FC40857258D606DE72FCD97 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		A128506346E8D37065F2C29D /* GoalsHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsHubView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* FeelingMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeelingMoodPickerView.swift; sourceTree = "<group>"; };
 		A64A12EF52A1C088F31F097E /* GoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailView.swift; sourceTree = "<group>"; };
 		A8085232F550794EDE7EA8C9 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		B29578EE8E1607F5816296D7 /* GoalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalModels.swift; sourceTree = "<group>"; };
@@ -153,8 +153,8 @@
 		D23CB1EF073B6B9C2D1B4070 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		DAE8314A57B4215EF823E151 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		E6883199F6F2F0F0247B90E1 /* DomainModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainModels.swift; sourceTree = "<group>"; };
-		E7DF161F68E789C32DDBD7BD /* PrismTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PrismTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F4A63351F65700FA8544BF12 /* PrismUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PrismUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7DF161F68E789C32DDBD7BD /* PrismTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PrismTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4A63351F65700FA8544BF12 /* PrismUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PrismUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -718,6 +718,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -735,6 +736,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -752,6 +754,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -769,6 +772,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -786,6 +790,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -962,7 +967,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
@@ -1005,7 +1014,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
@@ -1021,7 +1034,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				INFOPLIST_FILE = PrismShareExtension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasminekaur.prism.share;
 				PRODUCT_NAME = PrismShareExtension;
 				SDKROOT = iphoneos;
@@ -1034,6 +1051,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 84UWSJTPV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
